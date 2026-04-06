@@ -119,6 +119,8 @@ Administrators **cannot** view user investments.
     - Commodities and currencies are excluded
 
 ---
+## Sprint Diary
+https://docs.google.com/document/d/1fMlQFu3eeY_bOj7huG8CzIbRopsYXZhz-vAS6GAQOIc/edit?usp=sharing
 
 ## Use Case Diagram
 
