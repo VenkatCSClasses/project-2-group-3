@@ -122,44 +122,8 @@ Administrators **cannot** view user investments.
 
 ## Use Case Diagram
 
-![Use Case Diagram](paper-trading-use-case-diagram.png)
+![Use Case Diagram](diagrams/use-case-diagram.png)
 
-```mermaid
-graph TB
-actor1["👤 User Account"]
-actor2["👤 Administrator"]
+## Class Diagram
 
-subgraph BothSystems
-direction LR
-
-subgraph UserSystem
-UC1((Login))
-UC2((View Portfolio))
-UC3((Manage Portfolio))
-UC4((Buy / Sell Stocks))
-UC5((Research Stocks))
-UC6((Exit))
-end
-
-subgraph AdminSystem
-UC7((Login))
-UC8((View Account Balances))
-UC9((Create Account))
-UC10((Close Account))
-UC11((Exit))
-end
-
-end
-
-actor1 --> UC1
-actor1 --> UC2
-actor1 --> UC3
-actor1 --> UC4
-actor1 --> UC5
-actor1 --> UC6
-
-actor2 --> UC7
-actor2 --> UC8
-actor2 --> UC9
-actor2 --> UC10
-actor2 --> UC11
+![Use Case Diagram](diagrams/class-diagram.png)

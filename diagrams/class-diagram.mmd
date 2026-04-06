@@ -1,0 +1,68 @@
+```text
+classDiagram
+
+    class User {
+        - userID: int
+        - password: String
+        - cashBalance: double
+        - portfolio: Portfolio
+        + getBalance() double
+        + purchaseStock(ticker, method, amount)
+        + sellStock(ticker, method, amount)
+        + viewPortfolio()
+        + researchStock(ticker)
+    }
+
+    class Admin {
+        - adminID: int
+        - password: String
+        + createAccount(userID, userPW)
+        + closeAccount(userID)
+        + viewAccountBalance(userID)
+    }
+
+    class Authentication {
+        + login(userID, password)
+        + logout()
+    }
+
+    class Portfolio {
+        - portfolioID: int
+        - investments: List~Investment~
+        + getTotalValue() double
+        + getTotalChange() double
+    }
+
+    class Investment {
+        - investmentID: int
+        - stock: Stock
+        - shares: double
+        - cost: double
+        - date: Date
+        + getValue() double
+        + getPercentChange() double
+    }
+
+    class Stock {
+        - ticker: String
+        - companyName: String
+        - lastClosingPrice: double
+        - lastOpeningPrice: double
+        - volume: int
+        + calcPriceChange(period) double
+    }
+
+    class API {
+        + getData(ticker)
+    }
+
+    Authentication ..> User : Authenticates
+    Authentication ..> Admin : Authenticates
+    Admin ..> User : Manages
+    User *-- Portfolio : Composition
+    Portfolio *-- "*" Investment : Composition
+    Investment --> "1" Stock
+    User ..> Stock : Buy, Sell
+    User ..> API : Research
+    API ..> Stock : Data
+```
