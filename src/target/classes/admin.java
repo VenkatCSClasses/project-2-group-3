@@ -13,15 +13,18 @@ public class admin {
         // code to change the admin password
     }
 
-    public createAccount (String userID, String password) {
+    public createUserAccount (String userID, String password) {
         // code to create a new user account
     }
 
-    public deleteAccount (String userID) {
+    public deleteUserAccount (String userID) {
         // code to delete a user account
     }
 
     public viewAllAccounts() {
         // code to view all user accounts
+    }
+    public void deleteOwnAccount() {
+        // code to delete the admin's own account
     }
 }
