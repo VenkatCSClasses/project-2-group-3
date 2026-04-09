@@ -6,7 +6,7 @@ import java.net.URI;
 import java.util.Scanner;
 
 public class getPrice {
-    public static void main(String[] args) throws Exception {
+    public static void run() throws Exception {
         String key = apiKey.getApiKey();
         String symbol = Symbol.getSymbol();
 
@@ -27,5 +27,9 @@ public class getPrice {
 
         input.close();
         urlConnection.disconnect();
+    }
+
+    public static void main(String[] args) throws Exception {
+        run();
     }
 }
