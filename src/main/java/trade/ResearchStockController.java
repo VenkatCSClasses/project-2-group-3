@@ -1,6 +1,8 @@
 package trade;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +17,10 @@ public class ResearchStockController {
     }
 
     @GetMapping("/{ticker}")
-    public ResearchStock getStock(@PathVariable String ticker) {
-        return researchStockService.getStockResearch(ticker);
+    public ResponseEntity<?> getStock(@PathVariable String ticker, HttpSession session) {
+        if (session.getAttribute("username") == null) {
+            return ResponseEntity.status(401).body("Please log in first.");
+        }
+        return ResponseEntity.ok(researchStockService.getStockResearch(ticker));
     }
 }
