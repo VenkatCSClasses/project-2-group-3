@@ -5,8 +5,11 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Scanner;
 
-public class getPrice {
-    public static void run() throws Exception {
+import com.google.gson.*;
+import stock.*;
+
+public class GetPrice {
+    public static Price run() throws Exception {
         String key = apiKey.getApiKey();
         String symbol = Symbol.getSymbol();
 
@@ -20,16 +23,22 @@ public class getPrice {
 
         Scanner input = new Scanner(urlConnection.getInputStream());
 
-        // WIP - modify structure to properly parse or print into JSON
+        StringBuilder response = new StringBuilder();
         while (input.hasNext()) {
-            System.out.println(input.nextLine());
+            response.append(input.nextLine());
         }
 
         input.close();
         urlConnection.disconnect();
+
+        JsonObject root = JsonParser.parseString(response.toString()).getAsJsonObject();
+        String priceValue = root.get("price").getAsString();
+
+        return new Price(symbol, priceValue);
     }
 
     public static void main(String[] args) throws Exception {
-        run();
+        Price price = run();
+        System.out.println(price);
     }
 }
