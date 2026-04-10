@@ -30,11 +30,11 @@ public class fetchData {
             int choice = input.nextInt();
     
             if (choice == 1) {
-                getPrice.run();
+                //getPrice.run();
             } else if (choice == 2) {
-                getEODPrice.run();
+                //getEODPrice.run();
             } else if (choice == 3) {
-                getQuote.run();
+                //getQuote.run();
             } else if (choice == 4) {
                 getTimeSeries.run();
             } else if (choice == 5) {

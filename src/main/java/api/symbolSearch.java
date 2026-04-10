@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class symbolSearch {
 
     public static void run() throws Exception {
-        String key = apiKey.getApiKey();
+        String key = ApiKey.getApiKey();
         String symbol = Symbol.getSymbol();
 
         String website = "https://api.twelvedata.com/symbol_search?symbol=" + symbol + "&apikey=" + key;

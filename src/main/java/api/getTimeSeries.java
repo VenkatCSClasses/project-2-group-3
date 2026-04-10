@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class getTimeSeries {
     public static void run() throws Exception {
-        String key = apiKey.getApiKey();
+        String key = ApiKey.getApiKey();
         String symbol = Symbol.getSymbol();
         String interval = "1min"; // 1min, 5min, 15min, 30min, 45min, 1h, 2h, 4h, 5h, 1day, 1week, 1month
         //maybe put into different file?

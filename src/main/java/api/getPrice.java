@@ -10,7 +10,7 @@ import stock.*;
 
 public class GetPrice {
     public static Price run() throws Exception {
-        String key = apiKey.getApiKey();
+        String key = ApiKey.getApiKey();
         String symbol = Symbol.getSymbol();
 
         String website = "https://api.twelvedata.com/price?symbol=" + symbol + "&apikey=" + key;
@@ -32,9 +32,9 @@ public class GetPrice {
         urlConnection.disconnect();
 
         JsonObject root = JsonParser.parseString(response.toString()).getAsJsonObject();
-        String priceValue = root.get("price").getAsString();
+        String price = root.get("price").getAsString();
 
-        return new Price(symbol, priceValue);
+        return new Price(symbol, price);
     }
 
     public static void main(String[] args) throws Exception {
