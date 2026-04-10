@@ -46,10 +46,21 @@ public class GetQuote {
         String previous_close = root.get("previous_close").getAsString();
         String change = root.get("change").getAsString();
         String percent_change = root.get("percent_change").getAsString();
-        //String fifty_two_week = root.get("fifty_two_week").getAsString(); // Need to make separate class
+
+        JsonObject fiftyTwoWeekObject = root.getAsJsonObject("fifty_two_week");
+
+        FiftyTwoWeek fiftyTwoWeek = new FiftyTwoWeek(
+            fiftyTwoWeekObject.get("low").getAsString(),
+            fiftyTwoWeekObject.get("high").getAsString(),
+            fiftyTwoWeekObject.get("low_change").getAsString(),
+            fiftyTwoWeekObject.get("high_change").getAsString(),
+            fiftyTwoWeekObject.get("low_change_percent").getAsString(),
+            fiftyTwoWeekObject.get("high_change_percent").getAsString(),
+            fiftyTwoWeekObject.get("range").getAsString()
+        );
 
         return new Quote(symbol, name, exchange, currency, datetime, last_quote_at, open, high, low, close, volume,
-            previous_close, change, percent_change);
+            previous_close, change, percent_change, fiftyTwoWeek);
     }
 
     public static void main(String[] args) throws Exception {

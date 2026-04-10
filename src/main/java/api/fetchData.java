@@ -36,9 +36,9 @@ public class fetchData {
             } else if (choice == 3) {
                 //getQuote.run();
             } else if (choice == 4) {
-                getTimeSeries.run();
+                //getTimeSeries.run();
             } else if (choice == 5) {
-                symbolSearch.run();
+                //symbolSearch.run();
             } else if (choice == 6) {
                 System.out.println("WIP");
             } else if (choice == 7) {
