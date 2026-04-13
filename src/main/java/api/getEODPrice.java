@@ -5,10 +5,12 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Scanner;
 
-public class getEODPrice {
-    public static void run() throws Exception {
-        String key = apiKey.getApiKey();
-        String symbol = Symbol.getSymbol();
+import com.google.gson.*;
+import stock.*;
+
+public class GetEODPrice {
+    public static EODPrice run(String symbol) throws Exception {
+        String key = ApiKey.getApiKey();
 
         String website = "https://api.twelvedata.com/eod?symbol=" + symbol + "&apikey=" + key;
 
@@ -20,16 +22,21 @@ public class getEODPrice {
 
         Scanner input = new Scanner(urlConnection.getInputStream());
 
-        // WIP - modify structure to properly parse or print into JSON
+        StringBuilder response = new StringBuilder();
         while (input.hasNext()) {
-            System.out.println(input.nextLine());
+            response.append(input.nextLine());
         }
 
         input.close();
         urlConnection.disconnect();
-    }
 
-    public static void main(String[] args) throws Exception {
-        run();
+        JsonObject root = JsonParser.parseString(response.toString()).getAsJsonObject();
+
+        String exchange = root.get("exchange").getAsString();
+        String currency = root.get("currency").getAsString();
+        String datetime = root.get("datetime").getAsString();
+        double close = root.get("close").getAsDouble();
+
+        return new EODPrice(symbol, exchange, currency, datetime, close);
     }
 }
