@@ -7,16 +7,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpSession;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 public class ResearchStockControllerTest {
 
     private ResearchStockController controller;
+    private ResearchStockService mockService;
     private MockHttpSession loggedInSession;
     private MockHttpSession emptySession;
 
     @BeforeEach
     void setUp() {
-        controller = new ResearchStockController(new ResearchStockService());
+        mockService = mock(ResearchStockService.class);
+        controller = new ResearchStockController(mockService);
+
+        ResearchStock fakeStock = new ResearchStock();
+        fakeStock.setTicker("AAPL");
+        fakeStock.setCompanyName("Apple Inc.");
+        fakeStock.setLastClosingPrice(210.15);
+        fakeStock.setLastOpeningPrice(208.40);
+        fakeStock.setVolume(58234120);
+        fakeStock.setOneDayPriceChange(1.75);
+        fakeStock.setOneDayPercentChange(0.84);
+
+        when(mockService.getStockResearch(anyString())).thenReturn(fakeStock);
 
         loggedInSession = new MockHttpSession();
         loggedInSession.setAttribute("username", "alice");
