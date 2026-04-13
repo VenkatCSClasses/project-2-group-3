@@ -1,9 +1,10 @@
 package stock;
 
 public class Values {
-    private String datetime, open, high, low, close, volume;
+    private String datetime;
+    private double open, high, low, close, volume;
 
-    public Values(String datetime, String open, String high, String low, String close, String volume) {
+    public Values(String datetime, double open, double high, double low, double close, double volume) {
         this.datetime = datetime;
         this.open = open;
         this.high = high;

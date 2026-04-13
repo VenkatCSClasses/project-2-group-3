@@ -10,9 +10,8 @@ import stock.*;
 
 public class SymbolSearch {
 
-    public static List<SymbolSearchResult> run() throws Exception {
+    public static List<SymbolSearchResult> run(String symbol) throws Exception {
         String key = ApiKey.getApiKey();
-        String symbol = Symbol.getSymbol();
 
         String website = "https://api.twelvedata.com/symbol_search?symbol=" + symbol + "&apikey=" + key;
 
@@ -54,12 +53,4 @@ public class SymbolSearch {
         return results;
     }
 
-    public static void main(String[] args) throws Exception {
-        List<SymbolSearchResult> results = run();
-        
-        for (int i = 0; i < results.size(); i++) {
-            System.out.println(results.get(i));
-            System.out.println("------------------");
-        }
-    }
 }

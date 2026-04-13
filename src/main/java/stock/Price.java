@@ -2,9 +2,9 @@ package stock;
 
 public class Price {
     private String symbol;
-    private String price;
+    private double price;
 
-    public Price(String symbol, String price) {
+    public Price(String symbol, double price) {
         this.symbol = symbol;
         this.price = price;
     }
@@ -13,7 +13,7 @@ public class Price {
         return symbol;
     }
 
-    public String getPrice() {
+    public double getPrice() {
         return price;
     }
 

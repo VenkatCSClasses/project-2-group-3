@@ -1,10 +1,11 @@
 package stock;
 
 public class FiftyTwoWeek {
-    private String low, high, low_change, high_change, low_change_percent, high_change_percent, range;
+    private double low, high, low_change, high_change, low_change_percent, high_change_percent;
+    private String range;
 
-    public FiftyTwoWeek(String low, String high, String low_change, String high_change, String low_change_percent, 
-        String high_change_percent, String range) {
+    public FiftyTwoWeek(double low, double high, double low_change, double high_change, double low_change_percent, 
+        double high_change_percent, String range) {
         this.low = low;
         this.high = high;
         this.low_change = low_change;

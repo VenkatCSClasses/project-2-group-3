@@ -9,10 +9,8 @@ import com.google.gson.*;
 import stock.*;
 
 public class GetTimeSeries {
-    public static TimeSeries run() throws Exception {
+    public static TimeSeries run(String symbol, String interval) throws Exception {
         String key = ApiKey.getApiKey();
-        String symbol = Symbol.getSymbol();
-        String interval = Interval.getInterval();
 
         String website = "https://api.twelvedata.com/time_series?symbol=" + symbol 
         + "&interval=" + interval + "&apikey=" + key;
@@ -54,11 +52,11 @@ public class GetTimeSeries {
 
             Values values = new Values(
                 valuesObject.get("datetime").getAsString(),
-                valuesObject.get("open").getAsString(),
-                valuesObject.get("high").getAsString(),
-                valuesObject.get("low").getAsString(),
-                valuesObject.get("close").getAsString(),
-                valuesObject.get("volume").getAsString()
+                valuesObject.get("open").getAsDouble(),
+                valuesObject.get("high").getAsDouble(),
+                valuesObject.get("low").getAsDouble(),
+                valuesObject.get("close").getAsDouble(),
+                valuesObject.get("volume").getAsDouble()
             );
 
             valuesList.add(values);
@@ -66,15 +64,5 @@ public class GetTimeSeries {
 
         return new TimeSeries(meta, valuesList);
 
-    }
-
-    public static void main(String[] args) throws Exception {
-        TimeSeries timeSeries = run();
-
-        System.out.println(timeSeries.getMeta());
-
-        for (int i = 0; i < timeSeries.getValues().size(); i++) {
-            System.out.println(timeSeries.getValues().get(i));
-        }
     }
 }

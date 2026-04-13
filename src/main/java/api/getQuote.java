@@ -9,9 +9,8 @@ import com.google.gson.*;
 import stock.*;
 
 public class GetQuote {
-    public static Quote run() throws Exception {
+    public static Quote run(String symbol) throws Exception {
         String key = ApiKey.getApiKey();
-        String symbol = Symbol.getSymbol();
 
         String website = "https://api.twelvedata.com/quote?symbol=" + symbol + "&apikey=" + key;
 
@@ -38,33 +37,28 @@ public class GetQuote {
         String currency = root.get("currency").getAsString();
         String datetime = root.get("datetime").getAsString();
         String last_quote_at = root.get("last_quote_at").getAsString();
-        String open = root.get("open").getAsString();
-        String high = root.get("high").getAsString();
-        String low = root.get("low").getAsString();
-        String close = root.get("close").getAsString();
-        String volume = root.get("volume").getAsString();
-        String previous_close = root.get("previous_close").getAsString();
-        String change = root.get("change").getAsString();
-        String percent_change = root.get("percent_change").getAsString();
+        double open = root.get("open").getAsDouble();
+        double high = root.get("high").getAsDouble();
+        double low = root.get("low").getAsDouble();
+        double close = root.get("close").getAsDouble();
+        double volume = root.get("volume").getAsDouble();
+        double previous_close = root.get("previous_close").getAsDouble();
+        double change = root.get("change").getAsDouble();
+        double percent_change = root.get("percent_change").getAsDouble();
 
         JsonObject fiftyTwoWeekObject = root.getAsJsonObject("fifty_two_week");
 
         FiftyTwoWeek fiftyTwoWeek = new FiftyTwoWeek(
-            fiftyTwoWeekObject.get("low").getAsString(),
-            fiftyTwoWeekObject.get("high").getAsString(),
-            fiftyTwoWeekObject.get("low_change").getAsString(),
-            fiftyTwoWeekObject.get("high_change").getAsString(),
-            fiftyTwoWeekObject.get("low_change_percent").getAsString(),
-            fiftyTwoWeekObject.get("high_change_percent").getAsString(),
+            fiftyTwoWeekObject.get("low").getAsDouble(),
+            fiftyTwoWeekObject.get("high").getAsDouble(),
+            fiftyTwoWeekObject.get("low_change").getAsDouble(),
+            fiftyTwoWeekObject.get("high_change").getAsDouble(),
+            fiftyTwoWeekObject.get("low_change_percent").getAsDouble(),
+            fiftyTwoWeekObject.get("high_change_percent").getAsDouble(),
             fiftyTwoWeekObject.get("range").getAsString()
         );
 
         return new Quote(symbol, name, exchange, currency, datetime, last_quote_at, open, high, low, close, volume,
             previous_close, change, percent_change, fiftyTwoWeek);
-    }
-
-    public static void main(String[] args) throws Exception {
-        Quote quote = run();
-        System.out.println(quote);
     }
 }

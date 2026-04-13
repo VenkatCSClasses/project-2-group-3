@@ -1,13 +1,13 @@
 package stock;
 
 public class Quote {
-    private String symbol, name, exchange, currency, datetime, last_quote_at, open, high, low, close, 
-    volume, previous_close, change, percent_change;
+    private String symbol, name, exchange, currency, datetime, last_quote_at;
+    private double open, high, low, close, volume, previous_close, change, percent_change;
     private FiftyTwoWeek fifty_two_week;
 
     public Quote(String symbol, String name, String exchange, String currency, String datetime, String last_quote_at,
-        String open, String high, String low, String close, String volume, String previous_close, String change,
-        String percent_change, FiftyTwoWeek fifty_two_week) {
+        double open, double high, double low, double close, double volume, double previous_close, double change,
+        double percent_change, FiftyTwoWeek fifty_two_week) {
         this.symbol = symbol;
         this.name = name;
         this.exchange = exchange;

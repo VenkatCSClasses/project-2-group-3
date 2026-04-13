@@ -9,9 +9,8 @@ import com.google.gson.*;
 import stock.*;
 
 public class GetEODPrice {
-    public static EODPrice run() throws Exception {
+    public static EODPrice run(String symbol) throws Exception {
         String key = ApiKey.getApiKey();
-        String symbol = Symbol.getSymbol();
 
         String website = "https://api.twelvedata.com/eod?symbol=" + symbol + "&apikey=" + key;
 
@@ -36,13 +35,8 @@ public class GetEODPrice {
         String exchange = root.get("exchange").getAsString();
         String currency = root.get("currency").getAsString();
         String datetime = root.get("datetime").getAsString();
-        String close = root.get("close").getAsString();
+        double close = root.get("close").getAsDouble();
 
         return new EODPrice(symbol, exchange, currency, datetime, close);
-    }
-
-    public static void main(String[] args) throws Exception {
-        EODPrice price = run();
-        System.out.println(price);
     }
 }

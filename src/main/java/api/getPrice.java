@@ -9,9 +9,8 @@ import com.google.gson.*;
 import stock.*;
 
 public class GetPrice {
-    public static Price run() throws Exception {
+    public static Price run(String symbol) throws Exception {
         String key = ApiKey.getApiKey();
-        String symbol = Symbol.getSymbol();
 
         String website = "https://api.twelvedata.com/price?symbol=" + symbol + "&apikey=" + key;
 
@@ -32,13 +31,8 @@ public class GetPrice {
         urlConnection.disconnect();
 
         JsonObject root = JsonParser.parseString(response.toString()).getAsJsonObject();
-        String price = root.get("price").getAsString();
+        double price = root.get("price").getAsDouble();
 
         return new Price(symbol, price);
-    }
-
-    public static void main(String[] args) throws Exception {
-        Price price = run();
-        System.out.println(price);
     }
 }

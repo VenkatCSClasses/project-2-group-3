@@ -5,9 +5,9 @@ public class EODPrice {
     private String exchange;
     private String currency;
     private String datetime;
-    private String close;
+    private double close;
 
-    public EODPrice(String symbol, String exchange, String currency, String datetime, String close) {
+    public EODPrice(String symbol, String exchange, String currency, String datetime, double close) {
         this.symbol = symbol;
         this.exchange = exchange;
         this.currency = currency;
@@ -31,7 +31,7 @@ public class EODPrice {
         return datetime;
     }
 
-    public String getClose() {
+    public double getClose() {
         return close;
     }
 
