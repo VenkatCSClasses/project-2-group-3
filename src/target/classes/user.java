@@ -6,5 +6,12 @@ public class user {
         this.userID = userID;
         this.password = password;
     }
+
+    public void changePassword(String newPassword) {
+        // code to change the user password
+    }
+    public void deleteOwnAccount() {
+        // code to delete the user's own account
+    }
     
 }

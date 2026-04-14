@@ -1,19 +1,19 @@
 import java.util.*;
 
-public class userList {
-    private List<user> users;
+public class UserList {
+    private List<User> Accounts;;
 
-    public userList() {
-        this.users = new ArrayList<>();
+    public UserList() {
+        this.Accounts = new ArrayList<>();
     }
 
-    public void addUser(user newUser) {
+    public void addUser(User newUser) {
         //adds new user to the list
     }
     public void removeUser(String userID) {
         //removes user from the list based on userID
     }
-    public user getUser(String userID) {
+    public Account getUser(String userID) {
         //returns user object based on userID
     }   
 }

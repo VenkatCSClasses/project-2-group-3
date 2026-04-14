@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class admin {
+public class admin extends User {
     private String adminID;
     private String password;
     
