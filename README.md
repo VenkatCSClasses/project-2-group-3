@@ -120,13 +120,13 @@ Administrators **cannot** view user investments.
 
 ---
 ## Sprint Diary
-https://docs.google.com/document/d/1fMlQFu3eeY_bOj7huG8CzIbRopsYXZhz-vAS6GAQOIc/edit?usp=sharing
+https://docs.google.com/document/d/1fMlQFu3eeY_bOj7huG8CzIbRopsYXZhz-vAS6GAQOIc
 
 ## Sprint 1 Review
 https://docs.google.com/document/d/1kY0PO8JxcXUhLz7ybEKR8b8pzsUQnz9_IJyOBBCMe7w
 
 ## Sprint 1 Retrospective
-https://docs.google.com/document/d/1fMlQFu3eeY_bOj7huG8CzIbRopsYXZhz-vAS6GAQOIc/edit?usp=sharing
+https://docs.google.com/document/d/1Zoo7wAxc-k_x145A1b-dCt78e1h3ZQr2WWR8p_BQi0Q
 
 ## Use Case Diagram
 
