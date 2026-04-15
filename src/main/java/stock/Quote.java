@@ -26,6 +26,10 @@ public class Quote {
 
     }
 
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String toString() {
         return "Symbol: " + symbol + 
