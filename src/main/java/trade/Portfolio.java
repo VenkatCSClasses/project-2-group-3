@@ -2,7 +2,6 @@ package trade;
 import java.util.ArrayList;
 
 public class Portfolio {
-    private int portfolioID;
     private ArrayList<Investment> investments;
     private int nextInvestmentID;
 
