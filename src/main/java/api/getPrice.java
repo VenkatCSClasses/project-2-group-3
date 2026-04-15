@@ -5,10 +5,12 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Scanner;
 
-public class getPrice {
-    public static void run() throws Exception {
-        String key = apiKey.getApiKey();
-        String symbol = Symbol.getSymbol();
+import com.google.gson.*;
+import stock.*;
+
+public class GetPrice {
+    public static Price run(String symbol) throws Exception {
+        String key = ApiKey.getApiKey();
 
         String website = "https://api.twelvedata.com/price?symbol=" + symbol + "&apikey=" + key;
 
@@ -20,16 +22,17 @@ public class getPrice {
 
         Scanner input = new Scanner(urlConnection.getInputStream());
 
-        // WIP - modify structure to properly parse or print into JSON
+        StringBuilder response = new StringBuilder();
         while (input.hasNext()) {
-            System.out.println(input.nextLine());
+            response.append(input.nextLine());
         }
 
         input.close();
         urlConnection.disconnect();
-    }
 
-    public static void main(String[] args) throws Exception {
-        run();
+        JsonObject root = JsonParser.parseString(response.toString()).getAsJsonObject();
+        double price = root.get("price").getAsDouble();
+
+        return new Price(symbol, price);
     }
 }
