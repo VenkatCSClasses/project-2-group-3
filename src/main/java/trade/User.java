@@ -1,130 +1,105 @@
 package trade;
-import java.util.ArrayList;
 
 public class User {
-    private int userID;
-    private String password;
+    private String username;
     private double cashBalance;
     private Portfolio portfolio;
 
-    public User(int userID, String password, double cashBalance) {
-        this.userID = userID;
-        this.password = password;
+    public User(String username, double cashBalance) {
+        this.username = username;
         this.cashBalance = cashBalance;
         this.portfolio = new Portfolio();
     }
 
-    public double getBalance() {
+    public String getUsername() {
+        return username;
+    }
+
+    public double getCashBalance() {
         return cashBalance;
     }
 
-    public void purchaseStock(String ticker, String method, double amount) {
-        Stock stock = API.getData(ticker);
-        double price = stock.getLastClosingPrice();
+    public Portfolio getPortfolio() {
+        return portfolio;
+    }
 
+    public void setPortfolio(Portfolio portfolio) {
+        this.portfolio = portfolio;
+    }
+
+    public void setCashBalance(double cashBalance) {
+        this.cashBalance = cashBalance;
+    }
+
+    /**
+     * Buy shares of a stock at the given live price.
+     * @param method "shares" to specify a share count, "dollars" to specify a dollar amount
+     * @return true if the purchase succeeded, false if insufficient funds or invalid amount
+     */
+    public boolean purchaseStock(String ticker, String companyName, double livePrice,
+                                  String method, double amount) {
         double sharesToBuy;
-
         if (method.equalsIgnoreCase("shares")) {
             sharesToBuy = amount;
         } else {
-            sharesToBuy = amount / price;
+            sharesToBuy = amount / livePrice;
         }
 
-        double totalCost = sharesToBuy * price;
+        if (sharesToBuy <= 0) return false;
 
-        if (totalCost > cashBalance) {
-            System.out.println("Not enough balance.");
-            return;
-        }
+        double totalCost = sharesToBuy * livePrice;
+        if (totalCost > cashBalance) return false;
 
         cashBalance -= totalCost;
 
         Investment existing = findInvestment(ticker);
-
         if (existing != null) {
-            existing.addShares(sharesToBuy, price);
+            existing.addShares(sharesToBuy, livePrice);
+            existing.setCurrentPrice(livePrice);
         } else {
-            Investment newInv = new Investment(
-                portfolio.generateInvestmentID(),
-                stock,
-                sharesToBuy,
-                totalCost,
-                new java.util.Date()
-            );
+            String today = java.time.LocalDate.now().toString();
+            Investment newInv = new Investment(ticker, companyName, today,
+                    sharesToBuy, livePrice, totalCost);
+            newInv.setCurrentPrice(livePrice);
             portfolio.addInvestment(newInv);
         }
+        return true;
     }
 
-    public void sellStock(String ticker, String method, double amount) {
+    /**
+     * Sell shares of a stock at the given live price.
+     * @param method "shares" to specify a share count, "dollars" to specify a dollar amount
+     * @return true if the sale succeeded, false if not enough shares or not found
+     */
+    public boolean sellStock(String ticker, double livePrice, String method, double amount) {
         Investment investment = findInvestment(ticker);
+        if (investment == null) return false;
 
-        if (investment == null) {
-            System.out.println("No such stock in portfolio.");
-            return;
-        }
-
-        double price = investment.getStock().getLastClosingPrice();
         double sharesToSell;
-
         if (method.equalsIgnoreCase("shares")) {
             sharesToSell = amount;
         } else {
-            sharesToSell = amount / price;
+            sharesToSell = amount / livePrice;
         }
 
-        if (sharesToSell > investment.getShares()) {
-            System.out.println("Not enough shares.");
-            return;
-        }
+        if (sharesToSell <= 0 || sharesToSell > investment.getShares()) return false;
 
-        double totalValue = sharesToSell * price;
-        cashBalance += totalValue;
+        double proceeds = sharesToSell * livePrice;
+        cashBalance += proceeds;
 
-        investment.removeShares(sharesToSell, price);
-
-        if (investment.getShares() == 0) {
+        investment.removeShares(sharesToSell);
+        if (investment.getShares() <= 0) {
             portfolio.removeInvestment(investment);
         }
+        return true;
     }
 
-    private Investment findInvestment(String ticker) {
+    public Investment findInvestment(String ticker) {
         for (Investment inv : portfolio.getInvestments()) {
-            if (inv.getStock().getTicker().equalsIgnoreCase(ticker)) {
+            if (inv.getTicker().equalsIgnoreCase(ticker)) {
                 return inv;
             }
         }
         return null;
-    }
-    public void viewPortfolio() {
-    System.out.println("Portfolio:");
-
-    for (Investment inv : portfolio.getInvestments()) {
-        Stock stock = inv.getStock();
-
-        System.out.println("Ticker: " + stock.getTicker());
-        System.out.println("Shares: " + inv.getShares());
-        System.out.println("Value: $" + inv.getValue());
-        System.out.println("Change: " + inv.getPercentChange() + "%");
-        System.out.println("------------------------");
-    }
-
-    System.out.println("Total Value: $" + portfolio.getTotalValue());
-    System.out.println("Total Change: " + portfolio.getTotalChange() + "%");
-    }
-
-    public void researchStock(String ticker) {
-        Stock stock = API.getData(ticker);
-
-    if (stock == null) {
-        System.out.println("Stock not found.");
-        return;
-    }
-
-    System.out.println("Stock Info:");
-    System.out.println("Ticker: " + stock.getTicker());
-    System.out.println("Company: " + stock.getCompanyName());
-    System.out.println("Last Close: $" + stock.getLastClosingPrice());
-    System.out.println("Open: $" + stock.getLastOpeningPrice());
-    System.out.println("Volume: " + stock.getVolume());
     }
 }

@@ -1,6 +1,6 @@
 package trade;
 
-import api.apiKey;
+import api.ApiKey;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class ResearchStockService {
 
     public ResearchStock getStockResearch(String ticker) {
         try {
-            String key = apiKey.getApiKey();
+            String key = ApiKey.getApiKey();
 
             String quoteUrl = BASE_URL + "/quote?symbol=" + ticker + "&apikey=" + key;
             String quoteJson = restTemplate.getForObject(quoteUrl, String.class);
