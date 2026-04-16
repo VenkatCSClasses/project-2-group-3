@@ -52,6 +52,20 @@ public class Investment {
         this.currentPrice = currentPrice;
     }
 
+    // Weighted-average cost basis update when adding shares
+    public void addShares(double newShares, double price) {
+        double totalCost = (this.shares * this.purchasePrice) + (newShares * price);
+        this.shares += newShares;
+        this.purchasePrice = totalCost / this.shares;
+        this.amountInvested = this.shares * this.purchasePrice;
+    }
+
+    // Reduce share count on sell
+    public void removeShares(double sharesToSell) {
+        this.shares -= sharesToSell;
+        this.amountInvested = this.shares * this.purchasePrice;
+    }
+
     public double getValue() {
         return shares * currentPrice;
     }
