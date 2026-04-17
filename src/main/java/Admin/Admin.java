@@ -1,10 +1,12 @@
+package Admin;
+
 import java.util.*;
 
-public class admin extends User {
+public class Admin {
     private String adminID;
     private String password;
     
-    public admin(String adminID, String password) {
+    public Admin(String adminID, String password) {
         this.adminID = adminID;
         this.password = password;
     }
@@ -13,15 +15,15 @@ public class admin extends User {
         // code to change the admin password
     }
 
-    public createUserAccount (String userID, String password) {
+    public void createUserAccount (String userID, String password) {
         // code to create a new user account
     }
 
-    public deleteUserAccount (String userID) {
+    public void deleteUserAccount (String userID) {
         // code to delete a user account
     }
 
-    public viewAllAccounts() {
+    public void viewAllAccounts() {
         // code to view all user accounts
     }
     public void deleteOwnAccount() {

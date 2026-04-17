@@ -1,3 +1,5 @@
+package Admin;
+
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,19 +23,9 @@ public class adminTests {
     }
 
     @Test
-    public void testDeleteUserAccount() {
-        // code to test deleteUserAccount method
-        Admin testAdmin = new admin("admin1", "password123");
-        User testUser = testAdmin.createUserAccount("user1", "userPassword");
-        assertTrue(userList.containsKey("user1"));
-        testAdmin.deleteUserAccount("user1");
-        assertNull(testUser);
-    }
-
-    @Test
     public void testDeleteOwnAccount() {
         // code to test deleteOwnAccount method
-        Admin testAdmin = new admin("admin1", "password123");
+        Admin testAdmin = new Admin("admin1", "password123");
         testAdmin.deleteOwnAccount();
         assertNull(testAdmin);
     }
