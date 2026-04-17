@@ -1,77 +1,47 @@
 package trade;
+import java.util.Date;
 
 public class Investment {
-    private String ticker;
-    private String companyName;
-    private String purchaseDate;
+    private int investmentID;
+    private Stock stock;
     private double shares;
-    private double purchasePrice;
-    private double amountInvested;
-    private double currentPrice;
+    private double cost;
+    private Date date;
 
-    public Investment(String ticker, String companyName, String purchaseDate,
-                      double shares, double purchasePrice, double amountInvested) {
-        this.ticker = ticker;
-        this.companyName = companyName;
-        this.purchaseDate = purchaseDate;
+    public Investment(int investmentID, Stock stock, double shares, double cost, Date date) {
+        this.investmentID = investmentID;
+        this.stock = stock;
         this.shares = shares;
-        this.purchasePrice = purchasePrice;
-        this.amountInvested = amountInvested;
-        this.currentPrice = purchasePrice;
+        this.cost = cost;
+        this.date = date;
     }
 
-    public String getTicker() {
-        return ticker;
+    public double getValue() {
+        return shares * stock.getLastClosingPrice();
     }
 
-    public String getCompanyName() {
-        return companyName;
+    public double getPercentChange() {
+        if (cost == 0) return 0;
+        return ((getValue() - cost) / cost) * 100;
     }
 
-    public String getPurchaseDate() {
-        return purchaseDate;
+    public void addShares(double additionalShares, double pricePerShare) {
+        double additionalCost = additionalShares * pricePerShare;
+        this.cost += additionalCost;
+        this.shares += additionalShares;
+    }
+
+    public void removeShares(double sharesToSell, double pricePerShare) {
+        double proportion = sharesToSell / this.shares;
+        this.cost -= this.cost * proportion;
+        this.shares -= sharesToSell;
+    }
+
+    public Stock getStock() {
+        return stock;
     }
 
     public double getShares() {
         return shares;
-    }
-
-    public double getPurchasePrice() {
-        return purchasePrice;
-    }
-
-    public double getAmountInvested() {
-        return amountInvested;
-    }
-
-    public double getCurrentPrice() {
-        return currentPrice;
-    }
-
-    public void setCurrentPrice(double currentPrice) {
-        this.currentPrice = currentPrice;
-    }
-
-    // Weighted-average cost basis update when adding shares
-    public void addShares(double newShares, double price) {
-        double totalCost = (this.shares * this.purchasePrice) + (newShares * price);
-        this.shares += newShares;
-        this.purchasePrice = totalCost / this.shares;
-        this.amountInvested = this.shares * this.purchasePrice;
-    }
-
-    // Reduce share count on sell
-    public void removeShares(double sharesToSell) {
-        this.shares -= sharesToSell;
-        this.amountInvested = this.shares * this.purchasePrice;
-    }
-
-    public double getValue() {
-        return shares * currentPrice;
-    }
-
-    public double getPercentChange() {
-        if (purchasePrice == 0) return 0;
-        return ((currentPrice - purchasePrice) / purchasePrice) * 100;
     }
 }
