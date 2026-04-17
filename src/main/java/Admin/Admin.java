@@ -29,4 +29,10 @@ public class Admin {
     public void deleteOwnAccount() {
         // code to delete the admin's own account
     }
+    public String getPassword() {
+        return password;
+    }
+    public String getAdminID() {
+        return adminID;
+    }
 }
