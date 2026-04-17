@@ -19,6 +19,11 @@ public class Admin {
         // code to create a new user account
     }
 
+    public User getUserAccount(String userID) {
+        // code to get a user account by userID
+        return null; // placeholder return statement
+    }
+
     public void deleteUserAccount (String userID) {
         // code to delete a user account
     }
