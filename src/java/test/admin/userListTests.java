@@ -1,8 +1,10 @@
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class userListTests {
-
-    @Test addUserTest() {
+    @Test
+    public void addUserTest() {
         // code to test addUser method
         UserList testUserList = new userList();
         testUserList.addUser(new User("user1", "password123"));
@@ -13,13 +15,15 @@ public class userListTests {
         assertTrue(testUserList.containsKey("admin1"));
 
     }
-    @Test removeUserTest() {
+    @Test
+    public void removeUserTest() {
         // code to test removeUser method
         UserList testUserList = new UserList();
         testUserList.addUser(new User("user1", "password123"));
         testUserList.addUser(new Admin("admin1", "password789"));
     }
-    @Test getUserTest() {
+    @Test
+    public void getUserTest() {
         // code to test getUser method
         UserList testUserList = new UserList();
         User testUser = new User("user1", "password123");
