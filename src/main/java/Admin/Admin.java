@@ -12,7 +12,7 @@ public class Admin {
     }
 
     public void changePassword(String newPassword) {
-        // code to change the admin password
+        this.password = newPassword;
     }
 
     public void createUserAccount (String userID, String password) {
@@ -33,10 +33,13 @@ public class Admin {
     }
     public void deleteOwnAccount() {
         // code to delete the admin's own account
+        this.adminID = null;
+        this.password = null;
     }
     public String getPassword() {
         return password;
     }
+    
     public String getAdminID() {
         return adminID;
     }

@@ -35,14 +35,14 @@ public class AdminTests {
     }
 
     @Test
-    public String testgetAdminID() {
+    public void testgetAdminID() {
         Admin admin = new Admin("admin1", "password123");
-        return admin.getAdminID();
+        assertEquals("admin1", admin.getAdminID());
     }
 
-    @Test String testgetPassword() {
+    @Test void testgetPassword() {
         Admin admin = new Admin("admin1", "password123");
-        return admin.getPassword();
+        assertEquals("password123", admin.getPassword());
     }
 
     @Test
@@ -50,6 +50,7 @@ public class AdminTests {
         Admin admin = new Admin("admin1", "password123");
         admin.deleteOwnAccount();
         assertNull(admin.getAdminID());
+        assertNull(admin.getPassword());
     }
 
 }
