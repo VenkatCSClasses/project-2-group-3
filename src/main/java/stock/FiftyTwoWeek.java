@@ -1,4 +1,5 @@
 package stock;
+import management.NumFormat;
 
 public class FiftyTwoWeek {
     private double low, high, low_change, high_change, low_change_percent, high_change_percent;
@@ -18,12 +19,12 @@ public class FiftyTwoWeek {
 
     @Override
     public String toString() {
-        return "Low: " + low +
-                "\nHigh: " + high +
-                "\nLow Change: " + low_change +
-                "\nHigh Change: " + high_change +
-                "\nLow Change Percent:  " + low_change_percent +
-                "\nHigh Change Percent: " + high_change_percent +
+        return "Low: " + NumFormat.formatCurrency(low) +
+                "\nHigh: " + NumFormat.formatCurrency(high) +
+                "\nLow Change: " + NumFormat.formatCurrency(low_change) +
+                "\nHigh Change: " + NumFormat.formatCurrency(high_change) +
+                "\nLow Percent Change:  " + NumFormat.formatPercent(low_change_percent) +
+                "\nHigh Percent Change: " + NumFormat.formatPercent(high_change_percent) +
                 "\nRange: " + range;
     }
 }

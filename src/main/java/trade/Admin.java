@@ -1,6 +1,4 @@
-package Admin;
-
-import java.util.*;
+package trade;
 
 public class Admin {
     private String adminID;

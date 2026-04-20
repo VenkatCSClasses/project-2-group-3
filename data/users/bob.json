@@ -1,0 +1,28 @@
+{
+  "username": "bob",
+  "password": "password2",
+  "cashBalance": 8856.8,
+  "portfolio": {
+    "investments": [
+      {
+        "ticker": "AMZN",
+        "companyName": "Amazon.com, Inc.",
+        "purchaseDate": "2026-04-20",
+        "shares": 0.012116316639741519,
+        "purchasePrice": 247.6,
+        "amountInvested": 3.0,
+        "currentPrice": 247.49
+      },
+      {
+        "ticker": "DXCM",
+        "companyName": "Dexcom Inc.",
+        "purchaseDate": "2026-04-20",
+        "shares": 10.0,
+        "purchasePrice": 64.72,
+        "amountInvested": 647.2,
+        "currentPrice": 64.68
+      }
+    ],
+    "nextInvestmentID": 1
+  }
+}

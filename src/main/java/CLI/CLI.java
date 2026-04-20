@@ -1,23 +1,19 @@
-package api;
+package CLI;
 
-import java.io.File;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-import storage.JsonFileManager;
-import storage.UserData;
-import stock.Quote;
-import stock.SymbolSearchResult;
-import trade.Investment;
-import trade.Portfolio;
-import trade.User;
+
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Lettuce.Cluster.Refresh;
+
+import api.*;
+import apistream.*;
+import storage.*;
+import stock.*;
+import trade.*;
 
 public class CLI {
-
-    private static final String USERS_DIR         = "data/users";
-    private static final double DEFAULT_CASH = 10_000.00;
-
     // Hardcoded credentials — matches UserService
     private static final Map<String, String> CREDENTIALS = new HashMap<>(Map.of(
             "alice",   "password1",
@@ -82,7 +78,7 @@ public class CLI {
             } else if (choice == 2) {
                 viewPortfolio(input, user, stream);
             } else if (choice == 3) {
-                saveUser(user);
+                UserDataManager.saveUser(user);
                 stream.close();
                 System.out.println("Progress saved. Goodbye!");
                 running = false;
@@ -108,7 +104,7 @@ public class CLI {
             String expected = CREDENTIALS.get(username);
             if (expected != null && expected.equals(password)) {
                 System.out.println("Login successful. Welcome, " + username + "!");
-                return loadUser(username);
+                return UserDataManager.loadUser(username);
             }
 
             attempts++;
@@ -144,7 +140,7 @@ public class CLI {
         boolean researching = true;
         while (researching) {
             // Resolve current price: prefer stream tick, fall back to HTTP
-            double currentPrice = resolvePrice(symbol, stream);
+            double currentPrice = ResolvePrice.resolvePrice(symbol, stream);
 
             System.out.println("\n--- " + symbol + " ---");
             System.out.printf("Live Price : $%.4f%s%n",
@@ -174,7 +170,7 @@ public class CLI {
             input.nextLine();
 
             if (choice == 1) {
-                double price = resolvePrice(symbol, stream);
+                double price = ResolvePrice.resolvePrice(symbol, stream);
                 System.out.printf("%s live price: $%.4f%s%n",
                         symbol, price,
                         stream.isConnected() && stream.getPrice(symbol) != null ? " (streaming)" : " (HTTP)");
@@ -216,11 +212,11 @@ public class CLI {
                 }
 
             } else if (choice == 6) {
-                double livePrice = resolvePrice(symbol, stream);
+                double livePrice = ResolvePrice.resolvePrice(symbol, stream);
                 buyStock(input, user, stream, symbol, quote.getName(), livePrice);
 
             } else if (choice == 7) {
-                double livePrice = resolvePrice(symbol, stream);
+                double livePrice = ResolvePrice.resolvePrice(symbol, stream);
                 addHistoricalPosition(input, user, symbol, quote.getName(), livePrice);
 
             } else if (choice == 8 || choice == 9) {
@@ -260,7 +256,7 @@ public class CLI {
         input.nextLine();
 
         // Re-resolve price right before executing in case stream updated it
-        double execPrice = resolvePrice(symbol, stream);
+        double execPrice = ResolvePrice.resolvePrice(symbol, stream);
 
         boolean success = user.purchaseStock(symbol, companyName, execPrice, method, amount);
         if (success) {
@@ -273,7 +269,7 @@ public class CLI {
 
             // Make sure this ticker is subscribed in the stream
             stream.subscribe(symbol);
-            saveUser(user);
+            UserDataManager.saveUser(user);
         } else {
             System.out.println("Purchase failed — insufficient funds or invalid amount.");
         }
@@ -303,7 +299,7 @@ public class CLI {
         inv.setCurrentPrice(currentPrice);
 
         user.getPortfolio().addInvestment(inv);
-        saveUser(user);
+        UserDataManager.saveUser(user);
 
         System.out.printf("Added %s (%s). Current value: $%.2f%n",
                 companyName, symbol, inv.getValue());
@@ -323,7 +319,7 @@ public class CLI {
         }
 
         // Initial price refresh: stream first, HTTP fallback
-        refreshPortfolioPrices(portfolio, stream);
+        RefreshPortfolioPrices.refreshPortfolioPrices(portfolio, stream);
 
         printPortfolioSnapshot(user);
 
@@ -384,7 +380,7 @@ public class CLI {
         printer.interrupt();
 
         // Persist the updated prices
-        saveUser(user);
+        UserDataManager.saveUser(user);
         System.out.println("\nReturning to portfolio menu...");
     }
 
@@ -404,7 +400,7 @@ public class CLI {
         Investment inv = investments.get(idx);
 
         // Get freshest available price
-        double livePrice = resolvePrice(inv.getTicker(), stream);
+        double livePrice = ResolvePrice.resolvePrice(inv.getTicker(), stream);
         inv.setCurrentPrice(livePrice);
 
         System.out.printf("%nSelling %s (%s) at $%.4f%n",
@@ -440,12 +436,12 @@ public class CLI {
         }
 
         // Re-resolve price at execution time
-        double execPrice = resolvePrice(inv.getTicker(), stream);
+        double execPrice = ResolvePrice.resolvePrice(inv.getTicker(), stream);
         boolean success = user.sellStock(inv.getTicker(), execPrice, method, amount);
 
         if (success) {
             System.out.printf("Sale complete. Cash balance: $%.2f%n", user.getCashBalance());
-            saveUser(user);
+            UserDataManager.saveUser(user);
         } else {
             System.out.println("Sale failed — check share count or dollar amount.");
         }
@@ -464,7 +460,7 @@ public class CLI {
         if (idx >= 0 && idx < investments.size()) {
             Investment removed = investments.get(idx);
             user.getPortfolio().removeInvestment(removed);
-            saveUser(user);
+            UserDataManager.saveUser(user);
             System.out.println("Removed " + removed.getTicker() + " from portfolio.");
         } else {
             System.out.println("Invalid selection.");
@@ -474,37 +470,6 @@ public class CLI {
     // -------------------------------------------------------------------------
     // Helpers
     // -------------------------------------------------------------------------
-
-    /**
-     * Returns the best available price for a symbol.
-     * Preference: WebSocket stream → HTTP fallback.
-     * Falls back to 0.0 only if both fail (caller should handle that case).
-     */
-    private static double resolvePrice(String symbol, PriceStream stream) {
-        Double streamPrice = stream.getPrice(symbol);
-        if (streamPrice != null) return streamPrice;
-
-        // HTTP fallback
-        try {
-            return GetPrice.run(symbol).getPrice();
-        } catch (Exception e) {
-            return 0.0;
-        }
-    }
-
-    /** Applies stream prices (or HTTP fallback) to every investment in the portfolio. */
-    private static void refreshPortfolioPrices(Portfolio portfolio, PriceStream stream) {
-        for (Investment inv : portfolio.getInvestments()) {
-            Double sp = stream.getPrice(inv.getTicker());
-            if (sp != null) {
-                inv.setCurrentPrice(sp);
-            } else {
-                try {
-                    inv.setCurrentPrice(GetPrice.run(inv.getTicker()).getPrice());
-                } catch (Exception ignored) {}
-            }
-        }
-    }
 
     /** Prints a formatted portfolio snapshot (no I/O prompts). */
     private static void printPortfolioSnapshot(User user) {
@@ -525,41 +490,4 @@ public class CLI {
                 portfolio.getTotalValue(), portfolio.getTotalChange(), user.getCashBalance());
     }
 
-    // -------------------------------------------------------------------------
-    // Persistence
-    // -------------------------------------------------------------------------
-
-    private static User loadUser(String username) {
-        String path = USERS_DIR + "/" + username + ".json";
-        try {
-            UserData data = JsonFileManager.load(path, UserData.class);
-            if (data != null) {
-                User user = new User(data.getUsername(), data.getCashBalance());
-                Portfolio p = data.getPortfolio();
-                user.setPortfolio(p != null ? p : new Portfolio());
-                return user;
-            }
-        } catch (Exception ignored) {
-            // No saved file yet — start fresh
-        }
-        return new User(username, DEFAULT_CASH);
-    }
-
-    private static void saveUser(User user) {
-        try {
-            File dir = new File(USERS_DIR);
-            if (!dir.exists()) dir.mkdirs();
-
-            String path = USERS_DIR + "/" + user.getUsername() + ".json";
-            UserData data = new UserData(
-                    user.getUsername(),
-                    CREDENTIALS.getOrDefault(user.getUsername(), ""),
-                    user.getCashBalance(),
-                    user.getPortfolio()
-            );
-            JsonFileManager.save(data, path);
-        } catch (Exception e) {
-            System.out.println("Warning: Could not save: " + e.getMessage());
-        }
-    }
 }
