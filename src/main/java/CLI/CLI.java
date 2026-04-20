@@ -1,11 +1,7 @@
 package CLI;
 
-import java.time.LocalTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-
-import org.springframework.boot.autoconfigure.data.redis.RedisProperties.Lettuce.Cluster.Refresh;
 
 import api.*;
 import apistream.*;
@@ -76,7 +72,7 @@ public class CLI {
             if (choice == 1) {
                 researchStock(input, user, stream);
             } else if (choice == 2) {
-                viewPortfolio(input, user, stream);
+                ViewPortfolio.viewPortfolio(input, user, stream);
             } else if (choice == 3) {
                 UserDataManager.saveUser(user);
                 stream.close();
@@ -134,21 +130,19 @@ public class CLI {
             return;
         }
 
+        System.out.println("\n--- Quote for " + symbol + " ---");
+        System.out.println(quote);
+        System.out.println("----------------------------------");
+        researchMenu(input, user, symbol, quote, stream);
+    }
+
+    private static void researchMenu(Scanner input, User user, String symbol, Quote quote, PriceStream stream) throws Exception {
         // Subscribe the researched ticker so stream starts filling its price
-        stream.subscribe(symbol);
+        //stream.subscribe(symbol); commented out for now bc of api credits
 
         boolean researching = true;
         while (researching) {
             // Resolve current price: prefer stream tick, fall back to HTTP
-            double currentPrice = ResolvePrice.resolvePrice(symbol, stream);
-
-            System.out.println("\n--- " + symbol + " ---");
-            System.out.printf("Live Price : $%.4f%s%n",
-                    currentPrice,
-                    stream.isConnected() && stream.getPrice(symbol) != null ? " (streaming)" : " (HTTP)");
-            System.out.println(quote);
-            System.out.println("----------------------------------");
-
             System.out.println("1. Refresh Live Price");
             System.out.println("2. Get Previous EOD Price");
             System.out.println("3. Get Full Quote");
@@ -213,11 +207,11 @@ public class CLI {
 
             } else if (choice == 6) {
                 double livePrice = ResolvePrice.resolvePrice(symbol, stream);
-                buyStock(input, user, stream, symbol, quote.getName(), livePrice);
+                BuyStock.buyStock(input, user, stream, symbol, quote.getName(), livePrice);
 
             } else if (choice == 7) {
                 double livePrice = ResolvePrice.resolvePrice(symbol, stream);
-                addHistoricalPosition(input, user, symbol, quote.getName(), livePrice);
+                AddHistoricalPosition.addHistoricalPosition(input, user, symbol, quote.getName(), livePrice);
 
             } else if (choice == 8 || choice == 9) {
                 researching = false;
@@ -227,267 +221,4 @@ public class CLI {
             }
         }
     }
-
-    // -------------------------------------------------------------------------
-    // Buy
-    // -------------------------------------------------------------------------
-
-    private static void buyStock(Scanner input, User user, PriceStream stream,
-                                  String symbol, String companyName, double livePrice) {
-        System.out.printf("%nBuying %s (%s) at $%.4f%n", companyName, symbol, livePrice);
-        System.out.printf("Available cash: $%.2f%n", user.getCashBalance());
-
-        System.out.println("Buy by:");
-        System.out.println("1. Number of shares");
-        System.out.println("2. Dollar amount");
-        System.out.print("Choose (1 or 2): ");
-
-        if (!input.hasNextInt()) { System.out.println("Invalid input."); input.nextLine(); return; }
-        int methodChoice = input.nextInt();
-        input.nextLine();
-
-        if (methodChoice != 1 && methodChoice != 2) { System.out.println("Invalid choice."); return; }
-
-        String method = (methodChoice == 1) ? "shares" : "dollars";
-        System.out.print(methodChoice == 1 ? "Enter number of shares: " : "Enter dollar amount: $");
-
-        if (!input.hasNextDouble()) { System.out.println("Invalid input."); input.nextLine(); return; }
-        double amount = input.nextDouble();
-        input.nextLine();
-
-        // Re-resolve price right before executing in case stream updated it
-        double execPrice = ResolvePrice.resolvePrice(symbol, stream);
-
-        boolean success = user.purchaseStock(symbol, companyName, execPrice, method, amount);
-        if (success) {
-            Investment inv = user.findInvestment(symbol);
-            System.out.printf("Bought %s. Position: %.4f shares @ $%.4f avg cost.%n",
-                    symbol,
-                    inv != null ? inv.getShares() : 0,
-                    inv != null ? inv.getPurchasePrice() : execPrice);
-            System.out.printf("Remaining cash: $%.2f%n", user.getCashBalance());
-
-            // Make sure this ticker is subscribed in the stream
-            stream.subscribe(symbol);
-            UserDataManager.saveUser(user);
-        } else {
-            System.out.println("Purchase failed — insufficient funds or invalid amount.");
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // Add historical position (manual, no cash impact)
-    // -------------------------------------------------------------------------
-
-    private static void addHistoricalPosition(Scanner input, User user,
-                                               String symbol, String companyName, double currentPrice) {
-        System.out.print("Enter purchase date (YYYY-MM-DD): ");
-        String purchaseDate = input.nextLine().trim();
-
-        System.out.print("Enter number of shares: ");
-        if (!input.hasNextDouble()) { System.out.println("Invalid input."); input.nextLine(); return; }
-        double shares = input.nextDouble();
-        input.nextLine();
-
-        System.out.print("Enter purchase price per share: $");
-        if (!input.hasNextDouble()) { System.out.println("Invalid input."); input.nextLine(); return; }
-        double purchasePrice = input.nextDouble();
-        input.nextLine();
-
-        Investment inv = new Investment(symbol, companyName, purchaseDate,
-                shares, purchasePrice, shares * purchasePrice);
-        inv.setCurrentPrice(currentPrice);
-
-        user.getPortfolio().addInvestment(inv);
-        UserDataManager.saveUser(user);
-
-        System.out.printf("Added %s (%s). Current value: $%.2f%n",
-                companyName, symbol, inv.getValue());
-    }
-
-    // -------------------------------------------------------------------------
-    // View / manage portfolio
-    // -------------------------------------------------------------------------
-
-    private static void viewPortfolio(Scanner input, User user, PriceStream stream) {
-        Portfolio portfolio = user.getPortfolio();
-        ArrayList<Investment> investments = portfolio.getInvestments();
-
-        if (investments.isEmpty()) {
-            System.out.println("\nYour portfolio is empty.");
-            return;
-        }
-
-        // Initial price refresh: stream first, HTTP fallback
-        RefreshPortfolioPrices.refreshPortfolioPrices(portfolio, stream);
-
-        printPortfolioSnapshot(user);
-
-        System.out.println("1. Watch Live Prices  (auto-refresh every 3s)");
-        System.out.println("2. Sell an investment");
-        System.out.println("3. Remove an investment  (no cash impact)");
-        System.out.println("4. Back to Main Menu");
-        System.out.print("Choose an option: ");
-
-        if (!input.hasNextInt()) { input.nextLine(); return; }
-        int choice = input.nextInt();
-        input.nextLine();
-
-        if (choice == 1) {
-            livePortfolioView(input, user, stream);
-        } else if (choice == 2) {
-            sellFromPortfolio(input, user, stream, investments);
-        } else if (choice == 3) {
-            removeFromPortfolio(input, user, investments);
-        }
-    }
-
-    /** Clears the screen and continuously reprints the portfolio using stream prices. */
-    private static void livePortfolioView(Scanner input, User user, PriceStream stream) {
-        System.out.println("\nLive Portfolio View — updating every 3 seconds.");
-        System.out.println("Press Enter at any time to stop.\n");
-
-        Portfolio portfolio = user.getPortfolio();
-        AtomicBoolean watching = new AtomicBoolean(true);
-
-        Thread printer = new Thread(() -> {
-            while (watching.get()) {
-                // Apply latest stream prices
-                for (Investment inv : portfolio.getInvestments()) {
-                    Double sp = stream.getPrice(inv.getTicker());
-                    if (sp != null) inv.setCurrentPrice(sp);
-                }
-
-                // Clear terminal and reprint
-                System.out.print("\033[H\033[2J");
-                System.out.flush();
-                System.out.printf("=== Live Portfolio  [%s] ===%n", LocalTime.now().withNano(0));
-                System.out.println("Press Enter to return to menu.\n");
-                printPortfolioSnapshot(user);
-
-                try {
-                    Thread.sleep(3_000);
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-        });
-        printer.setDaemon(true);
-        printer.start();
-
-        input.nextLine(); // Block until user presses Enter
-        watching.set(false);
-        printer.interrupt();
-
-        // Persist the updated prices
-        UserDataManager.saveUser(user);
-        System.out.println("\nReturning to portfolio menu...");
-    }
-
-    // -------------------------------------------------------------------------
-    // Sell
-    // -------------------------------------------------------------------------
-
-    private static void sellFromPortfolio(Scanner input, User user, PriceStream stream,
-                                           ArrayList<Investment> investments) {
-        System.out.print("Enter the number of the investment to sell: ");
-        if (!input.hasNextInt()) { System.out.println("Invalid input."); input.nextLine(); return; }
-        int idx = input.nextInt() - 1;
-        input.nextLine();
-
-        if (idx < 0 || idx >= investments.size()) { System.out.println("Invalid selection."); return; }
-
-        Investment inv = investments.get(idx);
-
-        // Get freshest available price
-        double livePrice = ResolvePrice.resolvePrice(inv.getTicker(), stream);
-        inv.setCurrentPrice(livePrice);
-
-        System.out.printf("%nSelling %s (%s) at $%.4f%n",
-                inv.getCompanyName(), inv.getTicker(), livePrice);
-        System.out.printf("You own %.4f shares  (value: $%.2f)%n",
-                inv.getShares(), inv.getValue());
-
-        System.out.println("Sell by:");
-        System.out.println("1. Number of shares");
-        System.out.println("2. Dollar amount");
-        System.out.println("3. Sell all");
-        System.out.print("Choose (1-3): ");
-
-        if (!input.hasNextInt()) { System.out.println("Invalid input."); input.nextLine(); return; }
-        int methodChoice = input.nextInt();
-        input.nextLine();
-
-        String method;
-        double amount;
-
-        if (methodChoice == 3) {
-            method = "shares";
-            amount = inv.getShares();
-        } else if (methodChoice == 1 || methodChoice == 2) {
-            method = (methodChoice == 1) ? "shares" : "dollars";
-            System.out.print(methodChoice == 1 ? "Shares to sell: " : "Dollar amount: $");
-            if (!input.hasNextDouble()) { System.out.println("Invalid input."); input.nextLine(); return; }
-            amount = input.nextDouble();
-            input.nextLine();
-        } else {
-            System.out.println("Invalid choice.");
-            return;
-        }
-
-        // Re-resolve price at execution time
-        double execPrice = ResolvePrice.resolvePrice(inv.getTicker(), stream);
-        boolean success = user.sellStock(inv.getTicker(), execPrice, method, amount);
-
-        if (success) {
-            System.out.printf("Sale complete. Cash balance: $%.2f%n", user.getCashBalance());
-            UserDataManager.saveUser(user);
-        } else {
-            System.out.println("Sale failed — check share count or dollar amount.");
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // Remove (no cash impact)
-    // -------------------------------------------------------------------------
-
-    private static void removeFromPortfolio(Scanner input, User user, ArrayList<Investment> investments) {
-        System.out.print("Enter the number of the investment to remove: ");
-        if (!input.hasNextInt()) { System.out.println("Invalid input."); input.nextLine(); return; }
-        int idx = input.nextInt() - 1;
-        input.nextLine();
-
-        if (idx >= 0 && idx < investments.size()) {
-            Investment removed = investments.get(idx);
-            user.getPortfolio().removeInvestment(removed);
-            UserDataManager.saveUser(user);
-            System.out.println("Removed " + removed.getTicker() + " from portfolio.");
-        } else {
-            System.out.println("Invalid selection.");
-        }
-    }
-
-    // -------------------------------------------------------------------------
-    // Helpers
-    // -------------------------------------------------------------------------
-
-    /** Prints a formatted portfolio snapshot (no I/O prompts). */
-    private static void printPortfolioSnapshot(User user) {
-        Portfolio portfolio = user.getPortfolio();
-        ArrayList<Investment> investments = portfolio.getInvestments();
-
-        System.out.println();
-        for (int i = 0; i < investments.size(); i++) {
-            Investment inv = investments.get(i);
-            System.out.printf("%d. %-30s (%s)%n", i + 1, inv.getCompanyName(), inv.getTicker());
-            System.out.printf("   Shares: %10.4f | Avg Cost: $%9.4f | Current: $%9.4f%n",
-                    inv.getShares(), inv.getPurchasePrice(), inv.getCurrentPrice());
-            System.out.printf("   Value:  $%10.2f | Change:   %+.2f%%%n%n",
-                    inv.getValue(), inv.getPercentChange());
-        }
-
-        System.out.printf("Portfolio Value: $%.2f | Overall Change: %+.2f%% | Cash: $%.2f%n%n",
-                portfolio.getTotalValue(), portfolio.getTotalChange(), user.getCashBalance());
-    }
-
 }
