@@ -1,4 +1,4 @@
-package trade;
+package webservice;
 
 public class AuthRequest {
     private String username;

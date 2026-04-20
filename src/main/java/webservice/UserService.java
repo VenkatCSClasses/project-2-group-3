@@ -1,9 +1,11 @@
-package trade;
+package webservice;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.stereotype.Service;
+
+import trade.UserAccount;
 
 @Service
 public class UserService {

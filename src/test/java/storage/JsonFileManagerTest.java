@@ -21,10 +21,10 @@ public class JsonFileManagerTest {
 
         storage.addInvestment(investment);
 
-        JsonFileManager.save(storage, "data/test-investments.json");
+        JsonFileManager.save(storage, "data/test/test-investments.json");
 
         InvestmentStorage loaded =
-                JsonFileManager.load("data/test-investments.json", InvestmentStorage.class);
+                JsonFileManager.load("data/test/test-investments.json", InvestmentStorage.class);
 
         assertNotNull(loaded);
         assertNotNull(loaded.getInvestments());

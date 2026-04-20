@@ -1,4 +1,4 @@
-package trade;
+package webservice;
 
 public class ResearchStock {
     private String ticker;

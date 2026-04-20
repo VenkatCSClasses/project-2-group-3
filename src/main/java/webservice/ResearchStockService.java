@@ -1,6 +1,7 @@
-package trade;
+package webservice;
 
 import api.ApiKey;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;

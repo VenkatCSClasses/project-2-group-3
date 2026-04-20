@@ -1,6 +1,6 @@
 package stock;
 
-import management.NumFormat;
+import misc.NumFormat;
 
 public class Values {
     private String datetime;

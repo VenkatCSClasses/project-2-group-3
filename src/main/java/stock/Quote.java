@@ -1,7 +1,8 @@
 package stock;
 
-import management.NumFormat;
 import java.time.LocalDateTime;
+
+import misc.NumFormat;
 
 public class Quote {
     private String symbol, name, exchange, currency, datetime;

@@ -1,6 +1,6 @@
 {
-  "username": "alice",
-  "password": "password1",
+  "username": "phillip",
+  "password": "1234",
   "cashBalance": 10000,
   "portfolio": {
     "investments": [],

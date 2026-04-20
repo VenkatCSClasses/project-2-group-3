@@ -1,5 +1,5 @@
 package stock;
-import management.NumFormat;
+import misc.NumFormat;
 
 public class FiftyTwoWeek {
     private double low, high, low_change, high_change, low_change_percent, high_change_percent;

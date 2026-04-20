@@ -1,5 +1,5 @@
 package stock;
-import management.NumFormat;
+import misc.NumFormat;
 
 public class Price {
     private String symbol;
