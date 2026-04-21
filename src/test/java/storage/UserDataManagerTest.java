@@ -2,6 +2,7 @@ package storage;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
 import trade.Investment;
 import trade.Portfolio;
 import trade.User;

@@ -6,9 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import apistream.*;
 import storage.*;
-import trade.Investment;
-import trade.Portfolio;
-import trade.User;
+import trade.*;
 
 public class ViewPortfolio {
     // -------------------------------------------------------------------------
@@ -32,7 +30,8 @@ public class ViewPortfolio {
         System.out.println("1. Watch Live Prices  (auto-refresh every 3s)");
         System.out.println("2. Sell an investment");
         System.out.println("3. Remove an investment  (no cash impact)");
-        System.out.println("4. Back to Main Menu");
+        System.out.println("4. Review transaction history");
+        System.out.println("5. Back to Main Menu");
         System.out.print("Choose an option: ");
 
         if (!input.hasNextInt()) { input.nextLine(); return; }
@@ -45,6 +44,8 @@ public class ViewPortfolio {
             RemoveFromPortfolio.sellFromPortfolio(input, user, stream, investments);
         } else if (choice == 3) {
             RemoveFromPortfolio.removeFromPortfolio(input, user, investments);
+        } else if (choice == 4) {
+            transactionHistory(input, user);
         }
     }
 
@@ -88,5 +89,25 @@ public class ViewPortfolio {
         // Persist the updated prices
         UserDataManager.saveUser(user);
         System.out.println("\nReturning to portfolio menu...");
+    }
+
+    public static void transactionHistory(Scanner input, User user) {
+        TransactionLog transactionLog = user.getTransactionLog();
+
+        System.out.printf("%-12s %-8s %-8s %-12s %-12s %-14s%n",
+                "Date", "Type", "Ticker", "Shares", "Price", "Invested");
+        System.out.println("---------------------------------------------------------------");
+
+        for (int i = 0; i < transactionLog.size(); i++) {
+            Transaction transaction = transactionLog.get(i);
+
+            System.out.printf("%-12s %-8s %-8s %-12.4f $%-11.2f $%-13.2f%n",
+                    transaction.getTransactionDate(),
+                    transaction.getTransactionType(),
+                    transaction.getTicker(),
+                    transaction.getShares(),
+                    transaction.getTransactionPrice(),
+                    transaction.getAmountInvested());
+        }
     }
 }

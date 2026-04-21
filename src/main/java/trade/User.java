@@ -4,11 +4,13 @@ public class User {
     private String username;
     private double cashBalance;
     private Portfolio portfolio;
+    private TransactionLog transactionLog;
 
     public User(String username, double cashBalance) {
         this.username = username;
         this.cashBalance = cashBalance;
         this.portfolio = new Portfolio();
+        this.transactionLog = new TransactionLog();
     }
 
     public String getUsername() {
@@ -23,8 +25,16 @@ public class User {
         return portfolio;
     }
 
+    public TransactionLog getTransactionLog() {
+        return transactionLog;
+    }
+
     public void setPortfolio(Portfolio portfolio) {
         this.portfolio = portfolio;
+    }
+
+    public void setTransactionLog(TransactionLog transactionLog) {
+        this.transactionLog = transactionLog;
     }
 
     public void setCashBalance(double cashBalance) {
@@ -53,13 +63,17 @@ public class User {
         cashBalance -= totalCost;
 
         Investment existing = findInvestment(ticker);
+        String today = java.time.LocalDate.now().toString();
+
         if (existing != null) {
             existing.addShares(sharesToBuy, livePrice);
             existing.setCurrentPrice(livePrice);
+            Transaction newTransaction = new Transaction("Buy", ticker, sharesToBuy, livePrice, totalCost);
+            transactionLog.addTransaction(newTransaction);
         } else {
-            String today = java.time.LocalDate.now().toString();
-            Investment newInv = new Investment(ticker, companyName, today,
-                    sharesToBuy, livePrice, totalCost);
+            Investment newInv = new Investment(ticker, companyName, today, sharesToBuy, livePrice, totalCost);
+            Transaction newTransaction = new Transaction("Buy", ticker, sharesToBuy, livePrice, totalCost);
+            transactionLog.addTransaction(newTransaction);
             newInv.setCurrentPrice(livePrice);
             portfolio.addInvestment(newInv);
         }
@@ -88,6 +102,9 @@ public class User {
         cashBalance += proceeds;
 
         investment.removeShares(sharesToSell);
+        Transaction newTransaction = new Transaction("Sell", ticker, sharesToSell, livePrice, proceeds);
+        transactionLog.addTransaction(newTransaction);
+
         if (investment.getShares() <= 0) {
             portfolio.removeInvestment(investment);
         }

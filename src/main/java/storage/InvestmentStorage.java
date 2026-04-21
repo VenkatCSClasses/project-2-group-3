@@ -2,6 +2,7 @@ package storage;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import trade.Investment;
 
 public class InvestmentStorage {

@@ -1,10 +1,10 @@
 package storage;
 
-import trade.Portfolio;
-import trade.User;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+
+import trade.*;
 
 public class UserDataManager {
     private static final String USERS_DIR = "data/users";
@@ -23,7 +23,9 @@ public class UserDataManager {
             if (data != null) {
                 User user = new User(data.getUsername(), data.getCashBalance());
                 Portfolio p = data.getPortfolio();
+                TransactionLog tl = data.getTransactionLog();
                 user.setPortfolio(p != null ? p : new Portfolio());
+                user.setTransactionLog(tl != null ? tl : new TransactionLog());
                 return user;
             }
         } catch (Exception ignored) {
@@ -42,7 +44,8 @@ public class UserDataManager {
                     user.getUsername(),
                     CREDENTIALS.getOrDefault(user.getUsername(), ""),
                     user.getCashBalance(),
-                    user.getPortfolio()
+                    user.getPortfolio(),
+                    user.getTransactionLog()
             );
             JsonFileManager.save(data, path);
         } catch (Exception e) {
