@@ -1,0 +1,9 @@
+{
+  "username": "alice",
+  "password": "password1",
+  "cashBalance": 10000.0,
+  "portfolio": {
+    "investments": [],
+    "nextInvestmentID": 1
+  }
+}

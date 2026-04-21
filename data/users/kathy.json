@@ -1,17 +1,17 @@
 {
   "username": "kathy",
   "password": "",
-  "cashBalance": 5000.0,
+  "cashBalance": 5268.07,
   "portfolio": {
     "investments": [
       {
         "ticker": "AAPL",
         "companyName": "Apple Inc.",
         "purchaseDate": "2026-04-13",
-        "shares": 5.0,
+        "shares": 4.0,
         "purchasePrice": 200.0,
-        "amountInvested": 1000.0,
-        "currentPrice": 200.0
+        "amountInvested": 800.0,
+        "currentPrice": 268.07
       }
     ],
     "nextInvestmentID": 1

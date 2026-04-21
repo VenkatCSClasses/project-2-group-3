@@ -9,6 +9,7 @@ import storage.*;
 import trade.Investment;
 import trade.Portfolio;
 import trade.User;
+import webservice.*;
 
 public class ViewPortfolio {
     // -------------------------------------------------------------------------

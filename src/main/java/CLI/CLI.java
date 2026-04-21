@@ -15,7 +15,7 @@ public class CLI {
     private static final Map<String, String> CREDENTIALS = new HashMap<>(Map.of(
             "alice",   "password1",
             "bob",     "password2",
-            "charlie", "password3"
+            "kathy", "1234"
     ));
 
     // -------------------------------------------------------------------------
