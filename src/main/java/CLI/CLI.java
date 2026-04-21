@@ -51,8 +51,10 @@ public class CLI {
                     user.getUsername(), user.getCashBalance());
             System.out.println("1. Research a Stock");
             System.out.println("2. View / Manage Portfolio");
-            System.out.println("3. Exit");
-            System.out.print("Choose an option (1-3): ");
+            System.out.println("3. Definitions Menu");
+            System.out.println("4. Assistance Menu");
+            System.out.println("5. Exit");
+            System.out.print("Choose an option (1-5): ");
 
             if (!input.hasNextInt()) {
                 System.out.println("Invalid input. Please enter an integer.");
@@ -68,6 +70,10 @@ public class CLI {
             } else if (choice == 2) {
                 ViewPortfolio.viewPortfolio(input, user, stream);
             } else if (choice == 3) {
+                DefinitionsMenu.definitionsMenu(input);
+            } else if (choice == 4) {
+              System.out.println("WIP");
+            } else if (choice == 5) {
                 UserDataManager.saveUser(user);
                 stream.close();
                 System.out.println("Progress saved. Goodbye!");
