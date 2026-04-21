@@ -1,6 +1,7 @@
 package api;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Scanner;
@@ -37,6 +38,7 @@ public class GetQuote {
         String currency = root.get("currency").getAsString();
         String datetime = root.get("datetime").getAsString();
         String last_quote_at = root.get("last_quote_at").getAsString();
+        LocalDateTime last_quote_at_dt = LocalDateTime.parse(last_quote_at);
         double open = root.get("open").getAsDouble();
         double high = root.get("high").getAsDouble();
         double low = root.get("low").getAsDouble();
@@ -58,7 +60,7 @@ public class GetQuote {
             fiftyTwoWeekObject.get("range").getAsString()
         );
 
-        return new Quote(symbol, name, exchange, currency, datetime, last_quote_at, open, high, low, close, volume,
+        return new Quote(symbol, name, exchange, currency, datetime, last_quote_at_dt, open, high, low, close, volume,
             previous_close, change, percent_change, fiftyTwoWeek);
     }
 }

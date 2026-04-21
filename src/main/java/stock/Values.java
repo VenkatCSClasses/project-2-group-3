@@ -1,5 +1,7 @@
 package stock;
 
+import misc.NumFormat;
+
 public class Values {
     private String datetime;
     private double open, high, low, close, volume;
@@ -16,10 +18,10 @@ public class Values {
     @Override
     public String toString() {
         return "Date and Time: " + datetime + 
-                "\nOpen Price: " + open +
-                "\nHigh: " + high +
-                "\nLow: " + low +
-                "\nClose: " + close +
-                "\nVolume: " + volume;
+                "\nOpen Price: " + NumFormat.formatCurrency(open) +
+                "\nHigh: " + NumFormat.formatCurrency(high) +
+                "\nLow: " + NumFormat.formatCurrency(low) +
+                "\nClose: " + NumFormat.formatCurrency(close) +
+                "\nVolume: " + NumFormat.formatNumber(volume);
     }
 }

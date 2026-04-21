@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ApiTest {
 
+    //
+
     @Test
     // Ensure API key is properly fetched
     void getApiKeyTest() {

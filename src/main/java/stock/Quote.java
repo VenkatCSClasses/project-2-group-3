@@ -1,11 +1,16 @@
 package stock;
 
+import java.time.LocalDateTime;
+
+import misc.NumFormat;
+
 public class Quote {
-    private String symbol, name, exchange, currency, datetime, last_quote_at;
+    private String symbol, name, exchange, currency, datetime;
+    private LocalDateTime last_quote_at;
     private double open, high, low, close, volume, previous_close, change, percent_change;
     private FiftyTwoWeek fifty_two_week;
 
-    public Quote(String symbol, String name, String exchange, String currency, String datetime, String last_quote_at,
+    public Quote(String symbol, String name, String exchange, String currency, String datetime, LocalDateTime last_quote_at,
         double open, double high, double low, double close, double volume, double previous_close, double change,
         double percent_change, FiftyTwoWeek fifty_two_week) {
         this.symbol = symbol;
@@ -38,14 +43,14 @@ public class Quote {
                 "\nCurrency: " + currency +
                 "\nDatetime: " + datetime +
                 "\nLast Quote: " + last_quote_at +
-                "\nOpen: " + open +
-                "\nHigh: " + high +
-                "\nLow: " + low +
-                "\nClose: " + close +
-                "\nVolume: " + volume +
-                "\nPrevious Close: " + previous_close +
-                "\nChange: " + change +
-                "\nPercent Change: " + percent_change +
-                "\n: " + fifty_two_week;
+                "\nOpen: " + NumFormat.formatCurrency(open) +
+                "\nHigh: " + NumFormat.formatCurrency(high) +
+                "\nLow: " + NumFormat.formatCurrency(low) +
+                "\nClose: " + NumFormat.formatCurrency(close) +
+                "\nVolume: " + NumFormat.formatNumber(volume) +
+                "\nPrevious Close: " + NumFormat.formatCurrency(previous_close) +
+                "\nChange: " + NumFormat.formatCurrency(change) +
+                "\nPercent Change: " + NumFormat.formatPercent(percent_change) +
+                "\n--- 52-Week Review ---" + fifty_two_week;
     }
 }
