@@ -2,7 +2,9 @@ package CLI;
 
 import apistream.*;
 import storage.*;
-import trade.*;
+import trade.Investment;
+import trade.User;
+
 import java.util.*;
 
 public class RemoveFromPortfolio {

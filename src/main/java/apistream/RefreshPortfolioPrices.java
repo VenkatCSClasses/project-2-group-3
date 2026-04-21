@@ -1,7 +1,8 @@
 package apistream;
 
-import trade.*;
 import api.*;
+import trade.Investment;
+import trade.Portfolio;
 
 public class RefreshPortfolioPrices {
 

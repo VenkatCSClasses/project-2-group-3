@@ -1,7 +1,9 @@
 package CLI;
 
 import storage.*;
-import trade.*;
+import trade.Investment;
+import trade.User;
+
 import java.util.*;
 
 public class AddHistoricalPosition {

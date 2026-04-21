@@ -6,8 +6,9 @@ import java.util.stream.Collectors;
 import api.*;
 import apistream.*;
 import storage.*;
+import trade.Investment;
+import trade.User;
 import stock.*;
-import trade.*;
 
 public class CLI {
     // Hardcoded credentials — matches UserService

@@ -6,7 +6,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import apistream.*;
 import storage.*;
-import trade.*;
+import trade.Investment;
+import trade.Portfolio;
+import trade.User;
 
 public class ViewPortfolio {
     // -------------------------------------------------------------------------

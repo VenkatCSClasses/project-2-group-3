@@ -1,7 +1,10 @@
 package CLI;
 
-import trade.*;
 import java.util.ArrayList;
+
+import trade.Investment;
+import trade.Portfolio;
+import trade.User;
 
 public class PrintPortfolioSnapshot {
     /** Prints a formatted portfolio snapshot (no I/O prompts). */

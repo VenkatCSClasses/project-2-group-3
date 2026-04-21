@@ -1,15 +1,11 @@
-package trade;
+package webservice;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpSession;
-
-import webservice.ResearchStock;
-import webservice.ResearchStockController;
-import webservice.ResearchStockService;
-
+import trade.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
