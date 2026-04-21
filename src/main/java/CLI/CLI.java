@@ -24,6 +24,7 @@ public class CLI {
 
     public static void main(String[] args) throws Exception {
         Scanner input = new Scanner(System.in);
+        startingScreen(input);
 
         User user = login(input);
         if (user == null) {
@@ -90,6 +91,32 @@ public class CLI {
     // Login
     // -------------------------------------------------------------------------
 
+    private static void startingScreen(Scanner input) {
+        boolean starting = true;
+        
+        while (starting) {
+            System.out.println("=== Welcome! ===");
+            System.out.println("1. Login");
+            System.out.println("2. Create New Account");
+            System.out.print("Choose (1-2): ");
+
+            if (!input.hasNextInt()) {
+                System.out.println("Invalid input. Please enter an integer 1-2.");
+                input.nextLine();
+                continue;
+            }
+
+            int choice = input.nextInt();
+            input.nextLine();
+
+            if (choice == 1) {
+                login(input);
+            } else if (choice == 2) {
+                //
+            }
+        }
+    }
+
     private static User login(Scanner input) {
         int attempts = 0;
         while (attempts < 3) {
@@ -139,7 +166,7 @@ public class CLI {
 
     private static void researchMenu(Scanner input, User user, String symbol, Quote quote, PriceStream stream) throws Exception {
         // Subscribe the researched ticker so stream starts filling its price
-        //stream.subscribe(symbol); commented out for now bc of api credits
+        stream.subscribe(symbol);
 
         boolean researching = true;
         while (researching) {
@@ -156,7 +183,7 @@ public class CLI {
             System.out.print("Choose (1-9): ");
 
             if (!input.hasNextInt()) {
-                System.out.println("Invalid input. Please enter an integer.");
+                System.out.println("Invalid input. Please enter an integer 1-9.");
                 input.nextLine();
                 continue;
             }
