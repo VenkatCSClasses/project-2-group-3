@@ -3,7 +3,11 @@ package storage;
 import java.util.Map;
 
 public class CredentialsDataManager {
-    private static final String CREDS_FILE = "data/credentials/credentials.json";
+    private static String CREDS_FILE = "data/credentials/credentials.json";
+
+    public static void setCredentialsFile(String filePath) {
+        CREDS_FILE = filePath;
+    }
 
     public static Map<String, String> loadCredentials() throws Exception {
         CredentialsStorage storage = JsonFileManager.load(CREDS_FILE, CredentialsStorage.class);
@@ -23,6 +27,9 @@ public class CredentialsDataManager {
     public static boolean validateLogin(String username, String password) throws Exception {
         Map<String, String> credentials = loadCredentials();
         String savedPassword = credentials.get(username.toLowerCase());
+        if (savedPassword == null) {
+            return false;
+        }
         return savedPassword.equals(password);
     }
 

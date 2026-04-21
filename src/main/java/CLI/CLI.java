@@ -11,22 +11,14 @@ import trade.User;
 import stock.*;
 
 public class CLI {
-    // Hardcoded credentials — matches UserService
-    private static final Map<String, String> CREDENTIALS = new HashMap<>(Map.of(
-            "alice",   "password1",
-            "bob",     "password2",
-            "kathy", "1234"
-    ));
-
     // -------------------------------------------------------------------------
     // Entry point
     // -------------------------------------------------------------------------
 
     public static void main(String[] args) throws Exception {
         Scanner input = new Scanner(System.in);
-        startingScreen(input);
+        User user = startingScreen(input);
 
-        User user = login(input);
         if (user == null) {
             System.out.println("Too many failed attempts. Exiting.");
             input.close();
@@ -91,7 +83,7 @@ public class CLI {
     // Login
     // -------------------------------------------------------------------------
 
-    private static void startingScreen(Scanner input) {
+    private static User startingScreen(Scanner input) throws Exception {
         boolean starting = true;
         
         while (starting) {
@@ -110,14 +102,17 @@ public class CLI {
             input.nextLine();
 
             if (choice == 1) {
-                login(input);
+                User user = login(input);
+                return user;
             } else if (choice == 2) {
-                //
+                User user = createAccount(input);
+                return user;
             }
         }
+        return null;
     }
 
-    private static User login(Scanner input) {
+    private static User login(Scanner input) throws Exception {
         int attempts = 0;
         while (attempts < 3) {
             System.out.print("Username: ");
@@ -125,14 +120,32 @@ public class CLI {
             System.out.print("Password: ");
             String password = input.nextLine().trim();
 
-            String expected = CREDENTIALS.get(username);
-            if (expected != null && expected.equals(password)) {
+            if (CredentialsDataManager.validateLogin(username, password)) {
                 System.out.println("Login successful. Welcome, " + username + "!");
                 return UserDataManager.loadUser(username);
+            } else {
+                attempts++;
+                System.out.println("Invalid credentials. " + (3 - attempts) + " attempt(s) remaining.");
             }
+        }
+        return null;
+    }
 
-            attempts++;
-            System.out.println("Invalid credentials. " + (3 - attempts) + " attempt(s) remaining.");
+    private static User createAccount(Scanner input) throws Exception {
+        boolean running = true;
+
+        while (running) {
+            System.out.print("Enter your username - no spaces allowed: ");
+            String username = input.nextLine().trim().toLowerCase();
+            System.out.print("Enter your password: "); // todo add forbidden symbols
+            String password = input.nextLine().trim();
+
+            if(!CredentialsDataManager.createAccount(username, password)) {
+                System.out.println("The username " + username + "is already taken. Please choose another username.");
+            } else {
+                System.out.println("Welcome, " + username + "!");
+                return UserDataManager.loadUser(username);
+            }
         }
         return null;
     }
