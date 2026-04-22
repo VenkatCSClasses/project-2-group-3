@@ -11,13 +11,17 @@ public class UserDataManager {
     private static final double DEFAULT_CASH = 10_000.00;
 
     private static final Map<String, String> CREDENTIALS = new HashMap<>(Map.of(
-            "alice",   "password1",
-            "bob",     "password2",
+            "alice", "password1",
+            "bob", "password2",
             "charlie", "password3"
     ));
 
     public static User loadUser(String username) {
-        String path = USERS_DIR + "/" + username + ".json";
+        return loadUser(username, USERS_DIR);
+    }
+
+    public static User loadUser(String username, String directory) {
+        String path = directory + "/" + username + ".json";
         try {
             UserData data = JsonFileManager.load(path, UserData.class);
             if (data != null) {
@@ -35,11 +39,17 @@ public class UserDataManager {
     }
 
     public static void saveUser(User user) {
-        try {
-            File dir = new File(USERS_DIR);
-            if (!dir.exists()) dir.mkdirs();
+        saveUser(user, USERS_DIR);
+    }
 
-            String path = USERS_DIR + "/" + user.getUsername() + ".json";
+    public static void saveUser(User user, String directory) {
+        try {
+            File dir = new File(directory);
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+
+            String path = directory + "/" + user.getUsername() + ".json";
             UserData data = new UserData(
                     user.getUsername(),
                     CREDENTIALS.getOrDefault(user.getUsername(), ""),

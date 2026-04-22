@@ -1,6 +1,9 @@
 package storage;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.File;
+
 import org.junit.jupiter.api.Test;
 
 import trade.Investment;
@@ -8,11 +11,14 @@ import trade.Portfolio;
 import trade.User;
 
 public class UserDataManagerTest {
-    String testDir = "data/test/users";
+
+    private final String testDir = "data/test";
 
     @Test
     public void testSaveAndLoadUser() {
-        User user = new User("kathy", 10000.0);
+        new File(testDir).mkdirs();
+
+        User user = new User("bobby", 10000.0);
 
         Portfolio portfolio = new Portfolio();
         portfolio.addInvestment(new Investment(
@@ -26,17 +32,22 @@ public class UserDataManagerTest {
 
         user.setPortfolio(portfolio);
 
-        UserDataManager.saveUser(user);
-
-        User loaded = UserDataManager.loadUser("kathy");
+        UserDataManager.saveUser(user, testDir);
+        User loaded = UserDataManager.loadUser("bobby", testDir);
 
         assertNotNull(loaded);
-        assertEquals("alice", loaded.getUsername());
-        assertEquals(5000.0, loaded.getCashBalance());
+        assertEquals("bobby", loaded.getUsername());
+        assertEquals(10000.0, loaded.getCashBalance());
         assertNotNull(loaded.getPortfolio());
         assertNotNull(loaded.getPortfolio().getInvestments());
         assertEquals(1, loaded.getPortfolio().getInvestments().size());
-        assertEquals("AAPL", loaded.getPortfolio().getInvestments().get(0).getTicker());
-        assertEquals(5.0, loaded.getPortfolio().getInvestments().get(0).getShares());
+
+        Investment loadedInvestment = loaded.getPortfolio().getInvestments().get(0);
+        assertEquals("AAPL", loadedInvestment.getTicker());
+        assertEquals("Apple Inc.", loadedInvestment.getCompanyName());
+        assertEquals("2026-04-13", loadedInvestment.getPurchaseDate());
+        assertEquals(5.0, loadedInvestment.getShares());
+        assertEquals(200.0, loadedInvestment.getPurchasePrice());
+        assertEquals(1000.0, loadedInvestment.getAmountInvested());
     }
 }

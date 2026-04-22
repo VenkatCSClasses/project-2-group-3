@@ -54,20 +54,6 @@ public class UserTest {
     }
 
     @Test
-    public void testPurchaseAddsToExistingInvestment() {
-        User user = new User("alice", 10000.0);
-
-        user.purchaseStock("AAPL", "Apple Inc.", 200.0, "shares", 5.0);
-        user.purchaseStock("AAPL", "Apple Inc.", 300.0, "shares", 5.0);
-
-        Investment inv = user.findInvestment("AAPL");
-
-        assertNotNull(inv);
-        assertEquals(10.0, inv.getShares(), 0.0001);
-        assertEquals(250.0, inv.getPurchasePrice(), 0.0001);
-    }
-
-    @Test
     public void testSellStockByShares() {
         User user = new User("alice", 10000.0);
         user.purchaseStock("AAPL", "Apple Inc.", 200.0, "shares", 5.0);

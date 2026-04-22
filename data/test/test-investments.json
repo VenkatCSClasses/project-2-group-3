@@ -6,7 +6,8 @@
       "purchaseDate": "2026-04-13",
       "shares": 5.0,
       "purchasePrice": 200.0,
-      "amountInvested": 1000.0
+      "amountInvested": 1000.0,
+      "currentPrice": 200.0
     }
   ]
 }

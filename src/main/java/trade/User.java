@@ -94,8 +94,10 @@ public class User {
         double sharesToSell;
         if (method.equalsIgnoreCase("shares")) {
             sharesToSell = amount;
-        } else {
+        } else if (method.equalsIgnoreCase("dollars")) {
             sharesToSell = amount / livePrice;
+        } else {
+            return false;
         }
 
         if (sharesToSell <= 0 || sharesToSell > investment.getShares()) return false;
