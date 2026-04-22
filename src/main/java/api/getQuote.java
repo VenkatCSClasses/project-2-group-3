@@ -21,10 +21,18 @@ public class GetQuote {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         urlConnection.setRequestMethod("GET");
 
-        Scanner input = new Scanner(urlConnection.getInputStream());
+        int responseCode = urlConnection.getResponseCode();
+
+        // Fix API is
+        Scanner input;
+        if (responseCode >= 200 && responseCode < 300) {
+            input = new Scanner(urlConnection.getInputStream());
+        } else {
+            input = new Scanner(urlConnection.getErrorStream());
+        }
 
         StringBuilder response = new StringBuilder();
-        while (input.hasNext()) {
+        while (input.hasNextLine()) {
             response.append(input.nextLine());
         }
 
@@ -33,12 +41,16 @@ public class GetQuote {
 
         JsonObject root = JsonParser.parseString(response.toString()).getAsJsonObject();
 
+        if (root.has("status") && root.get("status").getAsString().equals("error")) {
+            throw new RuntimeException(root.toString());
+        }
+
         String name = root.get("name").getAsString();
         String exchange = root.get("exchange").getAsString();
         String currency = root.get("currency").getAsString();
         String datetime = root.get("datetime").getAsString();
-        String last_quote_at = root.get("last_quote_at").getAsString();
-        LocalDateTime last_quote_at_dt = LocalDateTime.parse(last_quote_at);
+        long last_quote_at = root.get("last_quote_at").getAsLong();
+        LocalDateTime last_quote_at_dt = java.time.Instant.ofEpochSecond(last_quote_at).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime();
         double open = root.get("open").getAsDouble();
         double high = root.get("high").getAsDouble();
         double low = root.get("low").getAsDouble();

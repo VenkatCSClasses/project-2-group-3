@@ -1,7 +1,7 @@
 package api;
 
 public class ApiKey {
-    private final static String apiKey = "d355b76586984b69a33ce709af165e84";
+    private final static String apiKey = "912887cdb07d48adb5c6eabde5c07494";
 
     public static String getApiKey(){
         return apiKey;
