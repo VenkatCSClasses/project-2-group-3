@@ -8,8 +8,7 @@ import trade.User;
 import java.util.Scanner;
 
 public class BuyStock {
-    public static void buyStock(Scanner input, User user, PriceStream stream,
-                                  String symbol, String companyName, double livePrice) {
+    public static void buyStock(Scanner input, User user, PriceStream stream, String symbol, String companyName, double livePrice) {
         System.out.printf("%nBuying %s (%s) at $%.4f%n", companyName, symbol, livePrice);
         System.out.printf("Available cash: $%.2f%n", user.getCashBalance());
 
@@ -47,7 +46,7 @@ public class BuyStock {
             stream.subscribe(symbol);
             UserDataManager.saveUser(user);
         } else {
-            System.out.println("Purchase failed — insufficient funds or invalid amount.");
+            System.out.println("Insufficient funds. Purchase failed.");
         }
     }
 }

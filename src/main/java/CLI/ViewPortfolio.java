@@ -14,38 +14,46 @@ public class ViewPortfolio {
     // -------------------------------------------------------------------------
 
     public static void viewPortfolio(Scanner input, User user, PriceStream stream) {
-        Portfolio portfolio = user.getPortfolio();
-        ArrayList<Investment> investments = portfolio.getInvestments();
+        boolean viewing = true;
+        
+        while (viewing) {
+            Portfolio portfolio = user.getPortfolio();
+                    ArrayList<Investment> investments = portfolio.getInvestments();
 
-        if (investments.isEmpty()) {
-            System.out.println("\nYour portfolio is empty.");
-            return;
-        }
+                    if (investments.isEmpty()) {
+                        System.out.println("\nYour portfolio is empty.");
+                        return;
+                    }
 
-        // Initial price refresh: stream first, HTTP fallback
-        RefreshPortfolioPrices.refreshPortfolioPrices(portfolio, stream);
+                    // Initial price refresh: stream first, HTTP fallback
+                    RefreshPortfolioPrices.refreshPortfolioPrices(portfolio, stream);
 
-        PrintPortfolioSnapshot.printPortfolioSnapshot(user);
+                    PrintPortfolioSnapshot.printPortfolioSnapshot(user);
 
-        System.out.println("1. Watch Live Prices  (auto-refresh every 3s)");
-        System.out.println("2. Sell an investment");
-        System.out.println("3. Remove an investment  (no cash impact)");
-        System.out.println("4. Review transaction history");
-        System.out.println("5. Back to Main Menu");
-        System.out.print("Choose an option: ");
+                    System.out.println("1. Watch Live Prices  (auto-refresh every 3s)");
+                    System.out.println("2. Sell an investment");
+                    System.out.println("3. Remove an investment  (no cash impact)");
+                    System.out.println("4. Review transaction history");
+                    System.out.println("5. Back to Main Menu");
+                    System.out.print("Choose an option: ");
 
-        if (!input.hasNextInt()) { input.nextLine(); return; }
-        int choice = input.nextInt();
-        input.nextLine();
+                    if (!input.hasNextInt()) { input.nextLine(); return; }
+                    int choice = input.nextInt();
+                    input.nextLine();
 
-        if (choice == 1) {
-            livePortfolioView(input, user, stream);
-        } else if (choice == 2) {
-            RemoveFromPortfolio.sellFromPortfolio(input, user, stream, investments);
-        } else if (choice == 3) {
-            RemoveFromPortfolio.removeFromPortfolio(input, user, investments);
-        } else if (choice == 4) {
-            transactionHistory(input, user);
+                    if (choice == 1) {
+                        livePortfolioView(input, user, stream);
+                    } else if (choice == 2) {
+                        RemoveFromPortfolio.sellFromPortfolio(input, user, stream, investments);
+                    } else if (choice == 3) {
+                        RemoveFromPortfolio.removeFromPortfolio(input, user, investments);
+                    } else if (choice == 4) {
+                        transactionHistory(input, user);
+                    } else if (choice == 5) {
+                        viewing = false;
+                    } else {
+                        System.out.println("Invalid input. Please enter an integer 1-5.");
+                    }
         }
     }
 

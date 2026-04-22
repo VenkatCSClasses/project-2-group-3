@@ -46,37 +46,39 @@ public class User {
      * @param method "shares" to specify a share count, "dollars" to specify a dollar amount
      * @return true if the purchase succeeded, false if insufficient funds or invalid amount
      */
-    public boolean purchaseStock(String ticker, String companyName, double livePrice,
-                                  String method, double amount) {
+    public boolean purchaseStock(String ticker, String companyName, double livePrice, String method, double amount) {
+        if (livePrice <= 0 || amount <= 0) {
+            return false;
+        }
+
         double sharesToBuy;
         if (method.equalsIgnoreCase("shares")) {
             sharesToBuy = amount;
-        } else {
+        } else if (method.equalsIgnoreCase("dollars")) {
             sharesToBuy = amount / livePrice;
+        } else {
+            return false;
         }
 
-        if (sharesToBuy <= 0) return false;
+        if (sharesToBuy <= 0) {
+            return false;
+        }
 
         double totalCost = sharesToBuy * livePrice;
-        if (totalCost > cashBalance) return false;
+        if (totalCost > cashBalance) {
+            return false;
+        }
 
         cashBalance -= totalCost;
 
-        Investment existing = findInvestment(ticker);
         String today = java.time.LocalDate.now().toString();
+        Investment newInv = new Investment(ticker, companyName, today, sharesToBuy, livePrice, totalCost);
+        newInv.setCurrentPrice(livePrice);
+        portfolio.addInvestment(newInv);
 
-        if (existing != null) {
-            existing.addShares(sharesToBuy, livePrice);
-            existing.setCurrentPrice(livePrice);
-            Transaction newTransaction = new Transaction("Buy", ticker, sharesToBuy, livePrice, totalCost);
-            transactionLog.addTransaction(newTransaction);
-        } else {
-            Investment newInv = new Investment(ticker, companyName, today, sharesToBuy, livePrice, totalCost);
-            Transaction newTransaction = new Transaction("Buy", ticker, sharesToBuy, livePrice, totalCost);
-            transactionLog.addTransaction(newTransaction);
-            newInv.setCurrentPrice(livePrice);
-            portfolio.addInvestment(newInv);
-        }
+        Transaction newTransaction = new Transaction("Buy", ticker, sharesToBuy, livePrice, totalCost);
+        transactionLog.addTransaction(newTransaction);
+
         return true;
     }
 

@@ -1,22 +1,72 @@
 {
   "username": "kathy",
   "password": "",
-  "cashBalance": 5268.07,
+  "cashBalance": 4344.514999999999,
   "portfolio": {
     "investments": [
       {
-        "ticker": "AAPL",
-        "companyName": "Apple Inc.",
-        "purchaseDate": "2026-04-13",
-        "shares": 4.0,
-        "purchasePrice": 200.0,
-        "amountInvested": 800.0,
-        "currentPrice": 268.07
+        "ticker": "AMZN",
+        "companyName": "Amazon.com, Inc.",
+        "purchaseDate": "2026-04-22",
+        "shares": 1.9883852934781552,
+        "purchasePrice": 251.26,
+        "amountInvested": 499.60168883932124,
+        "currentPrice": 252.77
+      },
+      {
+        "ticker": "DXCM",
+        "companyName": "Dexcom Inc.",
+        "purchaseDate": "2026-04-22",
+        "shares": 12.0,
+        "purchasePrice": 63.24,
+        "amountInvested": 758.88,
+        "currentPrice": 63.24
       }
     ],
     "nextInvestmentID": 1
   },
   "transactionLog": {
-    "transactionLog": []
+    "transactionLog": [
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Buy",
+        "ticker": "AMZN",
+        "shares": 3.9799410968717663,
+        "transactionPrice": 251.26,
+        "amountInvested": 1000.0
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Sell",
+        "ticker": "AMZN",
+        "shares": 1.9915558033936112,
+        "transactionPrice": 251.06,
+        "amountInvested": 500.0
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Sell",
+        "ticker": "AAPL",
+        "shares": 1.0,
+        "transactionPrice": 268.325,
+        "amountInvested": 268.325
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Sell",
+        "ticker": "AAPL",
+        "shares": 0.24955303933253872,
+        "transactionPrice": 268.48,
+        "amountInvested": 67.0
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Buy",
+        "ticker": "DXCM",
+        "shares": 12.0,
+        "transactionPrice": 63.24,
+        "amountInvested": 758.88
+      }
+    ]
   }
 }

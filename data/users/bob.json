@@ -1,9 +1,31 @@
 {
   "username": "bob",
   "password": "password2",
-  "cashBalance": 10000.0,
+  "cashBalance": 0.0,
   "portfolio": {
-    "investments": [],
+    "investments": [
+      {
+        "ticker": "AMZN",
+        "companyName": "Amazon.com, Inc.",
+        "purchaseDate": "2026-04-22",
+        "shares": 39.50695322376738,
+        "purchasePrice": 253.12,
+        "amountInvested": 10000.0,
+        "currentPrice": 253.12
+      }
+    ],
     "nextInvestmentID": 1
+  },
+  "transactionLog": {
+    "transactionLog": [
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Buy",
+        "ticker": "AMZN",
+        "shares": 39.50695322376738,
+        "transactionPrice": 253.12,
+        "amountInvested": 10000.0
+      }
+    ]
   }
 }

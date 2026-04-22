@@ -123,9 +123,9 @@ public class CLI {
             System.out.println("2. Get Previous EOD Price");
             System.out.println("3. Get Full Quote");
             System.out.println("4. Get Time Series");
-            System.out.println("5. Stock Symbol Search");
-            System.out.println("6. Buy Stock  (live price)");
-            System.out.println("7. Add Historical Position  (manual)");
+            System.out.println("5. Similar Stocks");
+            System.out.println("6. Buy Stock (live price)");
+            System.out.println("7. Add Historical Position (manual)");
             System.out.println("8. Research New Stock");
             System.out.println("9. Back to Main Menu");
             System.out.print("Choose (1-9): ");
@@ -189,7 +189,9 @@ public class CLI {
                 double livePrice = ResolvePrice.resolvePrice(symbol, stream);
                 AddHistoricalPosition.addHistoricalPosition(input, user, symbol, quote.getName(), livePrice);
 
-            } else if (choice == 8 || choice == 9) {
+            } else if (choice == 8) {
+                researchStock(input, user, stream);
+            } else if (choice == 9) {
                 researching = false;
 
             } else {
