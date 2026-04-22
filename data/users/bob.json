@@ -1,17 +1,28 @@
 {
   "username": "bob",
   "password": "password2",
-  "cashBalance": 0.0,
+  "cashBalance": 1504672.0599999998,
   "portfolio": {
     "investments": [
       {
         "ticker": "AMZN",
         "companyName": "Amazon.com, Inc.",
         "purchaseDate": "2026-04-22",
-        "shares": 39.50695322376738,
+        "shares": 19.506914054162998,
         "purchasePrice": 253.12,
-        "amountInvested": 10000.0,
-        "currentPrice": 253.12
+        "amountInvested": 4937.590085389738,
+        "currentPrice": 255.3,
+        "investmentType": 0
+      },
+      {
+        "ticker": "AMZN",
+        "companyName": "Amazon.com, Inc.",
+        "purchaseDate": "2020-01-01",
+        "shares": 20.0,
+        "purchasePrice": 92.392,
+        "amountInvested": 1847.84,
+        "currentPrice": 255.3,
+        "investmentType": 0
       }
     ],
     "nextInvestmentID": 1
@@ -25,6 +36,30 @@
         "shares": 39.50695322376738,
         "transactionPrice": 253.12,
         "amountInvested": 10000.0
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Sell",
+        "ticker": "AMZN",
+        "shares": 3.916960438699569E-5,
+        "transactionPrice": 255.3,
+        "amountInvested": 0.01
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Sell",
+        "ticker": "AMZN",
+        "shares": 20.0,
+        "transactionPrice": 255.3,
+        "amountInvested": 5106.0
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Sell",
+        "ticker": "AAPL",
+        "shares": 5490.0,
+        "transactionPrice": 273.145,
+        "amountInvested": 1499566.0499999998
       }
     ]
   }

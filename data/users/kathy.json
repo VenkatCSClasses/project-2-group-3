@@ -1,7 +1,7 @@
 {
   "username": "kathy",
   "password": "",
-  "cashBalance": 10000.0,
+  "cashBalance": 10815.765,
   "portfolio": {
     "investments": [
       {
@@ -11,12 +11,55 @@
         "shares": 5.0,
         "purchasePrice": 200.0,
         "amountInvested": 1000.0,
-        "currentPrice": 200.0
+        "currentPrice": 272.72
+      },
+      {
+        "ticker": "PYPL",
+        "companyName": "PayPal Holdings Inc",
+        "purchaseDate": "2026-04-22",
+        "shares": 1.754556974363973,
+        "purchasePrice": 51.295,
+        "amountInvested": 90.0,
+        "currentPrice": 51.3
+      },
+      {
+        "ticker": "PYPL",
+        "companyName": "PayPal Holdings Inc",
+        "purchaseDate": "2026-04-22",
+        "shares": 33.0,
+        "purchasePrice": 51.295,
+        "amountInvested": 1692.7350000000001,
+        "currentPrice": 51.3
       }
     ],
     "nextInvestmentID": 1
   },
   "transactionLog": {
-    "transactionLog": []
+    "transactionLog": [
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Buy",
+        "ticker": "PYPL",
+        "shares": 1.754556974363973,
+        "transactionPrice": 51.295,
+        "amountInvested": 90.0
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Buy",
+        "ticker": "PYPL",
+        "shares": 33.0,
+        "transactionPrice": 51.295,
+        "amountInvested": 1692.7350000000001
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Sell",
+        "ticker": "T",
+        "shares": 100.0,
+        "transactionPrice": 25.985,
+        "amountInvested": 2598.5
+      }
+    ]
   }
 }

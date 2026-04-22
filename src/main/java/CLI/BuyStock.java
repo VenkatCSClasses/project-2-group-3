@@ -2,10 +2,8 @@ package CLI;
 
 import apistream.*;
 import storage.*;
-import trade.Investment;
-import trade.User;
-
-import java.util.Scanner;
+import trade.*;
+import java.util.*;
 
 public class BuyStock {
     public static void buyStock(Scanner input, User user, PriceStream stream, String symbol, String companyName, double livePrice) {
@@ -33,9 +31,9 @@ public class BuyStock {
         // Re-resolve price right before executing in case stream updated it
         double execPrice = ResolvePrice.resolvePrice(symbol, stream);
 
-        boolean success = user.purchaseStock(symbol, companyName, execPrice, method, amount);
+        boolean success = UserTrading.purchaseStock(user, symbol, companyName, execPrice, method, amount);
         if (success) {
-            Investment inv = user.findInvestment(symbol);
+            Investment inv = UserTrading.findInvestment(user, symbol);
             System.out.printf("Bought %s. Position: %.4f shares @ $%.4f avg cost.%n",
                     symbol,
                     inv != null ? inv.getShares() : 0,

@@ -2,9 +2,7 @@ package CLI;
 
 import apistream.*;
 import storage.*;
-import trade.Investment;
-import trade.User;
-
+import trade.*;
 import java.util.*;
 
 public class RemoveFromPortfolio {
@@ -13,23 +11,34 @@ public class RemoveFromPortfolio {
     // -------------------------------------------------------------------------
 
     public static void sellFromPortfolio(Scanner input, User user, PriceStream stream, ArrayList<Investment> investments) {
+        System.out.println("NOTICE: Historical what-if investments cannot be sold. They can only be removed.");
         System.out.print("Enter the number of the investment to sell: ");
-        if (!input.hasNextInt()) { System.out.println("Invalid input."); input.nextLine(); return; }
+        if (!input.hasNextInt()) { 
+            System.out.println("Invalid input."); 
+            input.nextLine(); 
+            return; 
+        }
         int idx = input.nextInt() - 1;
         input.nextLine();
 
-        if (idx < 0 || idx >= investments.size()) { System.out.println("Invalid selection."); return; }
+        if (idx < 0 || idx >= investments.size()) { 
+            System.out.println("Invalid selection."); 
+            return; 
+        }
 
         Investment inv = investments.get(idx);
+
+        if (inv.getInvestmentType() == 1) {
+            System.out.println("What-if investments cannot be sold. They can only be removed.");
+            return;
+        }
 
         // Get freshest available price
         double livePrice = ResolvePrice.resolvePrice(inv.getTicker(), stream);
         inv.setCurrentPrice(livePrice);
 
-        System.out.printf("%nSelling %s (%s) at $%.4f%n",
-                inv.getCompanyName(), inv.getTicker(), livePrice);
-        System.out.printf("You own %.4f shares  (value: $%.2f)%n",
-                inv.getShares(), inv.getValue());
+        System.out.printf("%nSelling %s (%s) at $%.4f%n", inv.getCompanyName(), inv.getTicker(), livePrice);
+        System.out.printf("You own %.4f shares  (value: $%.2f)%n", inv.getShares(), inv.getValue());
 
         System.out.println("Sell by:");
         System.out.println("1. Number of shares");
@@ -37,7 +46,11 @@ public class RemoveFromPortfolio {
         System.out.println("3. Sell all");
         System.out.print("Choose (1-3): ");
 
-        if (!input.hasNextInt()) { System.out.println("Invalid input."); input.nextLine(); return; }
+        if (!input.hasNextInt()) { 
+            System.out.println("Invalid input."); 
+            input.nextLine(); 
+            return; 
+        }
         int methodChoice = input.nextInt();
         input.nextLine();
 
@@ -60,7 +73,7 @@ public class RemoveFromPortfolio {
 
         // Re-resolve price at execution time
         double execPrice = ResolvePrice.resolvePrice(inv.getTicker(), stream);
-        boolean success = user.sellStock(inv.getTicker(), execPrice, method, amount);
+        boolean success = UserTrading.sellStock(user, inv.getTicker(), execPrice, method, amount);
 
         if (success) {
             System.out.printf("Sale complete. Cash balance: $%.2f%n", user.getCashBalance());
@@ -71,20 +84,36 @@ public class RemoveFromPortfolio {
     }
 
     // -------------------------------------------------------------------------
-    // Remove (no cash impact)
+    // Remove (no cash impact) - primarily for what-if investments
     // -------------------------------------------------------------------------
 
     public static void removeFromPortfolio(Scanner input, User user, ArrayList<Investment> investments) {
+        System.out.println("NOTICE: Your cash will not change upon removing an investment.");
         System.out.print("Enter the number of the investment to remove: ");
-        if (!input.hasNextInt()) { System.out.println("Invalid input."); input.nextLine(); return; }
+
+        if (!input.hasNextInt()) { 
+            System.out.println("Invalid input."); 
+            input.nextLine(); 
+            return; 
+        }
         int idx = input.nextInt() - 1;
         input.nextLine();
 
         if (idx >= 0 && idx < investments.size()) {
             Investment removed = investments.get(idx);
-            user.getPortfolio().removeInvestment(removed);
-            UserDataManager.saveUser(user);
-            System.out.println("Removed " + removed.getTicker() + " from portfolio.");
+            if (removed.getInvestmentType() == 0) {
+                user.getPortfolio().removeInvestment(removed);
+                UserDataManager.saveUser(user);
+                Transaction newTransaction = new Transaction("Removal", removed.getTicker(), 
+                removed.getShares(), removed.getCurrentPrice(), 0);
+                TransactionLog transactionLog = user.getTransactionLog();
+                transactionLog.addTransaction(newTransaction);
+                System.out.println("Removed " + removed.getTicker() + " from portfolio.");
+            } else if (removed.getInvestmentType() == 1) {
+                user.getPortfolio().removeInvestment(removed);
+                UserDataManager.saveUser(user);
+                System.out.println("Removed " + removed.getTicker() + " from portfolio.");
+            }
         } else {
             System.out.println("Invalid selection.");
         }
