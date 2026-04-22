@@ -12,8 +12,7 @@ public class RemoveFromPortfolio {
     // Sell
     // -------------------------------------------------------------------------
 
-    public static void sellFromPortfolio(Scanner input, User user, PriceStream stream,
-                                           ArrayList<Investment> investments) {
+    public static void sellFromPortfolio(Scanner input, User user, PriceStream stream, ArrayList<Investment> investments) {
         System.out.print("Enter the number of the investment to sell: ");
         if (!input.hasNextInt()) { System.out.println("Invalid input."); input.nextLine(); return; }
         int idx = input.nextInt() - 1;

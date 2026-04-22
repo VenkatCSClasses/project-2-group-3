@@ -3,8 +3,6 @@ package trade;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import trade.Investment;
-
 public class InvestmentTest {
 
     @Test

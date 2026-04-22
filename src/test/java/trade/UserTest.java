@@ -3,9 +3,6 @@ package trade;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import trade.Investment;
-import trade.User;
-
 // current fails
 
 public class UserTest {

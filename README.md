@@ -128,6 +128,9 @@ https://docs.google.com/document/d/1kY0PO8JxcXUhLz7ybEKR8b8pzsUQnz9_IJyOBBCMe7w
 ## Sprint 1 Retrospective
 https://docs.google.com/document/d/1Zoo7wAxc-k_x145A1b-dCt78e1h3ZQr2WWR8p_BQi0Q
 
+## Sprint 2 Review
+https://docs.google.com/document/d/1gkXGanp0KlpdXKhPZEXx28eHQ4JMBSvqu-arnf0j74M
+
 ## Use Case Diagram
 
 ![Use Case Diagram](diagrams/use-case-diagram.png)

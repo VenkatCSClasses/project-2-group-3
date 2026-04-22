@@ -46,7 +46,7 @@ public class BuyStock {
             stream.subscribe(symbol);
             UserDataManager.saveUser(user);
         } else {
-            System.out.println("Insufficient funds. Purchase failed.");
+            System.out.println("Insufficient funds. Purchase failed.    ");
         }
     }
 }
