@@ -6,7 +6,7 @@ import java.util.Locale;
 public class NumFormat {
 
     private static final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.US);
-    private static final NumberFormat percentFormat = NumberFormat.getPercentInstance();
+    private static final NumberFormat percentFormat = NumberFormat.getNumberInstance(Locale.US);
     private static final NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
 
     static {
@@ -25,7 +25,7 @@ public class NumFormat {
     }
 
     public static String formatPercent(double value) {
-        return percentFormat.format(value);
+        return percentFormat.format(value) + "%";
     }
 
     public static String formatNumber(double value) {

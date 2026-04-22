@@ -19,7 +19,7 @@ public class Investment {
         this.purchasePrice = purchasePrice;
         this.amountInvested = amountInvested;
         this.currentPrice = purchasePrice;
-        this.investmentType = 0; // 0 if it is a regular investment, 1 if it is a historical/what-if investment
+        this.investmentType = investmentType; // 0 if it is a regular investment, 1 if it is a historical/what-if investment
     }
 
     public String getTicker() {
@@ -53,7 +53,6 @@ public class Investment {
     public int getInvestmentType() {
         return investmentType;
     }
-
 
     public void setCurrentPrice(double currentPrice) {
         this.currentPrice = currentPrice;

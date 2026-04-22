@@ -90,29 +90,33 @@ public class CLI {
     // -------------------------------------------------------------------------
 
     private static void researchStock(Scanner input, User user, PriceStream stream) throws Exception {
-        System.out.print("\nEnter a stock symbol: ");
-        String symbol = input.nextLine().toUpperCase().trim();
+        boolean researching = true;
 
-        if (!symbol.matches("[A-Z]{1,5}")) {
-            System.out.println("Invalid symbol format. Use 1-5 letters (e.g., AAPL).");
-            return;
+        while (researching) {
+            System.out.print("\nEnter a stock symbol: ");
+            String symbol = input.nextLine().toUpperCase().trim();
+
+            if (!symbol.matches("[A-Z]{1,5}")) {
+                System.out.println("Invalid symbol format. Use 1-5 letters (e.g., AAPL).");
+                return;
+            }
+
+            Quote quote;
+            try {
+                quote = GetQuote.run(symbol);
+            } catch (Exception e) {
+                System.out.println("API error: " + e.getMessage());
+                return;
+            }
+
+            System.out.println("\n--- Quote for " + symbol + " ---");
+            System.out.println(quote);
+            System.out.println("----------------------------------");
+            researching = researchMenu(input, user, symbol, quote, stream);
         }
-
-        Quote quote;
-        try {
-            quote = GetQuote.run(symbol);
-        } catch (Exception e) {
-            System.out.println("API error: " + e.getMessage());
-            return;
-        }
-
-        System.out.println("\n--- Quote for " + symbol + " ---");
-        System.out.println(quote);
-        System.out.println("----------------------------------");
-        researchMenu(input, user, symbol, quote, stream);
     }
 
-    private static void researchMenu(Scanner input, User user, String symbol, Quote quote, PriceStream stream) throws Exception {
+    private static boolean researchMenu(Scanner input, User user, String symbol, Quote quote, PriceStream stream) throws Exception {
         // Subscribe the researched ticker so stream starts filling its price
         stream.subscribe(symbol);
 
@@ -190,13 +194,14 @@ public class CLI {
                 AddHistoricalPosition.addHistoricalPosition(input, user, symbol, quote.getName(), livePrice);
 
             } else if (choice == 8) {
-                researchStock(input, user, stream);
+                return true;
             } else if (choice == 9) {
-                researching = false;
+                return false;
 
             } else {
                 System.out.println("Invalid input. Please enter 1-9.");
             }
         }
+        return false;
     }
 }

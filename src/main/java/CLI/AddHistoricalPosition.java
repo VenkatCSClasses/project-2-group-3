@@ -19,6 +19,7 @@ public class AddHistoricalPosition {
 
         double price = GetOldPrice.run(symbol, purchaseDate);
 
+        System.out.println("Price at " + purchaseDate + ": $" + price);
         System.out.print("Enter number of shares: ");
         if (!input.hasNextDouble()) { 
                 System.out.println("Invalid input. Please enter an integer."); 
@@ -28,7 +29,7 @@ public class AddHistoricalPosition {
         double shares = input.nextDouble();
         input.nextLine();
 
-        // ?
+        
         Investment inv = new Investment(symbol, companyName, purchaseDate, shares, price, shares * price, 1);
         inv.setCurrentPrice(currentPrice);
 
