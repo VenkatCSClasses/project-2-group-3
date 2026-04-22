@@ -15,5 +15,8 @@
       }
     ],
     "nextInvestmentID": 1
+  },
+  "transactionLog": {
+    "transactionLog": []
   }
 }

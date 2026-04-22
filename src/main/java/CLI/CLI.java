@@ -102,7 +102,7 @@ public class CLI {
         try {
             quote = GetQuote.run(symbol);
         } catch (Exception e) {
-            System.out.println("Invalid stock symbol or API error.");
+            System.out.println("API error: " + e.getMessage());
             return;
         }
 
