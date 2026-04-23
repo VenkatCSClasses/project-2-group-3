@@ -5,12 +5,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ApiTest {
 
-    //
-
     @Test
     // Ensure API key is properly fetched
     void getApiKeyTest() {
-        assertEquals("d355b76586984b69a33ce709af165e84", ApiKey.getApiKey());
+        assertEquals("912887cdb07d48adb5c6eabde5c07494", ApiKey.getApiKey());
     }
     
 }

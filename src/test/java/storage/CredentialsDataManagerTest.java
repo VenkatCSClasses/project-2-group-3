@@ -18,7 +18,7 @@ public class CredentialsDataManagerTest {
         assertEquals("1234", credentials.get("billybob"));
     }
 
-    @Test
+    @Test // must be changed with every new test
     public void testCreateAccount() throws Exception {
         boolean created = CredentialsDataManager.createAccount("joe", "5678");
         Map<String, String> updated = CredentialsDataManager.loadCredentials();

@@ -2,14 +2,11 @@ package CLI;
 
 import apistream.*;
 import storage.*;
-import trade.Investment;
-import trade.User;
-
-import java.util.Scanner;
+import trade.*;
+import java.util.*;
 
 public class BuyStock {
-    public static void buyStock(Scanner input, User user, PriceStream stream,
-                                  String symbol, String companyName, double livePrice) {
+    public static void buyStock(Scanner input, User user, PriceStream stream, String symbol, String companyName, double livePrice) {
         System.out.printf("%nBuying %s (%s) at $%.4f%n", companyName, symbol, livePrice);
         System.out.printf("Available cash: $%.2f%n", user.getCashBalance());
 
@@ -34,20 +31,18 @@ public class BuyStock {
         // Re-resolve price right before executing in case stream updated it
         double execPrice = ResolvePrice.resolvePrice(symbol, stream);
 
-        boolean success = user.purchaseStock(symbol, companyName, execPrice, method, amount);
-        if (success) {
-            Investment inv = user.findInvestment(symbol);
+        Investment success = UserTrading.purchaseStock(user, symbol, companyName, execPrice, method, amount);
+        if (success != null) {
+            Investment inv = UserTrading.findInvestment(user, symbol);
             System.out.printf("Bought %s. Position: %.4f shares @ $%.4f avg cost.%n",
-                    symbol,
-                    inv != null ? inv.getShares() : 0,
-                    inv != null ? inv.getPurchasePrice() : execPrice);
+                symbol, inv.getShares(), inv.getPurchasePrice());
             System.out.printf("Remaining cash: $%.2f%n", user.getCashBalance());
 
             // Make sure this ticker is subscribed in the stream
             stream.subscribe(symbol);
             UserDataManager.saveUser(user);
         } else {
-            System.out.println("Purchase failed — insufficient funds or invalid amount.");
+            System.out.println("Insufficient funds. Purchase failed.    ");
         }
     }
 }

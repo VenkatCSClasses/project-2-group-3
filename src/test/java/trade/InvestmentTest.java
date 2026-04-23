@@ -3,39 +3,43 @@ package trade;
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import trade.Investment;
-
 public class InvestmentTest {
 
     @Test
     public void testConstructorAndGetters() {
         Investment inv = new Investment(
+                1,
                 "AAPL",
                 "Apple Inc.",
                 "2026-04-13",
                 5.0,
                 200.0,
-                1000.0
+                1000.0,
+                0
         );
 
+        assertEquals(1, inv.getInvestmentId());
         assertEquals("AAPL", inv.getTicker());
         assertEquals("Apple Inc.", inv.getCompanyName());
         assertEquals("2026-04-13", inv.getPurchaseDate());
         assertEquals(5.0, inv.getShares());
         assertEquals(200.0, inv.getPurchasePrice());
         assertEquals(1000.0, inv.getAmountInvested());
+        assertEquals(0, inv.getInvestmentType());
         assertEquals(200.0, inv.getCurrentPrice());
     }
 
     @Test
     public void testSetCurrentPrice() {
         Investment inv = new Investment(
+                1,
                 "AAPL",
                 "Apple Inc.",
                 "2026-04-13",
                 5.0,
                 200.0,
-                1000.0
+                1000.0,
+                0
         );
 
         inv.setCurrentPrice(220.0);
@@ -46,12 +50,14 @@ public class InvestmentTest {
     @Test
     public void testGetValue() {
         Investment inv = new Investment(
+                1,
                 "AAPL",
                 "Apple Inc.",
                 "2026-04-13",
                 5.0,
                 200.0,
-                1000.0
+                1000.0,
+                0
         );
 
         inv.setCurrentPrice(220.0);
@@ -62,12 +68,14 @@ public class InvestmentTest {
     @Test
     public void testGetPercentChange() {
         Investment inv = new Investment(
+                1,
                 "AAPL",
                 "Apple Inc.",
                 "2026-04-13",
                 5.0,
                 200.0,
-                1000.0
+                1000.0,
+                0
         );
 
         inv.setCurrentPrice(220.0);
@@ -78,12 +86,14 @@ public class InvestmentTest {
     @Test
     public void testAddShares() {
         Investment inv = new Investment(
+                1,
                 "AAPL",
                 "Apple Inc.",
                 "2026-04-13",
                 5.0,
                 200.0,
-                1000.0
+                1000.0,
+                0
         );
 
         inv.addShares(5.0, 300.0);
@@ -96,12 +106,14 @@ public class InvestmentTest {
     @Test
     public void testRemoveShares() {
         Investment inv = new Investment(
+                1,
                 "AAPL",
                 "Apple Inc.",
                 "2026-04-13",
                 10.0,
                 200.0,
-                2000.0
+                2000.0,
+                0
         );
 
         inv.removeShares(4.0);
@@ -113,12 +125,14 @@ public class InvestmentTest {
     @Test
     public void testRemoveAllShares() {
         Investment inv = new Investment(
+                1,
                 "AAPL",
                 "Apple Inc.",
                 "2026-04-13",
                 10.0,
                 200.0,
-                2000.0
+                2000.0,
+                0
         );
 
         inv.removeShares(10.0);

@@ -1,9 +1,6 @@
 package trade;
 
 import org.junit.jupiter.api.Test;
-
-import trade.Admin;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AdminTests {

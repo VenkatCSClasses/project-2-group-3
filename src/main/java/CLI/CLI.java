@@ -31,8 +31,9 @@ public class CLI {
         stream.connect();
 
         List<String> tickers = user.getPortfolio().getInvestments().stream()
-                .map(Investment::getTicker)
+                .map(Investment::getTicker).distinct()
                 .collect(Collectors.toList());
+
         if (!tickers.isEmpty()) {
             stream.subscribe(tickers);
             System.out.println("Subscribed to: " + tickers);
@@ -90,29 +91,33 @@ public class CLI {
     // -------------------------------------------------------------------------
 
     private static void researchStock(Scanner input, User user, PriceStream stream) throws Exception {
-        System.out.print("\nEnter a stock symbol: ");
-        String symbol = input.nextLine().toUpperCase().trim();
+        boolean researching = true;
 
-        if (!symbol.matches("[A-Z]{1,5}")) {
-            System.out.println("Invalid symbol format. Use 1-5 letters (e.g., AAPL).");
-            return;
+        while (researching) {
+            System.out.print("\nEnter a stock symbol: ");
+            String symbol = input.nextLine().toUpperCase().trim();
+
+            if (!symbol.matches("[A-Z]{1,5}")) {
+                System.out.println("Invalid symbol format. Use 1-5 letters (e.g., AAPL).");
+                return;
+            }
+
+            Quote quote;
+            try {
+                quote = GetQuote.run(symbol);
+            } catch (Exception e) {
+                System.out.println("API error: " + e.getMessage());
+                return;
+            }
+
+            System.out.println("\n--- Quote for " + symbol + " ---");
+            System.out.println(quote);
+            System.out.println("----------------------------------");
+            researching = researchMenu(input, user, symbol, quote, stream);
         }
-
-        Quote quote;
-        try {
-            quote = GetQuote.run(symbol);
-        } catch (Exception e) {
-            System.out.println("API error: " + e.getMessage());
-            return;
-        }
-
-        System.out.println("\n--- Quote for " + symbol + " ---");
-        System.out.println(quote);
-        System.out.println("----------------------------------");
-        researchMenu(input, user, symbol, quote, stream);
     }
 
-    private static void researchMenu(Scanner input, User user, String symbol, Quote quote, PriceStream stream) throws Exception {
+    private static boolean researchMenu(Scanner input, User user, String symbol, Quote quote, PriceStream stream) throws Exception {
         // Subscribe the researched ticker so stream starts filling its price
         stream.subscribe(symbol);
 
@@ -123,9 +128,9 @@ public class CLI {
             System.out.println("2. Get Previous EOD Price");
             System.out.println("3. Get Full Quote");
             System.out.println("4. Get Time Series");
-            System.out.println("5. Stock Symbol Search");
-            System.out.println("6. Buy Stock  (live price)");
-            System.out.println("7. Add Historical Position  (manual)");
+            System.out.println("5. Similar Stocks");
+            System.out.println("6. Buy Stock (live price)");
+            System.out.println("7. Add Historical Position (what-if)");
             System.out.println("8. Research New Stock");
             System.out.println("9. Back to Main Menu");
             System.out.print("Choose (1-9): ");
@@ -189,12 +194,15 @@ public class CLI {
                 double livePrice = ResolvePrice.resolvePrice(symbol, stream);
                 AddHistoricalPosition.addHistoricalPosition(input, user, symbol, quote.getName(), livePrice);
 
-            } else if (choice == 8 || choice == 9) {
-                researching = false;
+            } else if (choice == 8) {
+                return true;
+            } else if (choice == 9) {
+                return false;
 
             } else {
                 System.out.println("Invalid input. Please enter 1-9.");
             }
         }
+        return false;
     }
 }

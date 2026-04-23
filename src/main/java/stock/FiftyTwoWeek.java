@@ -19,7 +19,7 @@ public class FiftyTwoWeek {
 
     @Override
     public String toString() {
-        return "Low: " + NumFormat.formatCurrency(low) +
+        return "\nLow: " + NumFormat.formatCurrency(low) +
                 "\nHigh: " + NumFormat.formatCurrency(high) +
                 "\nLow Change: " + NumFormat.formatCurrency(low_change) +
                 "\nHigh Change: " + NumFormat.formatCurrency(high_change) +
