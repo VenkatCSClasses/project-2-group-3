@@ -17,7 +17,13 @@ public class AddHistoricalPosition {
         System.out.print("Enter purchase date (YYYY-MM-DD): ");
         String purchaseDate = input.nextLine().trim();
 
-        double price = GetOldPrice.run(symbol, purchaseDate);
+        double price;
+        try {
+            price = GetOldPrice.run(symbol, purchaseDate);
+        } catch (Exception e) {
+            System.out.println("Invalid historical purchase date or no historical data found.");
+            return;
+        }
 
         System.out.println("Price at " + purchaseDate + ": $" + price);
         System.out.print("Enter number of shares: ");
@@ -29,8 +35,8 @@ public class AddHistoricalPosition {
         double shares = input.nextDouble();
         input.nextLine();
 
-        
-        Investment inv = new Investment(symbol, companyName, purchaseDate, shares, price, shares * price, 1);
+        int investmentId = user.getPortfolio().generateInvestmentID();
+        Investment inv = new Investment(investmentId, symbol, companyName, purchaseDate, shares, price, shares * price, 1);
         inv.setCurrentPrice(currentPrice);
 
         user.getPortfolio().addInvestment(inv);

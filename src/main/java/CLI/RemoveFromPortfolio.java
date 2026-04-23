@@ -73,7 +73,7 @@ public class RemoveFromPortfolio {
 
         // Re-resolve price at execution time
         double execPrice = ResolvePrice.resolvePrice(inv.getTicker(), stream);
-        boolean success = UserTrading.sellStock(user, inv.getTicker(), execPrice, method, amount);
+        boolean success = UserTrading.sellStock(user, inv.getInvestmentId(), inv.getTicker(), execPrice, method, amount);
 
         if (success) {
             System.out.printf("Sale complete. Cash balance: $%.2f%n", user.getCashBalance());

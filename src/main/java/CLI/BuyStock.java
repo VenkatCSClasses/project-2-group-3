@@ -31,13 +31,11 @@ public class BuyStock {
         // Re-resolve price right before executing in case stream updated it
         double execPrice = ResolvePrice.resolvePrice(symbol, stream);
 
-        boolean success = UserTrading.purchaseStock(user, symbol, companyName, execPrice, method, amount);
-        if (success) {
+        Investment success = UserTrading.purchaseStock(user, symbol, companyName, execPrice, method, amount);
+        if (success != null) {
             Investment inv = UserTrading.findInvestment(user, symbol);
             System.out.printf("Bought %s. Position: %.4f shares @ $%.4f avg cost.%n",
-                    symbol,
-                    inv != null ? inv.getShares() : 0,
-                    inv != null ? inv.getPurchasePrice() : execPrice);
+                symbol, inv.getShares(), inv.getPurchasePrice());
             System.out.printf("Remaining cash: $%.2f%n", user.getCashBalance());
 
             // Make sure this ticker is subscribed in the stream

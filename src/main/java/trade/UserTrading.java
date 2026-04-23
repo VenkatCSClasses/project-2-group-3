@@ -6,9 +6,9 @@ public class UserTrading {
      * @param method "shares" to specify a share count, "dollars" to specify a dollar amount
      * @return true if the purchase succeeded, false if insufficient funds or invalid amount
      */
-    public static boolean purchaseStock(User user, String ticker, String companyName, double livePrice, String method, double amount) {
+    public static Investment purchaseStock(User user, String ticker, String companyName, double livePrice, String method, double amount) {
         if (livePrice <= 0 || amount <= 0) {
-            return false;
+            return null;
         }
 
         double sharesToBuy;
@@ -17,29 +17,31 @@ public class UserTrading {
         } else if (method.equalsIgnoreCase("dollars")) {
             sharesToBuy = amount / livePrice;
         } else {
-            return false;
+            return null;
         }
 
         if (sharesToBuy <= 0) {
-            return false;
+            return null;
         }
 
         double totalCost = sharesToBuy * livePrice;
         if (totalCost > user.getCashBalance()) {
-            return false;
+            return null;
         }
 
         user.setCashBalance(user.getCashBalance() - totalCost);
 
         String today = java.time.LocalDate.now().toString();
-        Investment newInv = new Investment(ticker, companyName, today, sharesToBuy, livePrice, totalCost, 0);
+        int investmentId = user.getPortfolio().generateInvestmentID();
+
+        Investment newInv = new Investment(investmentId, ticker, companyName, today, sharesToBuy, livePrice, totalCost, 0);
         newInv.setCurrentPrice(livePrice);
         user.getPortfolio().addInvestment(newInv);
 
         Transaction newTransaction = new Transaction("Buy", ticker, sharesToBuy, livePrice, totalCost);
         user.getTransactionLog().addTransaction(newTransaction);
 
-        return true;
+        return newInv;
     }
 
     /**
@@ -47,9 +49,11 @@ public class UserTrading {
      * @param method "shares" to specify a share count, "dollars" to specify a dollar amount
      * @return true if the sale succeeded, false if not enough shares or not found
      */
-    public static boolean sellStock(User user, String ticker, double livePrice, String method, double amount) {
-        Investment investment = findInvestment(user, ticker);
-        if (investment == null) return false;
+    public static boolean sellStock(User user, int investmentId, String ticker, double livePrice, String method, double amount) {
+        Investment investment = findInvestmentById(user, investmentId);
+        if (investment == null) {
+            return false;
+        }
 
         double sharesToSell;
         if (method.equalsIgnoreCase("shares")) {
@@ -86,4 +90,15 @@ public class UserTrading {
         }
         return null;
     }
+
+    public static Investment findInvestmentById(User user, int investmentId) {
+        Portfolio portfolio = user.getPortfolio();
+        for (Investment inv : portfolio.getInvestments()) { 
+            if (inv.getInvestmentId() == investmentId) { 
+                return inv; 
+            }
+        }
+        return null;
+    }
+
 }

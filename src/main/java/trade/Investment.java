@@ -1,6 +1,7 @@
 package trade;
 
 public class Investment {
+    private int investmentId;
     private String ticker;
     private String companyName;
     private String purchaseDate;
@@ -10,8 +11,9 @@ public class Investment {
     private double currentPrice;
     private int investmentType;
 
-    public Investment(String ticker, String companyName, String purchaseDate,
+    public Investment(int investmentId, String ticker, String companyName, String purchaseDate,
                       double shares, double purchasePrice, double amountInvested, int investmentType) {
+        this.investmentId = investmentId;
         this.ticker = ticker;
         this.companyName = companyName;
         this.purchaseDate = purchaseDate;
@@ -20,6 +22,10 @@ public class Investment {
         this.amountInvested = amountInvested;
         this.currentPrice = purchasePrice;
         this.investmentType = investmentType; // 0 if it is a regular investment, 1 if it is a historical/what-if investment
+    }
+
+    public int getInvestmentId() {
+        return investmentId;
     }
 
     public String getTicker() {

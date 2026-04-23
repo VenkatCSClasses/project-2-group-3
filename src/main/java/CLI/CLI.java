@@ -31,8 +31,9 @@ public class CLI {
         stream.connect();
 
         List<String> tickers = user.getPortfolio().getInvestments().stream()
-                .map(Investment::getTicker)
+                .map(Investment::getTicker).distinct()
                 .collect(Collectors.toList());
+
         if (!tickers.isEmpty()) {
             stream.subscribe(tickers);
             System.out.println("Subscribed to: " + tickers);
