@@ -22,12 +22,14 @@ public class UserDataManagerTest {
 
         Portfolio portfolio = new Portfolio();
         portfolio.addInvestment(new Investment(
+                1,
                 "AAPL",
                 "Apple Inc.",
                 "2026-04-13",
                 5.0,
                 200.0,
-                1000.0
+                1000.0,
+                0
         ));
 
         user.setPortfolio(portfolio);
@@ -43,11 +45,13 @@ public class UserDataManagerTest {
         assertEquals(1, loaded.getPortfolio().getInvestments().size());
 
         Investment loadedInvestment = loaded.getPortfolio().getInvestments().get(0);
+        assertEquals(1, loadedInvestment.getInvestmentId());
         assertEquals("AAPL", loadedInvestment.getTicker());
         assertEquals("Apple Inc.", loadedInvestment.getCompanyName());
         assertEquals("2026-04-13", loadedInvestment.getPurchaseDate());
         assertEquals(5.0, loadedInvestment.getShares());
         assertEquals(200.0, loadedInvestment.getPurchasePrice());
         assertEquals(1000.0, loadedInvestment.getAmountInvested());
+        assertEquals(0, loadedInvestment.getInvestmentType());
     }
 }

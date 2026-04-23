@@ -16,7 +16,16 @@ public class PortfolioTest {
     @Test
     public void testAddAndRemoveInvestment() {
         Portfolio portfolio = new Portfolio();
-        Investment inv = new Investment("AAPL", "Apple Inc.", "2026-04-13", 5.0, 200.0, 1000.0);
+        Investment inv = new Investment(
+                1,
+                "AAPL",
+                "Apple Inc.",
+                "2026-04-13",
+                5.0,
+                200.0,
+                1000.0,
+                0
+        );
 
         portfolio.addInvestment(inv);
         assertEquals(1, portfolio.getInvestments().size());
@@ -35,44 +44,71 @@ public class PortfolioTest {
     }
 
     @Test
-    public void testGetTotalValue() {
+    public void testGetRealTotalValue() {
         Portfolio portfolio = new Portfolio();
 
-        Investment a = new Investment("AAPL", "Apple Inc.", "2026-04-13", 5.0, 200.0, 1000.0);
+        Investment a = new Investment(
+                1,
+                "AAPL",
+                "Apple Inc.",
+                "2026-04-13",
+                5.0,
+                200.0,
+                1000.0,
+                0
+        );
         a.setCurrentPrice(220.0);
 
-        Investment b = new Investment("MSFT", "Microsoft", "2026-04-13", 2.0, 100.0, 200.0);
+        Investment b = new Investment(
+                2,
+                "MSFT",
+                "Microsoft",
+                "2026-04-13",
+                2.0,
+                100.0,
+                200.0,
+                0
+        );
         b.setCurrentPrice(150.0);
 
         portfolio.addInvestment(a);
         portfolio.addInvestment(b);
 
-        assertEquals(1400.0, portfolio.getTotalValue());
+        assertEquals(1400.0, portfolio.getRealTotalValue(), 0.0001);
     }
 
     @Test
-    public void testGetTotalChange() {
+    public void testGetRealTotalChange() {
         Portfolio portfolio = new Portfolio();
 
-        Investment a = new Investment("AAPL", "Apple Inc.", "2026-04-13", 5.0, 200.0, 1000.0);
+        Investment a = new Investment(
+                1,
+                "AAPL",
+                "Apple Inc.",
+                "2026-04-13",
+                5.0,
+                200.0,
+                1000.0,
+                0
+        );
         a.setCurrentPrice(220.0);
 
         portfolio.addInvestment(a);
 
-        assertEquals(10.0, portfolio.getTotalChange(), 0.0001);
+        assertEquals(10.0, portfolio.getRealTotalChange(), 0.0001);
     }
 
     @Test
-    public void testGetTotalValueWhenEmpty() {
+    public void testGetRealTotalValueWhenEmpty() {
         Portfolio portfolio = new Portfolio();
 
-        assertEquals(0.0, portfolio.getTotalValue());
+        assertEquals(0.0, portfolio.getRealTotalValue(), 0.0001);
     }
 
     @Test
-    public void testGetTotalChangeWhenEmpty() {
+    public void testGetRealTotalChangeWhenEmpty() {
         Portfolio portfolio = new Portfolio();
 
-        assertEquals(0.0, portfolio.getTotalChange());
+        assertEquals(0.0, portfolio.getRealTotalChange(), 0.0001);
     }
 }

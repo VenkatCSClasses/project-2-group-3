@@ -12,12 +12,14 @@ public class JsonFileManagerTest {
         InvestmentStorage storage = new InvestmentStorage();
 
         Investment investment = new Investment(
+                1,
                 "AAPL",
                 "Apple Inc.",
                 "2026-04-13",
                 5.0,
                 200.0,
-                1000.0
+                1000.0,
+                0
         );
 
         storage.addInvestment(investment);
@@ -32,5 +34,7 @@ public class JsonFileManagerTest {
         assertEquals(1, loaded.getInvestments().size());
         assertEquals("AAPL", loaded.getInvestments().get(0).getTicker());
         assertEquals(5.0, loaded.getInvestments().get(0).getShares());
+        assertEquals(1, loaded.getInvestments().get(0).getInvestmentId());
+        assertEquals(0, loaded.getInvestments().get(0).getInvestmentType());
     }
 }
