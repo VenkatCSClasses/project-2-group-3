@@ -1,6 +1,6 @@
 package trade;
 
-import api.PriceStream;
+import apistream.PriceStream;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

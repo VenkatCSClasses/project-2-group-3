@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import webservice.UserService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -42,8 +43,8 @@ public class PortfolioController {
             return ResponseEntity.badRequest().body("Could not fetch price for " + req.ticker());
         }
 
-        boolean ok = user.purchaseStock(req.ticker(), req.companyName(), price, req.method(), req.amount());
-        if (!ok) return ResponseEntity.badRequest().body("Purchase failed — insufficient funds or invalid amount.");
+        Investment inv = UserTrading.purchaseStock(user, req.ticker(), req.companyName(), price, req.method(), req.amount());
+        if (inv == null) return ResponseEntity.badRequest().body("Purchase failed — insufficient funds or invalid amount.");
 
         userService.saveUser(user);
         return ResponseEntity.ok(buildPortfolioResponse(user));
@@ -61,7 +62,9 @@ public class PortfolioController {
             return ResponseEntity.badRequest().body("Could not fetch price for " + req.ticker());
         }
 
-        boolean ok = user.sellStock(req.ticker(), price, req.method(), req.amount());
+        Investment found = UserTrading.findInvestment(user, req.ticker());
+        if (found == null) return ResponseEntity.badRequest().body("Investment not found.");
+        boolean ok = UserTrading.sellStock(user, found.getInvestmentId(), req.ticker(), price, req.method(), req.amount());
         if (!ok) return ResponseEntity.badRequest().body("Sale failed — check share count or dollar amount.");
 
         userService.saveUser(user);
@@ -73,7 +76,7 @@ public class PortfolioController {
         User user = sessionUser(session);
         if (user == null) return ResponseEntity.status(401).body("Please log in first.");
 
-        Investment inv = user.findInvestment(ticker);
+        Investment inv = UserTrading.findInvestment(user, ticker);
         if (inv == null) return ResponseEntity.badRequest().body("Investment not found.");
 
         user.getPortfolio().removeInvestment(inv);
@@ -91,8 +94,8 @@ public class PortfolioController {
         map.put("username", user.getUsername());
         map.put("cashBalance", user.getCashBalance());
         map.put("investments", user.getPortfolio().getInvestments());
-        map.put("totalValue", user.getPortfolio().getTotalValue());
-        map.put("totalChange", user.getPortfolio().getTotalChange());
+        map.put("totalValue", user.getPortfolio().getRealTotalValue());
+        map.put("totalChange", user.getPortfolio().getRealTotalChange());
         return map;
     }
 

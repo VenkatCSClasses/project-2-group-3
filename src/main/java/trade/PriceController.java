@@ -1,7 +1,7 @@
 package trade;
 
 import api.GetPrice;
-import api.PriceStream;
+import apistream.PriceStream;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
