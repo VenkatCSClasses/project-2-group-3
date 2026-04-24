@@ -1,6 +1,7 @@
 package Admin;
 
 import java.util.*;
+import trade.User;
 
 public class Admin {
     private String adminID;

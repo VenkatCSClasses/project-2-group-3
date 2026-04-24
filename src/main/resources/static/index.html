@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeApp — Sign In</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #06091a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+    }
+
+    /* animated grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
+    /* gradient glow blobs */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .blob-1 { width: 400px; height: 400px; background: #00d4ff; top: -100px; left: -100px; }
+    .blob-2 { width: 350px; height: 350px; background: #a855f7; bottom: -80px; right: -80px; }
+
+    .card {
+      background: rgba(13,20,45,0.75);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 48px 40px;
+      width: 400px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,212,255,0.05);
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .logo h1 {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #00d4ff 0%, #a855f7 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .logo p { color: #475569; font-size: 14px; margin-top: 6px; }
+
+    /* tab switcher */
+    .tab-bar {
+      display: flex;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 10px;
+      padding: 4px;
+      margin-bottom: 28px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 9px;
+      background: none;
+      border: none;
+      border-radius: 7px;
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: rgba(0,212,255,0.12);
+      color: #00d4ff;
+      font-weight: 600;
+    }
+
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+
+    label {
+      display: block;
+      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+    }
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 9px;
+      color: #e2e8f0;
+      font-size: 15px;
+      margin-bottom: 18px;
+      transition: all 0.2s;
+    }
+    input:focus {
+      outline: none;
+      border-color: #00d4ff;
+      box-shadow: 0 0 0 3px rgba(0,212,255,0.1);
+      background: rgba(0,212,255,0.04);
+    }
+    input::placeholder { color: #334155; }
+
+    .btn-submit {
+      width: 100%;
+      padding: 13px;
+      background: linear-gradient(135deg, #00d4ff, #0ea5e9);
+      color: #06091a;
+      border: none;
+      border-radius: 9px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(0,212,255,0.3);
+      letter-spacing: 0.3px;
+    }
+    .btn-submit:hover {
+      box-shadow: 0 4px 30px rgba(0,212,255,0.5);
+      transform: translateY(-1px);
+    }
+    .btn-submit:disabled {
+      background: #1e293b;
+      color: #475569;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
+
+    .alert {
+      padding: 12px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-top: 14px;
+      display: none;
+    }
+    .alert-error   { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; }
+    .alert-success { background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.25); color: #6ee7b7; }
+
+    .hint { color: #334155; font-size: 12px; text-align: center; margin-top: 20px; }
+    .hint span { color: #475569; }
+  </style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="card">
+    <div class="logo">
+      <h1>TradeApp</h1>
+      <p>Paper trading &amp; stock education platform</p>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchTab('login', this)">Sign In</button>
+      <button class="tab-btn" onclick="switchTab('register', this)">Create Account</button>
+    </div>
+
+    <!-- Login -->
+    <div class="form-section active" id="section-login">
+      <form id="loginForm">
+        <label for="loginUser">Username</label>
+        <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username" required>
+        <label for="loginPass">Password</label>
+        <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password" required>
+        <button type="submit" class="btn-submit" id="loginBtn">Sign In</button>
+      </form>
+      <div class="alert alert-error" id="loginError"></div>
+      <p class="hint">Demo accounts: <span>alice / bob / charlie</span></p>
+    </div>
+
+    <!-- Register -->
+    <div class="form-section" id="section-register">
+      <form id="registerForm">
+        <label for="regUser">Username</label>
+        <input type="text" id="regUser" placeholder="3–20 characters" autocomplete="username" required>
+        <label for="regPass">Password</label>
+        <input type="password" id="regPass" placeholder="At least 6 characters" autocomplete="new-password" required>
+        <label for="regConfirm">Confirm Password</label>
+        <input type="password" id="regConfirm" placeholder="Repeat password" autocomplete="new-password" required>
+        <button type="submit" class="btn-submit" id="registerBtn">Create Account</button>
+      </form>
+      <div class="alert alert-error"   id="registerError"></div>
+      <div class="alert alert-success" id="registerSuccess"></div>
+    </div>
+  </div>
+
+  <script>
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('section-' + tab).classList.add('active');
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const err = document.getElementById('loginError');
+      btn.disabled = true; btn.textContent = 'Signing in…';
+      err.style.display = 'none';
+
+      const res = await fetch('/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('loginUser').value.trim().toLowerCase(),
+          password: document.getElementById('loginPass').value
+        })
+      });
+
+      if (res.ok) {
+        window.location.href = '/dashboard.html';
+      } else {
+        err.textContent = await res.text();
+        err.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Sign In';
+      }
+    });
+
+    document.getElementById('registerForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn  = document.getElementById('registerBtn');
+      const err  = document.getElementById('registerError');
+      const succ = document.getElementById('registerSuccess');
+      err.style.display = 'none'; succ.style.display = 'none';
+
+      const pass    = document.getElementById('regPass').value;
+      const confirm = document.getElementById('regConfirm').value;
+      if (pass !== confirm) {
+        err.textContent = 'Passwords do not match.';
+        err.style.display = 'block';
+        return;
+      }
+
+      btn.disabled = true; btn.textContent = 'Creating account…';
+
+      const res = await fetch('/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: document.getElementById('regUser').value.trim().toLowerCase(),
+          password: pass
+        })
+      });
+
+      if (res.ok) {
+        window.location.href = '/dashboard.html';
+      } else {
+        err.textContent = await res.text();
+        err.style.display = 'block';
+        btn.disabled = false; btn.textContent = 'Create Account';
+      }
+    });
+  </script>
+</body>
+</html>

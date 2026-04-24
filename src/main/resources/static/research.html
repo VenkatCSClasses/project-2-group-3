@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeApp — Research</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #06091a; color: #e2e8f0; min-height: 100vh; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px; pointer-events: none; z-index: 0;
+    }
+
+    /* ── Nav ── */
+    nav { background: rgba(6,9,26,0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); padding: 0 32px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(0,212,255,0.12); height: 60px; position: sticky; top: 0; z-index: 50; }
+    .brand { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; background: linear-gradient(135deg, #00d4ff, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; text-decoration: none; }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-link { padding: 7px 14px; border-radius: 8px; color: #64748b; text-decoration: none; font-size: 14px; transition: all 0.2s; }
+    .nav-link:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
+    .nav-link.active { background: rgba(0,212,255,0.1); color: #00d4ff; }
+    .btn-logout { padding: 7px 16px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #64748b; font-size: 13px; cursor: pointer; transition: all 0.2s; }
+    .btn-logout:hover { border-color: rgba(255,255,255,0.25); color: #e2e8f0; }
+
+    /* ── Layout ── */
+    .container { max-width: 960px; margin: 0 auto; padding: 40px 24px; position: relative; z-index: 1; }
+    h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.3px; margin-bottom: 24px; }
+
+    /* ── Search ── */
+    .search-bar { display: flex; gap: 12px; margin-bottom: 32px; }
+    .search-bar input { flex: 1; padding: 14px 18px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #e2e8f0; font-size: 16px; text-transform: uppercase; transition: all 0.2s; }
+    .search-bar input:focus { outline: none; border-color: #00d4ff; box-shadow: 0 0 0 3px rgba(0,212,255,0.1); background: rgba(0,212,255,0.04); }
+    .search-bar input::placeholder { text-transform: none; color: #334155; }
+    .btn-primary { padding: 14px 28px; background: linear-gradient(135deg, #00d4ff, #0ea5e9); color: #06091a; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; white-space: nowrap; box-shadow: 0 4px 20px rgba(0,212,255,0.25); }
+    .btn-primary:hover { box-shadow: 0 4px 28px rgba(0,212,255,0.45); transform: translateY(-1px); }
+    .btn-primary:disabled { background: #1e293b; color: #475569; cursor: not-allowed; box-shadow: none; transform: none; }
+
+    /* ── Feedback ── */
+    .error-msg { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; padding: 14px; border-radius: 10px; margin-bottom: 24px; display: none; }
+    .spinner { display: none; color: #475569; font-size: 14px; margin-bottom: 16px; }
+
+    /* ── Stock card ── */
+    .stock-card { background: rgba(13,20,45,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 32px; display: none; margin-bottom: 24px; }
+
+    /* ── Header ── */
+    .stock-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+    .stock-title h3 { font-size: 26px; font-weight: 800; letter-spacing: -0.3px; }
+    .stock-title p { color: #475569; font-size: 14px; margin-top: 4px; }
+    .live-price-block { text-align: right; }
+    .live-price { font-size: 36px; font-weight: 700; color: #00d4ff; transition: color 0.3s; }
+    .live-price.up   { color: #00ff88; }
+    .live-price.down { color: #ff4f4f; }
+    .live-label { font-size: 12px; color: #475569; margin-top: 4px; display: flex; align-items: center; gap: 6px; justify-content: flex-end; }
+    .stream-dot { width: 7px; height: 7px; border-radius: 50%; background: #00d4ff; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── Chart ── */
+    .chart-section { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 16px; margin-bottom: 24px; border: 1px solid rgba(255,255,255,0.04); }
+    .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .chart-header span { font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.6px; }
+    .period-btns { display: flex; gap: 6px; }
+    .period-btn { padding: 4px 12px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 5px; color: #64748b; font-size: 12px; cursor: pointer; transition: all 0.15s; }
+    .period-btn:hover { border-color: rgba(0,212,255,0.4); color: #00d4ff; }
+    .period-btn.active { background: rgba(0,212,255,0.15); border-color: rgba(0,212,255,0.4); color: #00d4ff; font-weight: 600; }
+
+    /* ── Stats grid ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 14px 16px; position: relative; }
+    .stat .label { color: #475569; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .stat .value { color: #e2e8f0; font-size: 18px; font-weight: 600; }
+    .info-btn { background: none; border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; width: 18px; height: 18px; color: #475569; font-size: 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
+    .info-btn:hover { border-color: #00d4ff; color: #00d4ff; }
+
+    /* ── Performance bars ── */
+    .perf-section { margin-bottom: 24px; }
+    .perf-section h4 { font-size: 11px; color: #475569; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .perf-row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+    .perf-label { width: 64px; font-size: 12px; color: #64748b; text-align: right; flex-shrink: 0; }
+    .perf-bar-wrap { flex: 1; height: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; overflow: visible; position: relative; }
+    .perf-bar { height: 100%; border-radius: 4px; transition: width 0.6s ease; min-width: 2px; }
+    .perf-bar.pos { background: linear-gradient(90deg, #00ff88, #00d4ff); }
+    .perf-bar.neg { background: linear-gradient(90deg, #ff4f4f, #f97316); margin-left: auto; }
+    .perf-pct { width: 64px; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+    .perf-pct.positive { color: #00ff88; }
+    .perf-pct.negative { color: #ff4f4f; }
+    .perf-center { width: 1px; background: rgba(255,255,255,0.1); height: 100%; position: absolute; left: 50%; top: 0; }
+
+    /* ── Insights ── */
+    .insights { margin-bottom: 24px; }
+    .insight { padding: 12px 16px; border-radius: 8px; font-size: 14px; line-height: 1.6; margin-bottom: 8px; }
+    .insight.positive { background: rgba(0,255,136,0.07); border-left: 3px solid #00ff88; }
+    .insight.negative { background: rgba(255,79,79,0.07);  border-left: 3px solid #ff4f4f; }
+    .insight.neutral  { background: rgba(255,255,255,0.04); border-left: 3px solid #334155; }
+
+    /* ── Buy ── */
+    .buy-section { border-top: 1px solid rgba(255,255,255,0.07); padding-top: 24px; }
+    .buy-section h4 { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
+    .buy-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+    .buy-row select, .buy-row input[type="number"] { padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #e2e8f0; font-size: 14px; }
+    .buy-row select:focus, .buy-row input[type="number"]:focus { outline: none; border-color: #00d4ff; }
+    .btn-success { padding: 10px 20px; background: linear-gradient(135deg, #00ff88, #00c46a); color: #06091a; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(0,255,136,0.25); }
+    .btn-success:hover { box-shadow: 0 4px 24px rgba(0,255,136,0.4); transform: translateY(-1px); }
+    .buy-feedback { margin-top: 12px; padding: 10px 14px; border-radius: 8px; font-size: 14px; display: none; }
+    .buy-feedback.success { background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.25); color: #6ee7b7; }
+    .buy-feedback.error   { background: rgba(239,68,68,0.1);  border: 1px solid rgba(239,68,68,0.3);  color: #fca5a5; }
+
+    /* ── Learn panel ── */
+    .learn-panel { background: rgba(13,20,45,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.07); border-radius: 16px; padding: 28px; display: none; }
+    .learn-panel h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; background: linear-gradient(135deg, #00d4ff, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .tab-bar { display: flex; gap: 4px; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.07); padding-bottom: 0; }
+    .tab-btn { padding: 10px 18px; background: none; border: none; color: #64748b; font-size: 14px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+    .tab-btn:hover { color: #94a3b8; }
+    .tab-btn.active { color: #00d4ff; border-bottom-color: #00d4ff; font-weight: 600; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .learn-section { margin-bottom: 24px; }
+    .learn-section h4 { font-size: 15px; font-weight: 600; color: #e2e8f0; margin-bottom: 10px; }
+    .learn-section p { font-size: 14px; line-height: 1.75; color: #64748b; margin-bottom: 10px; }
+    .learn-section ul { padding-left: 20px; }
+    .learn-section li { font-size: 14px; line-height: 1.75; color: #64748b; margin-bottom: 6px; }
+    .learn-section li strong { color: #e2e8f0; }
+    .glossary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .glossary-card { background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 16px; }
+    .glossary-card h5 { font-size: 14px; font-weight: 600; color: #00d4ff; margin-bottom: 8px; }
+    .glossary-card p { font-size: 13px; line-height: 1.65; color: #64748b; }
+
+    /* ── Modal ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(4px); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 24px; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: rgba(13,20,45,0.95); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 28px; max-width: 540px; width: 100%; position: relative; max-height: 80vh; overflow-y: auto; box-shadow: 0 24px 60px rgba(0,0,0,0.6); }
+    .modal h3 { font-size: 18px; font-weight: 700; color: #00d4ff; margin-bottom: 16px; }
+    .modal-body p { font-size: 14px; line-height: 1.75; color: #64748b; margin-bottom: 12px; }
+    .modal-body ul { padding-left: 20px; margin-bottom: 12px; }
+    .modal-body li { font-size: 14px; line-height: 1.75; color: #64748b; margin-bottom: 6px; }
+    .modal-body strong { color: #e2e8f0; }
+    .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #64748b; width: 28px; height: 28px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+    .modal-close:hover { border-color: rgba(255,255,255,0.3); color: #e2e8f0; }
+
+    .positive { color: #00ff88; }
+    .negative { color: #ff4f4f; }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="brand" href="/dashboard.html">TradeApp</a>
+    <div class="nav-links">
+      <a class="nav-link active" href="/research.html">Research</a>
+      <a class="nav-link" href="/portfolio.html">Portfolio</a>
+    </div>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </nav>
+
+  <div class="container">
+    <h2>Research a Stock</h2>
+
+    <div class="search-bar">
+      <input type="text" id="tickerInput" placeholder="Enter ticker symbol (e.g. AAPL)" maxlength="5">
+      <button class="btn-primary" id="searchBtn" onclick="searchStock()">Look Up</button>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+    <div class="spinner" id="spinner">Loading stock data…</div>
+
+    <!-- ── Stock Card ── -->
+    <div class="stock-card" id="stockCard">
+
+      <div class="stock-header">
+        <div class="stock-title">
+          <h3 id="stockTicker"></h3>
+          <p id="stockName"></p>
+        </div>
+        <div class="live-price-block">
+          <div class="live-price" id="livePrice">—</div>
+          <div class="live-label">
+            <span class="stream-dot"></span>
+            Live Price
+          </div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <span>Price History</span>
+          <div class="period-btns">
+            <button class="period-btn" data-period="5"  onclick="setPeriod(this)">1W</button>
+            <button class="period-btn active" data-period="22" onclick="setPeriod(this)">1M</button>
+            <button class="period-btn" data-period="all" onclick="setPeriod(this)">All</button>
+          </div>
+        </div>
+        <canvas id="priceChart" height="90"></canvas>
+      </div>
+
+      <!-- Key Stats -->
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="label">Open <button class="info-btn" onclick="showInfo('open')">?</button></div>
+          <div class="value" id="statOpen">—</div>
+        </div>
+        <div class="stat">
+          <div class="label">Prev Close <button class="info-btn" onclick="showInfo('close')">?</button></div>
+          <div class="value" id="statClose">—</div>
+        </div>
+        <div class="stat">
+          <div class="label">Volume <button class="info-btn" onclick="showInfo('volume')">?</button></div>
+          <div class="value" id="statVolume">—</div>
+        </div>
+        <div class="stat">
+          <div class="label">1-Day Change <button class="info-btn" onclick="showInfo('dayChange')">?</button></div>
+          <div class="value" id="statDayChange">—</div>
+        </div>
+      </div>
+
+      <!-- Performance bars -->
+      <div class="perf-section">
+        <h4>Performance <button class="info-btn" onclick="showInfo('performance')">?</button></h4>
+        <div id="perfBars"></div>
+      </div>
+
+      <!-- Insights -->
+      <div class="insights" id="insightsBox"></div>
+
+      <!-- Buy -->
+      <div class="buy-section">
+        <h4>Buy Stock</h4>
+        <div class="buy-row">
+          <select id="buyMethod">
+            <option value="shares">By Shares</option>
+            <option value="dollars">By Dollar Amount</option>
+          </select>
+          <input type="number" id="buyAmount" placeholder="Amount" min="0.01" step="any" style="width:160px">
+          <button class="btn-success" onclick="buyStock()">Buy</button>
+        </div>
+        <div class="buy-feedback" id="buyFeedback"></div>
+      </div>
+    </div>
+
+    <!-- ── Learn Panel ── -->
+    <div class="learn-panel" id="learnPanel">
+      <h3 id="learnTitle">Understanding Stock Analysis</h3>
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('metrics', this)">Metrics Explained</button>
+        <button class="tab-btn" onclick="switchTab('charts', this)">Reading Charts</button>
+        <button class="tab-btn" onclick="switchTab('glossary', this)">Glossary</button>
+      </div>
+
+      <!-- Tab: Metrics Explained -->
+      <div class="tab-content active" id="tab-metrics">
+        <div class="learn-section">
+          <h4>Opening Price</h4>
+          <p>The opening price is the first trade of the day at market open (9:30 AM ET). It often differs from the previous closing price due to after-hours news, earnings, or events that happened while markets were closed. A large gap between close and open is called a <strong>gap up</strong> (positive) or <strong>gap down</strong> (negative) and can signal strong momentum.</p>
+        </div>
+        <div class="learn-section">
+          <h4>Closing Price</h4>
+          <p>The closing price (4:00 PM ET) is considered the most important price of the day. Portfolio values, performance metrics, and technical indicators are all calculated using closing prices. Institutional investors — mutual funds, hedge funds, pension funds — often make decisions based on where a stock closes relative to key levels.</p>
+        </div>
+        <div class="learn-section">
+          <h4>Volume</h4>
+          <p>Volume is the total number of shares traded during the session. It answers the question: <strong>how much conviction is behind this price move?</strong></p>
+          <ul>
+            <li>A price increase on <strong>high volume</strong> suggests strong buying interest — the move is more likely to continue.</li>
+            <li>A price increase on <strong>low volume</strong> may not be sustainable — fewer participants are driving the move.</li>
+            <li>Unusually high volume (2–3× the daily average) often precedes or accompanies major news events.</li>
+            <li>Institutional investors (funds managing billions) must trade large volumes gradually — their activity shows up as sustained volume over days.</li>
+          </ul>
+        </div>
+        <div class="learn-section">
+          <h4>1-Day Change</h4>
+          <p>How much the stock has moved since yesterday's close, shown as both a dollar amount and a percentage. The percentage is more meaningful — a $5 move means very different things for a $10 stock vs. a $500 stock.</p>
+          <ul>
+            <li><strong>Under ±1%:</strong> Typical day, low volatility</li>
+            <li><strong>±1–3%:</strong> Notable move, likely some news or sector activity</li>
+            <li><strong>±3–5%:</strong> Significant — earnings, guidance, analyst upgrades/downgrades</li>
+            <li><strong>Over ±5%:</strong> Major event — earnings beat/miss, FDA approval, acquisition news</li>
+          </ul>
+          <p>For reference: the S&P 500 index averages roughly <strong>+0.04% per day</strong> over the long run.</p>
+        </div>
+        <div class="learn-section">
+          <h4>Performance Periods (1W, 1M, 3M, 6M, YTD)</h4>
+          <p>Each period shows how much the stock has gained or lost from that point in time until today. These help you understand the stock's <strong>momentum</strong> across different time horizons:</p>
+          <ul>
+            <li><strong>1 Week:</strong> Short-term momentum. Useful for spotting reactions to recent news.</li>
+            <li><strong>1 Month:</strong> Aligns with monthly reporting cycles. A widely-used benchmark period.</li>
+            <li><strong>3 Months:</strong> One earnings cycle. The market's verdict on recent quarterly results often shows here.</li>
+            <li><strong>6 Months:</strong> Filters short-term noise. Sustained trends are more visible at this scale.</li>
+            <li><strong>YTD (Year-to-Date):</strong> From January 1st to today. Used to compare against indices like the S&P 500 (+/- the market's annual performance).</li>
+          </ul>
+          <p>A stock outperforming the S&P 500 in every period shows strong <strong>relative strength</strong> — a signal many professional investors watch closely.</p>
+        </div>
+      </div>
+
+      <!-- Tab: Reading Charts -->
+      <div class="tab-content" id="tab-charts">
+        <div class="learn-section">
+          <h4>What a Price Chart Shows</h4>
+          <p>A price chart plots a stock's closing price over time. The x-axis is time; the y-axis is price. The shape of the line tells a story about investor sentiment and supply/demand dynamics.</p>
+        </div>
+        <div class="learn-section">
+          <h4>Trends</h4>
+          <ul>
+            <li><strong>Uptrend:</strong> A series of higher highs and higher lows. Buyers are in control. Each dip gets bought up before reaching the previous low.</li>
+            <li><strong>Downtrend:</strong> Lower highs and lower lows. Sellers are in control. Each rally fails before reaching the previous high.</li>
+            <li><strong>Sideways (consolidation):</strong> The stock moves within a range. Neither buyers nor sellers have conviction. Often precedes a breakout in one direction.</li>
+          </ul>
+        </div>
+        <div class="learn-section">
+          <h4>Support and Resistance</h4>
+          <p><strong>Support</strong> is a price level where the stock tends to stop falling — buyers step in at that price. <strong>Resistance</strong> is where it tends to stop rising — sellers take profits there.</p>
+          <p>When a stock <strong>breaks through resistance</strong> on high volume, that resistance often becomes the new support — a bullish sign. The reverse is true for breaking support.</p>
+        </div>
+        <div class="learn-section">
+          <h4>What to Look For</h4>
+          <ul>
+            <li><strong>Sharp single-day spikes:</strong> Usually news-driven. Sustainable or not depends on volume and what follows.</li>
+            <li><strong>Smooth, gradual climbs:</strong> Often driven by improving fundamentals. More sustainable than vertical moves.</li>
+            <li><strong>V-shaped recovery:</strong> A sharp drop followed by an equally sharp recovery. Can indicate an overreaction to temporary news.</li>
+            <li><strong>Staircase pattern:</strong> Move up → consolidate → move up → consolidate. Classic institutional accumulation pattern.</li>
+          </ul>
+        </div>
+        <div class="learn-section">
+          <h4>Time Frame Matters</h4>
+          <p>The same stock can look like a great buy on a 1-week chart and a poor one on a 1-year chart — or vice versa. Always look at multiple time frames. Short-term traders focus on days/weeks; long-term investors focus on months/years. Understanding your own time horizon is critical.</p>
+        </div>
+        <div class="learn-section">
+          <h4>The Live Price Feed</h4>
+          <p>The live price in this app streams from a WebSocket connection — it updates in real time as trades happen on the exchange. During market hours (9:30 AM – 4:00 PM ET), you'll see the price tick with every transaction. Outside market hours, you'll see the last closing price.</p>
+        </div>
+      </div>
+
+      <!-- Tab: Glossary -->
+      <div class="tab-content" id="tab-glossary">
+        <div class="glossary-grid">
+          <div class="glossary-card">
+            <h5>Bull Market</h5>
+            <p>A period of rising stock prices, typically defined as a 20%+ gain from a recent low. Characterized by investor optimism and economic expansion. The average bull market lasts about 4 years.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Bear Market</h5>
+            <p>A period of falling prices — 20%+ decline from a recent high. Often tied to economic recession or contraction. The average bear market lasts about 14 months. "Bear" because a bear swipes down.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Market Capitalization</h5>
+            <p>Share price × total shares outstanding. Represents the total market value of a company. Large-cap (&gt;$10B) are stable blue chips; mid-cap ($2–10B) offer growth potential; small-cap (&lt;$2B) are riskier but can grow faster.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>P/E Ratio</h5>
+            <p>Price-to-Earnings ratio: share price ÷ earnings per share. A P/E of 20 means investors pay $20 for every $1 of annual earnings. High P/E = growth expectations; low P/E = value or concern. Compare within the same industry.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Dividend</h5>
+            <p>A portion of a company's profits paid directly to shareholders, usually quarterly. Mature, profitable companies (utilities, consumer staples) tend to pay dividends. Growth companies (tech startups) typically reinvest profits instead.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Volatility</h5>
+            <p>How much a stock's price fluctuates. High volatility = big swings up and down (higher risk, higher potential reward). Low volatility = steady, predictable movement. Measured statistically as standard deviation or "beta."</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Beta</h5>
+            <p>Measures a stock's volatility relative to the market. Beta of 1.0 = moves with the market. Beta of 1.5 = 50% more volatile than the market. Beta of 0.5 = half as volatile. Negative beta = moves opposite to the market (rare).</p>
+          </div>
+          <div class="glossary-card">
+            <h5>52-Week High / Low</h5>
+            <p>The highest and lowest prices over the past year. Trading near a 52-week high can mean momentum; near a 52-week low may signal trouble or a value opportunity. Context (why it reached those levels) matters more than the number itself.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Earnings Per Share (EPS)</h5>
+            <p>Net profit ÷ total shares outstanding. Shows how much profit the company generates per share. Rising EPS over time is a sign of a healthy, growing business and is one of the most important fundamental metrics.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>ETF (Exchange-Traded Fund)</h5>
+            <p>A basket of securities traded on an exchange like a single stock. An S&P 500 ETF (e.g., SPY) gives you exposure to 500 companies in one purchase. ETFs offer instant diversification and typically lower fees than actively managed funds.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Diversification</h5>
+            <p>Spreading investments across different assets, sectors, and geographies to reduce risk. If one sector crashes, others may hold steady. "Don't put all your eggs in one basket." Research shows diversification reduces risk without proportionally reducing returns.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Liquidity</h5>
+            <p>How easily a stock can be bought or sold without significantly affecting its price. High-volume, large-cap stocks are highly liquid. Thinly-traded small-cap stocks can have wide spreads and large price impact when you try to buy or sell.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Short Selling</h5>
+            <p>Borrowing shares and selling them, hoping the price drops so you can buy them back cheaper and pocket the difference. Unlimited downside risk (price can rise indefinitely). Used by hedge funds and sophisticated investors to profit from or hedge against declines.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Earnings Report</h5>
+            <p>Published quarterly by public companies. Shows revenue, expenses, profit, and forward guidance. Earnings reports are the most significant recurring event affecting stock prices. "Beating estimates" (earning more than analysts predicted) typically causes a stock to rise.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Market Order vs Limit Order</h5>
+            <p>A <strong>market order</strong> executes immediately at whatever the current price is. A <strong>limit order</strong> only executes at a price you specify or better — giving you control over the price but no guarantee of execution.</p>
+          </div>
+          <div class="glossary-card">
+            <h5>Dollar-Cost Averaging (DCA)</h5>
+            <p>Investing a fixed dollar amount on a regular schedule regardless of price. When prices are low you buy more shares; when high, fewer. Over time this reduces the impact of volatility and removes the impossible task of "timing the market."</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Info Modal ── -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal(null)">✕</button>
+      <h3 id="modalTitle"></h3>
+      <div class="modal-body" id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    // ── State ──────────────────────────────────────────────────────────────
+    let currentTicker = null;
+    let currentName   = null;
+    let priceEventSource = null;
+    let priceChart    = null;
+    let allChartPoints = [];    // full dataset [{label, close}]
+    let activePeriod   = '22';  // default 1M
+    let lastPrice      = null;
+
+    // ── Metric info modal content ──────────────────────────────────────────
+    const METRIC_INFO = {
+      open: {
+        title: 'Opening Price',
+        body: `<p>The <strong>opening price</strong> is the very first trade executed when the stock market opens at 9:30 AM Eastern Time. It is determined by the balance of buy and sell orders that accumulated overnight and during the pre-market session.</p>
+               <p>The opening price often differs significantly from the previous day's closing price — this difference is called a <strong>gap</strong>:</p>
+               <ul>
+                 <li><strong>Gap Up:</strong> Opens higher than prior close. Positive news overnight (earnings beat, analyst upgrade, acquisition announced).</li>
+                 <li><strong>Gap Down:</strong> Opens lower than prior close. Negative news (earnings miss, scandal, sector-wide selling).</li>
+               </ul>
+               <p>Large gaps that "fill" (return to the prior close level) during the trading day suggest the opening reaction was an overreaction. Gaps that hold suggest conviction behind the move.</p>`
+      },
+      close: {
+        title: 'Previous Closing Price',
+        body: `<p>The <strong>closing price</strong> is the last price at which a stock traded during regular market hours (4:00 PM ET). It is the benchmark used for almost every performance calculation — your portfolio's daily gain/loss, ETF net asset values, and index levels are all computed from closing prices.</p>
+               <p>The closing price also carries psychological weight: professional traders, analysts, and algorithms monitor <em>where</em> a stock closes relative to key levels:</p>
+               <ul>
+                 <li>Closing <strong>above resistance</strong> = breakout signal</li>
+                 <li>Closing <strong>below support</strong> = breakdown signal</li>
+                 <li>Closing at the <strong>day's high</strong> = bullish strength (buyers in full control)</li>
+                 <li>Closing at the <strong>day's low</strong> = bearish weakness (sellers dominated)</li>
+               </ul>`
+      },
+      volume: {
+        title: 'Volume',
+        body: `<p><strong>Volume</strong> is the total number of shares traded during the current session. Each trade — a buyer purchasing shares from a seller — counts once toward volume.</p>
+               <p>Volume is the <em>conviction meter</em> of price movements:</p>
+               <ul>
+                 <li><strong>High volume + price up:</strong> Strong buying interest. The move is more likely to be sustained.</li>
+                 <li><strong>Low volume + price up:</strong> Weak conviction. The rally may reverse easily.</li>
+                 <li><strong>High volume + price down:</strong> Strong selling pressure. Potentially more downside ahead.</li>
+                 <li><strong>Spike in volume with no big price move:</strong> Can indicate institutional accumulation or distribution happening quietly.</li>
+               </ul>
+               <p>Comparing today's volume to the stock's average daily volume (ADV) is key. A stock trading 3× its ADV is experiencing an unusual event worth investigating.</p>`
+      },
+      dayChange: {
+        title: '1-Day Change',
+        body: `<p>Shows how much the stock has moved today compared to yesterday's closing price, expressed as both a dollar amount and a percentage.</p>
+               <p>The <strong>percentage change</strong> is always more meaningful than the dollar change, because it normalizes across different price levels. A $1 move on a $10 stock (10%) is vastly more significant than a $1 move on a $500 stock (0.2%).</p>
+               <p><strong>Context for daily moves:</strong></p>
+               <ul>
+                 <li><strong>Under ±1%:</strong> Quiet day. Normal background noise.</li>
+                 <li><strong>±1–3%:</strong> Something is happening — sector news, analyst activity, or market-wide movement.</li>
+                 <li><strong>±3–5%:</strong> Significant. Often tied to earnings, guidance changes, or major announcements.</li>
+                 <li><strong>Over ±5%:</strong> Major event. Earnings surprise, acquisition, regulatory decision, or macro shock.</li>
+               </ul>
+               <p>Always ask <em>why</em> a stock moved significantly. Price alone tells you <em>what</em>; news tells you <em>why</em> — and whether the move is justified or an overreaction.</p>`
+      },
+      performance: {
+        title: 'Performance Across Time Periods',
+        body: `<p>These bars show the stock's percentage change across multiple time horizons. Looking at multiple periods together is more powerful than any single metric alone:</p>
+               <ul>
+                 <li><strong>All periods positive and trending upward:</strong> Strong sustained momentum across all timeframes — a classic sign of institutional accumulation.</li>
+                 <li><strong>Short-term positive, long-term negative:</strong> A recent bounce within a longer downtrend. Could be a "dead cat bounce" — temporary recovery before further decline.</li>
+                 <li><strong>Short-term negative, long-term positive:</strong> A recent pullback within a healthy uptrend. Often a buying opportunity for longer-term investors.</li>
+                 <li><strong>Mixed signals:</strong> The stock is volatile and directionless. Higher risk, requires deeper fundamental research.</li>
+               </ul>
+               <p>The most valuable comparison: <strong>how does this stock's performance compare to the S&P 500 over the same period?</strong> If the stock gained 15% while the market gained 5%, it has strong <em>relative strength</em>. If it gained 3% while the market gained 20%, it significantly underperformed — a red flag.</p>`
+      }
+    };
+
+    // ── Search ─────────────────────────────────────────────────────────────
+    document.getElementById('tickerInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') searchStock();
+    });
+
+    async function searchStock() {
+      const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+      if (!ticker || !/^[A-Z]{1,5}$/.test(ticker)) {
+        showError('Enter a valid ticker symbol (1–5 letters).');
+        return;
+      }
+
+      const btn = document.getElementById('searchBtn');
+      btn.disabled = true; btn.textContent = 'Loading…';
+      document.getElementById('errorMsg').style.display = 'none';
+      document.getElementById('stockCard').style.display = 'none';
+      document.getElementById('learnPanel').style.display = 'none';
+      document.getElementById('spinner').style.display = 'block';
+
+      if (priceEventSource) { priceEventSource.close(); priceEventSource = null; }
+      if (priceChart)        { priceChart.destroy(); priceChart = null; }
+
+      const res = await fetch('/stocks/' + ticker);
+      document.getElementById('spinner').style.display = 'none';
+      btn.disabled = false; btn.textContent = 'Look Up';
+
+      if (!res.ok) {
+        if (res.status === 401) { window.location.href = '/index.html'; return; }
+        showError('Could not find "' + ticker + '". Check the symbol and try again.');
+        return;
+      }
+
+      const data = await res.json();
+      currentTicker = data.ticker;
+      currentName   = data.companyName;
+
+      // Populate header
+      document.getElementById('stockTicker').textContent = data.ticker;
+      document.getElementById('stockName').textContent   = data.companyName;
+
+      // Populate stats
+      document.getElementById('statOpen').textContent   = '$' + data.lastOpeningPrice.toFixed(2);
+      document.getElementById('statClose').textContent  = '$' + data.lastClosingPrice.toFixed(2);
+      document.getElementById('statVolume').textContent = Number(data.volume).toLocaleString();
+      setChangeStat('statDayChange', data.oneDayPriceChange, data.oneDayPercentChange);
+
+      // Performance bars
+      buildPerfBars([
+        { label: '1 Week', pct: data.oneWeekPercentChange },
+        { label: '1 Month', pct: data.oneMonthPercentChange },
+        { label: '3 Month', pct: data.threeMonthPercentChange },
+        { label: '6 Month', pct: data.sixMonthPercentChange },
+        { label: 'YTD',     pct: data.yearToDatePercentChange }
+      ]);
+
+      // Insights
+      buildInsights(data);
+
+      document.getElementById('stockCard').style.display = 'block';
+      document.getElementById('learnPanel').style.display = 'block';
+      document.getElementById('learnTitle').textContent = 'Understanding ' + data.ticker;
+      document.getElementById('buyFeedback').style.display = 'none';
+
+      await loadChart(currentTicker);
+      startPriceStream(currentTicker);
+    }
+
+    // ── Chart ──────────────────────────────────────────────────────────────
+    async function loadChart(ticker) {
+      const res = await fetch('/stocks/' + ticker + '/chart');
+      if (!res.ok) return;
+      const ts = await res.json();
+
+      allChartPoints = [...ts.values].reverse().map(v => ({
+        label: v.datetime,
+        close: v.close
+      }));
+
+      renderChart(activePeriod);
+    }
+
+    function renderChart(period) {
+      activePeriod = period;
+      let points = allChartPoints;
+      if (period !== 'all') {
+        const n = parseInt(period);
+        points = allChartPoints.slice(Math.max(0, allChartPoints.length - n));
+      }
+
+      const labels = points.map(p => p.label);
+      const closes = points.map(p => p.close);
+
+      // Seed live price display
+      if (closes.length > 0 && lastPrice === null) {
+        document.getElementById('livePrice').textContent = '$' + closes[closes.length - 1].toFixed(4);
+      }
+
+      if (priceChart) {
+        priceChart.data.labels   = labels;
+        priceChart.data.datasets[0].data = closes;
+        priceChart.update('none');
+        return;
+      }
+
+      const ctx = document.getElementById('priceChart').getContext('2d');
+      priceChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: currentTicker,
+            data: closes,
+            borderColor: '#38bdf8',
+            backgroundColor: 'rgba(56,189,248,0.07)',
+            borderWidth: 2,
+            pointRadius: 0,
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          animation: false,
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: ctx => '$' + ctx.parsed.y.toFixed(2)
+              }
+            }
+          },
+          scales: {
+            x: { ticks: { color: '#475569', maxTicksLimit: 6, font: { size: 11 } }, grid: { color: '#1e293b' } },
+            y: { ticks: { color: '#475569', callback: v => '$' + v.toFixed(0), font: { size: 11 } }, grid: { color: '#1e293b' } }
+          }
+        }
+      });
+    }
+
+    function setPeriod(btn) {
+      document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderChart(btn.dataset.period);
+    }
+
+    // ── SSE price stream ───────────────────────────────────────────────────
+    function startPriceStream(ticker) {
+      priceEventSource = new EventSource('/prices/' + ticker + '/stream');
+      priceEventSource.onmessage = e => {
+        const d = JSON.parse(e.data);
+        const price = d.price;
+        const prev  = lastPrice;
+        lastPrice   = price;
+
+        const el = document.getElementById('livePrice');
+        el.textContent = '$' + price.toFixed(4);
+        el.classList.remove('up', 'down');
+        if (prev !== null) el.classList.add(price >= prev ? 'up' : 'down');
+
+        if (priceChart) {
+          const now = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+          priceChart.data.labels.push(now);
+          priceChart.data.datasets[0].data.push(price);
+          if (priceChart.data.labels.length > 300) {
+            priceChart.data.labels.shift();
+            priceChart.data.datasets[0].data.shift();
+          }
+          priceChart.update('none');
+        }
+      };
+      priceEventSource.onerror = () => priceEventSource.close();
+    }
+
+    // ── Performance bars ───────────────────────────────────────────────────
+    function buildPerfBars(periods) {
+      const maxAbs = Math.max(...periods.map(p => Math.abs(p.pct)), 0.01);
+      const html = periods.map(p => {
+        const pct   = p.pct;
+        const width = Math.min(Math.abs(pct) / maxAbs * 48, 48); // max 48% of bar wrap
+        const cls   = pct >= 0 ? 'pos' : 'neg';
+        const sign  = pct >= 0 ? '+' : '';
+        const pctCls = pct >= 0 ? 'positive' : 'negative';
+        const barStyle = pct >= 0
+          ? `width:${width}%; margin-left:50%;`
+          : `width:${width}%; margin-right:50%; margin-left:auto;`;
+        return `
+          <div class="perf-row">
+            <span class="perf-label">${p.label}</span>
+            <div class="perf-bar-wrap">
+              <div class="perf-center"></div>
+              <div class="perf-bar ${cls}" style="${barStyle}"></div>
+            </div>
+            <span class="perf-pct ${pctCls}">${sign}${pct.toFixed(2)}%</span>
+          </div>`;
+      }).join('');
+      document.getElementById('perfBars').innerHTML = html;
+    }
+
+    // ── Auto-generated insights ────────────────────────────────────────────
+    function buildInsights(data) {
+      const insights = [];
+      const d = data.oneDayPercentChange;
+      const w = data.oneWeekPercentChange;
+      const m = data.oneMonthPercentChange;
+
+      // Day move commentary
+      if (Math.abs(d) >= 5) {
+        insights.push({ type: d > 0 ? 'positive' : 'negative',
+          text: `${data.ticker} moved ${d > 0 ? '+' : ''}${d.toFixed(2)}% today — a major single-day move. Moves above ±5% typically reflect significant news such as earnings surprises, analyst rating changes, or macroeconomic events. Investigate what drove it before acting.` });
+      } else if (Math.abs(d) >= 2) {
+        insights.push({ type: d > 0 ? 'positive' : 'negative',
+          text: `${data.ticker} is ${d > 0 ? 'up' : 'down'} ${Math.abs(d).toFixed(2)}% today. This is a meaningful single-day move — above the typical daily noise for most stocks. It may reflect sector activity, analyst commentary, or market sentiment shifts.` });
+      }
+
+      // Trend alignment
+      if (d > 0 && w > 0 && m > 0) {
+        insights.push({ type: 'positive',
+          text: `Short, medium, and longer-term momentum are all aligned positively (today: ${d > 0 ? '+' : ''}${d.toFixed(1)}%, 1W: +${w.toFixed(1)}%, 1M: +${m.toFixed(1)}%). When multiple timeframes agree, the trend tends to be more reliable. This pattern often reflects sustained institutional buying.` });
+      } else if (d < 0 && w < 0 && m < 0) {
+        insights.push({ type: 'negative',
+          text: `All three momentum timeframes are negative (today: ${d.toFixed(1)}%, 1W: ${w.toFixed(1)}%, 1M: ${m.toFixed(1)}%). Consistent weakness across timeframes can indicate a fundamental problem or a broader sector/market downturn. Look for a change in fundamentals or a clear catalyst before considering a position.` });
+      } else if (m < 0 && d > 0) {
+        insights.push({ type: 'neutral',
+          text: `${data.ticker} is up today (+${d.toFixed(2)}%) but still down over the past month (${m.toFixed(2)}%). This could be a short-term bounce within a longer downtrend. Short bounces in downtrends are common and don't always signal a reversal — watch for sustained follow-through over several days.` });
+      } else if (m > 0 && d < 0) {
+        insights.push({ type: 'neutral',
+          text: `${data.ticker} is down today (${d.toFixed(2)}%) but remains positive over the past month (+${m.toFixed(2)}%). A single-day pullback in an uptrend is normal and healthy — markets rarely go straight up. Long-term investors often view these dips as potential opportunities.` });
+      }
+
+      // YTD vs reference
+      const ytd = data.yearToDatePercentChange;
+      if (Math.abs(ytd) > 20) {
+        insights.push({ type: ytd > 0 ? 'positive' : 'negative',
+          text: `${data.ticker} is ${ytd > 0 ? 'up' : 'down'} ${Math.abs(ytd).toFixed(1)}% year-to-date — a ${ytd > 0 ? 'strong outperformance' : 'significant underperformance'} compared to the S&P 500's typical annual return of ~10%. ${ytd > 0 ? 'High YTD gains can mean the stock is fairly valued or overvalued — future return expectations may be lower.' : 'Large YTD losses may represent either a real business problem or an opportunity, depending on the underlying cause.'}` });
+      }
+
+      if (insights.length === 0) {
+        insights.push({ type: 'neutral',
+          text: `${data.ticker} is showing typical market movement. No single data point tells the full story — combine price action with volume, news, and fundamental analysis (revenue growth, earnings, debt levels) for a complete picture.` });
+      }
+
+      document.getElementById('insightsBox').innerHTML = insights.map(i =>
+        `<div class="insight ${i.type}">${i.text}</div>`
+      ).join('');
+    }
+
+    // ── Buy ────────────────────────────────────────────────────────────────
+    async function buyStock() {
+      const method = document.getElementById('buyMethod').value;
+      const amount = parseFloat(document.getElementById('buyAmount').value);
+      if (!amount || amount <= 0) { showFeedback('Enter a valid amount.', false); return; }
+
+      const res = await fetch('/portfolio/buy', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker: currentTicker, companyName: currentName, method, amount })
+      });
+
+      if (res.status === 401) { window.location.href = '/index.html'; return; }
+      if (res.ok) {
+        const data = await res.json();
+        showFeedback('Bought! Cash remaining: $' + data.cashBalance.toFixed(2), true);
+      } else {
+        showFeedback(await res.text(), false);
+      }
+    }
+
+    // ── Info modal ─────────────────────────────────────────────────────────
+    function showInfo(key) {
+      const info = METRIC_INFO[key];
+      if (!info) return;
+      document.getElementById('modalTitle').textContent = info.title;
+      document.getElementById('modalBody').innerHTML    = info.body;
+      document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function closeModal(e) {
+      if (e === null || e.target === document.getElementById('modalOverlay')) {
+        document.getElementById('modalOverlay').classList.remove('open');
+      }
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') document.getElementById('modalOverlay').classList.remove('open');
+    });
+
+    // ── Tabs ───────────────────────────────────────────────────────────────
+    function switchTab(name, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab-' + name).classList.add('active');
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────
+    function setChangeStat(id, price, pct) {
+      const el  = document.getElementById(id);
+      const cls = pct >= 0 ? 'positive' : 'negative';
+      const sign = pct >= 0 ? '+' : '';
+      el.innerHTML = `<span class="${cls}">${sign}$${Math.abs(price).toFixed(2)} (${sign}${pct.toFixed(2)}%)</span>`;
+    }
+
+    function showFeedback(msg, success) {
+      const el = document.getElementById('buyFeedback');
+      el.textContent = msg;
+      el.className = 'buy-feedback ' + (success ? 'success' : 'error');
+      el.style.display = 'block';
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+
+    async function logout() {
+      await fetch('/auth/logout', { method: 'POST' });
+      window.location.href = '/index.html';
+    }
+
+    // ── Session guard ──────────────────────────────────────────────────────
+    fetch('/portfolio').then(r => { if (r.status === 401) window.location.href = '/index.html'; });
+  </script>
+</body>
+</html>

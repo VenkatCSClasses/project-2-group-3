@@ -1,9 +1,73 @@
 {
   "username": "alice",
   "password": "password1",
-  "cashBalance": 10993.941441447641,
+  "cashBalance": 4592.681441447642,
   "portfolio": {
-    "investments": [],
+    "investments": [
+      {
+        "ticker": "AAPL",
+        "companyName": "Apple Inc.",
+        "purchaseDate": "2026-04-20",
+        "shares": 6.0,
+        "purchasePrice": 273.97,
+        "amountInvested": 1643.8200000000002,
+        "currentPrice": 270.44
+      },
+      {
+        "ticker": "MSFT",
+        "companyName": "Microsoft Corp.",
+        "purchaseDate": "2026-04-20",
+        "shares": 0.011907029910459135,
+        "purchasePrice": 419.92,
+        "amountInvested": 5.0,
+        "currentPrice": 430.43
+      },
+      {
+        "ticker": "GOOGL",
+        "companyName": "Alphabet Inc.",
+        "purchaseDate": "2026-04-20",
+        "shares": 5.0,
+        "purchasePrice": 339.55,
+        "amountInvested": 1697.75,
+        "currentPrice": 337.76
+      },
+      {
+        "ticker": "TSLA",
+        "companyName": "Tesla, Inc.",
+        "purchaseDate": "2026-04-20",
+        "shares": 5.0,
+        "purchasePrice": 390.89,
+        "amountInvested": 1954.4499999999998,
+        "currentPrice": 391.57
+      },
+      {
+        "ticker": "BA",
+        "companyName": "Boeing Company",
+        "purchaseDate": "2026-04-22",
+        "shares": 3.0,
+        "purchasePrice": 225.17,
+        "amountInvested": 675.51,
+        "currentPrice": 225.36
+      },
+      {
+        "ticker": "NVDA",
+        "companyName": "NVIDIA Corporation",
+        "purchaseDate": "2026-04-22",
+        "shares": 2.0,
+        "purchasePrice": 199.855,
+        "amountInvested": 399.71,
+        "currentPrice": 199.855
+      },
+      {
+        "ticker": "F",
+        "companyName": "Ford Motor Company",
+        "purchaseDate": "2026-04-22",
+        "shares": 2.0,
+        "purchasePrice": 12.775,
+        "amountInvested": 25.55,
+        "currentPrice": 12.775
+      }
+    ],
     "nextInvestmentID": 1
   }
 }

@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TradeApp — Portfolio</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #06091a;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    nav {
+      background: rgba(6,9,26,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 0 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(0,212,255,0.12);
+      height: 60px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .brand {
+      font-size: 22px; font-weight: 800; letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #00d4ff, #a855f7);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 4px; }
+    .nav-link {
+      padding: 7px 14px; border-radius: 8px; color: #64748b;
+      text-decoration: none; font-size: 14px; transition: all 0.2s;
+    }
+    .nav-link:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
+    .nav-link.active { background: rgba(0,212,255,0.1); color: #00d4ff; }
+    .btn-logout {
+      padding: 7px 16px; background: transparent;
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      color: #64748b; font-size: 13px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-logout:hover { border-color: rgba(255,255,255,0.25); color: #e2e8f0; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 24px; position: relative; z-index: 1; }
+
+    .page-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+    }
+    h2 { font-size: 26px; font-weight: 800; letter-spacing: -0.3px; }
+
+    .refresh-note { color: #334155; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+    .refresh-dot { width: 6px; height: 6px; border-radius: 50%; background: #00d4ff; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    .summary-bar {
+      display: flex; gap: 0;
+      background: rgba(13,20,45,0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      padding: 24px 32px;
+      margin-bottom: 28px;
+      flex-wrap: wrap; gap: 32px;
+    }
+    .summary-item .label {
+      color: #475569; font-size: 11px; text-transform: uppercase;
+      letter-spacing: 0.6px; margin-bottom: 6px;
+    }
+    .summary-item .value { font-size: 26px; font-weight: 700; }
+    .positive { color: #00ff88; }
+    .negative { color: #ff4f4f; }
+    .neutral  { color: #e2e8f0; }
+
+    .empty-state {
+      text-align: center; padding: 80px 0; color: #334155; display: none;
+    }
+    .empty-state h3 { font-size: 20px; margin-bottom: 8px; color: #475569; }
+    .empty-state a { color: #00d4ff; text-decoration: none; }
+
+    /* Table wrapper */
+    .table-wrap {
+      background: rgba(13,20,45,0.7);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left; color: #475569; font-size: 11px;
+      text-transform: uppercase; letter-spacing: 0.6px;
+      padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(0,0,0,0.2);
+    }
+    tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(0,212,255,0.03); }
+    tbody td { padding: 16px 20px; font-size: 14px; vertical-align: middle; }
+    .ticker-cell { font-weight: 700; font-size: 16px; color: #e2e8f0; }
+    .name-cell { color: #64748b; font-size: 12px; margin-top: 2px; }
+
+    .btn-sell {
+      padding: 6px 14px; background: rgba(255,79,79,0.15);
+      border: 1px solid rgba(255,79,79,0.3); border-radius: 6px;
+      color: #ff4f4f; font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; margin-right: 6px;
+    }
+    .btn-sell:hover { background: rgba(255,79,79,0.25); border-color: rgba(255,79,79,0.5); }
+    .btn-remove {
+      padding: 6px 12px; background: transparent;
+      border: 1px solid rgba(255,255,255,0.08); border-radius: 6px;
+      color: #475569; font-size: 12px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-remove:hover { border-color: rgba(255,255,255,0.2); color: #94a3b8; }
+
+    /* Sell Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      display: none; align-items: center; justify-content: center; z-index: 100;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: rgba(13,20,45,0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 16px; padding: 32px; width: 440px; max-width: 95vw;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
+    .modal h3 { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+    .modal h3 span { color: #00d4ff; }
+    .modal label { display: block; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .modal select, .modal input {
+      width: 100%; padding: 11px 14px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      color: #e2e8f0; font-size: 14px; margin-bottom: 16px;
+    }
+    .modal select:focus, .modal input:focus { outline: none; border-color: #00d4ff; box-shadow: 0 0 0 3px rgba(0,212,255,0.1); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+    .btn-cancel {
+      padding: 10px 20px; background: transparent;
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;
+      color: #64748b; font-size: 14px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-cancel:hover { border-color: rgba(255,255,255,0.25); color: #e2e8f0; }
+    .btn-confirm {
+      padding: 10px 20px; background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 14px rgba(239,68,68,0.3);
+    }
+    .btn-confirm:hover { box-shadow: 0 4px 20px rgba(239,68,68,0.5); transform: translateY(-1px); }
+    .modal-feedback {
+      margin-bottom: 14px; padding: 10px 14px; border-radius: 8px; font-size: 13px; display: none;
+    }
+    .modal-feedback.error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
+    .sell-all-btn {
+      background: none; border: none; color: #00d4ff; font-size: 13px;
+      cursor: pointer; padding: 0; margin-bottom: 16px; text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="brand" href="/dashboard.html">TradeApp</a>
+    <div class="nav-links">
+      <a class="nav-link" href="/research.html">Research</a>
+      <a class="nav-link active" href="/portfolio.html">Portfolio</a>
+    </div>
+    <button class="btn-logout" onclick="logout()">Sign Out</button>
+  </nav>
+
+  <div class="container">
+    <div class="page-header">
+      <h2>My Portfolio</h2>
+      <span class="refresh-note"><span class="refresh-dot"></span>Prices refresh every 10s</span>
+    </div>
+
+    <div class="summary-bar" id="summaryBar">
+      <div class="summary-item">
+        <div class="label">Portfolio Value</div>
+        <div class="value neutral" id="totalValue">—</div>
+      </div>
+      <div class="summary-item">
+        <div class="label">Overall Change</div>
+        <div class="value" id="totalChange">—</div>
+      </div>
+      <div class="summary-item">
+        <div class="label">Cash Balance</div>
+        <div class="value neutral" id="cashBalance">—</div>
+      </div>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <h3>Your portfolio is empty</h3>
+      <p>Head to <a href="/research.html">Research</a> to find and buy stocks.</p>
+    </div>
+
+    <div class="table-wrap" id="tableWrap" style="display:none">
+      <table id="portfolioTable">
+        <thead>
+          <tr>
+            <th>Stock</th>
+            <th>Shares</th>
+            <th>Avg Cost</th>
+            <th>Current Price</th>
+            <th>Value</th>
+            <th>Change</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="portfolioBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Sell Modal -->
+  <div class="modal-backdrop" id="sellModal">
+    <div class="modal">
+      <h3>Sell <span id="modalTicker"></span></h3>
+      <div class="modal-feedback error" id="modalFeedback"></div>
+      <label>Sell by</label>
+      <select id="sellMethod">
+        <option value="shares">Number of shares</option>
+        <option value="dollars">Dollar amount</option>
+        <option value="all">Sell all</option>
+      </select>
+      <label id="amountLabel">Amount</label>
+      <input type="number" id="sellAmount" placeholder="Enter amount" min="0.01" step="any">
+      <button class="sell-all-btn" onclick="setSellAll()">Sell everything</button>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeSellModal()">Cancel</button>
+        <button class="btn-confirm" onclick="confirmSell()">Confirm Sale</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let portfolioData = null;
+    let sellTicker    = null;
+
+    async function loadPortfolio() {
+      const res = await fetch('/portfolio');
+      if (res.status === 401) { window.location.href = '/index.html'; return; }
+      portfolioData = await res.json();
+      renderPortfolio(portfolioData);
+    }
+
+    function renderPortfolio(data) {
+      document.getElementById('totalValue').textContent  = '$' + data.totalValue.toFixed(2);
+      const chgEl = document.getElementById('totalChange');
+      chgEl.textContent = (data.totalChange >= 0 ? '+' : '') + data.totalChange.toFixed(2) + '%';
+      chgEl.className   = 'value ' + (data.totalChange >= 0 ? 'positive' : 'negative');
+      document.getElementById('cashBalance').textContent = '$' + data.cashBalance.toFixed(2);
+
+      const tbody = document.getElementById('portfolioBody');
+      tbody.innerHTML = '';
+
+      if (!data.investments || data.investments.length === 0) {
+        document.getElementById('emptyState').style.display = 'block';
+        document.getElementById('tableWrap').style.display  = 'none';
+        return;
+      }
+
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('tableWrap').style.display  = 'block';
+
+      for (const inv of data.investments) {
+        const pct  = inv.percentChange ?? ((inv.currentPrice - inv.purchasePrice) / inv.purchasePrice * 100);
+        const cls  = pct >= 0 ? 'positive' : 'negative';
+        const sign = pct >= 0 ? '+' : '';
+        const row  = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            <div class="ticker-cell">${inv.ticker}</div>
+            <div class="name-cell">${inv.companyName}</div>
+          </td>
+          <td>${inv.shares.toFixed(4)}</td>
+          <td>$${inv.purchasePrice.toFixed(4)}</td>
+          <td>$${inv.currentPrice.toFixed(4)}</td>
+          <td>$${(inv.shares * inv.currentPrice).toFixed(2)}</td>
+          <td class="${cls}">${sign}${pct.toFixed(2)}%</td>
+          <td>
+            <button class="btn-sell" onclick="openSellModal('${inv.ticker}')">Sell</button>
+            <button class="btn-remove" onclick="removeInvestment('${inv.ticker}')">Remove</button>
+          </td>`;
+        tbody.appendChild(row);
+      }
+    }
+
+    function openSellModal(ticker) {
+      sellTicker = ticker;
+      document.getElementById('modalTicker').textContent  = ticker;
+      document.getElementById('sellMethod').value         = 'shares';
+      document.getElementById('sellAmount').value         = '';
+      document.getElementById('modalFeedback').style.display = 'none';
+      document.getElementById('sellModal').classList.add('open');
+    }
+    function closeSellModal() {
+      document.getElementById('sellModal').classList.remove('open');
+      sellTicker = null;
+    }
+    function setSellAll() { document.getElementById('sellMethod').value = 'all'; }
+
+    async function confirmSell() {
+      const method = document.getElementById('sellMethod').value;
+      let amount;
+      if (method === 'all') {
+        const inv = portfolioData.investments.find(i => i.ticker === sellTicker);
+        amount = inv ? inv.shares : 0;
+      } else {
+        amount = parseFloat(document.getElementById('sellAmount').value);
+        if (!amount || amount <= 0) { showModalError('Enter a valid amount.'); return; }
+      }
+
+      const res = await fetch('/portfolio/sell', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ticker: sellTicker, method: method === 'all' ? 'shares' : method, amount })
+      });
+
+      if (res.status === 401) { window.location.href = '/index.html'; return; }
+      if (res.ok) {
+        portfolioData = await res.json();
+        renderPortfolio(portfolioData);
+        closeSellModal();
+      } else {
+        showModalError(await res.text());
+      }
+    }
+
+    async function removeInvestment(ticker) {
+      if (!confirm('Remove ' + ticker + ' from your portfolio? (No cash impact)')) return;
+      const res = await fetch('/portfolio/' + ticker, { method: 'DELETE' });
+      if (res.status === 401) { window.location.href = '/index.html'; return; }
+      if (res.ok) { portfolioData = await res.json(); renderPortfolio(portfolioData); }
+    }
+
+    function showModalError(msg) {
+      const el = document.getElementById('modalFeedback');
+      el.textContent = msg; el.style.display = 'block';
+    }
+
+    async function logout() {
+      await fetch('/auth/logout', { method: 'POST' });
+      window.location.href = '/index.html';
+    }
+
+    document.getElementById('sellModal').addEventListener('click', e => {
+      if (e.target === document.getElementById('sellModal')) closeSellModal();
+    });
+
+    loadPortfolio();
+    setInterval(loadPortfolio, 10000);
+  </script>
+</body>
+</html>
