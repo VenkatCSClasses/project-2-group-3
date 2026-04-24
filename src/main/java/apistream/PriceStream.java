@@ -12,8 +12,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Maintains a persistent WebSocket connection to TwelveData and keeps a
@@ -33,6 +35,7 @@ public class PriceStream {
     private final HttpClient client = HttpClient.newHttpClient();
     private WebSocket ws;
     private final ConcurrentHashMap<String, Double> prices = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, CopyOnWriteArrayList<Consumer<Double>>> listeners = new ConcurrentHashMap<>();
     private volatile boolean connected = false;
     private final CountDownLatch connectLatch = new CountDownLatch(1);
 
@@ -102,6 +105,15 @@ public class PriceStream {
         subscribe(List.of(ticker));
     }
 
+    public void addListener(String ticker, Consumer<Double> listener) {
+        listeners.computeIfAbsent(ticker.toUpperCase(), k -> new CopyOnWriteArrayList<>()).add(listener);
+    }
+
+    public void removeListener(String ticker, Consumer<Double> listener) {
+        CopyOnWriteArrayList<Consumer<Double>> list = listeners.get(ticker.toUpperCase());
+        if (list != null) list.remove(listener);
+    }
+
     /**
      * Returns the most recently received price for the symbol,
      * or null if no tick has arrived yet.
@@ -132,6 +144,12 @@ public class PriceStream {
                 String symbol = msg.get("symbol").getAsString().toUpperCase();
                 double price = msg.get("price").getAsDouble();
                 prices.put(symbol, price);
+                CopyOnWriteArrayList<Consumer<Double>> tickerListeners = listeners.get(symbol);
+                if (tickerListeners != null) {
+                    for (Consumer<Double> l : tickerListeners) {
+                        try { l.accept(price); } catch (Exception ignored) {}
+                    }
+                }
             }
         } catch (Exception ignored) {}
     }

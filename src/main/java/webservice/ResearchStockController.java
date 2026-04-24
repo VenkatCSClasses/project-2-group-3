@@ -1,5 +1,6 @@
 package webservice;
 
+import api.GetTimeSeries;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,5 +27,17 @@ public class ResearchStockController {
             return ResponseEntity.status(401).body("Please log in first.");
         }
         return ResponseEntity.ok(researchStockService.getStockResearch(ticker));
+    }
+
+    @GetMapping("/{ticker}/chart")
+    public ResponseEntity<?> getChartData(@PathVariable String ticker, HttpSession session) {
+        if (session.getAttribute("username") == null) {
+            return ResponseEntity.status(401).body("Please log in first.");
+        }
+        try {
+            return ResponseEntity.ok(GetTimeSeries.run(ticker.toUpperCase(), "1day"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Could not fetch chart data for " + ticker);
+        }
     }
 }

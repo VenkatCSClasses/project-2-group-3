@@ -15,6 +15,13 @@ public class Values {
         this.volume = volume;
     }
 
+    public String getDatetime() { return datetime; }
+    public double getOpen()     { return open; }
+    public double getHigh()     { return high; }
+    public double getLow()      { return low; }
+    public double getClose()    { return close; }
+    public double getVolume()   { return volume; }
+
     @Override
     public String toString() {
         return "Date and Time: " + datetime + 
