@@ -26,25 +26,63 @@ public class Portfolio {
         return nextInvestmentID++;
     }
 
-    public double getTotalValue() {
+    public double getRealTotalValue() {
         double total = 0;
+
         for (Investment inv : investments) {
-            total += inv.getValue();
+            if (inv.getInvestmentType() == 0) {
+                total += inv.getValue();
+            }
         }
+
         return total;
     }
 
-    public double getTotalChange() {
-        double totalCost = 0;
+    public double getRealTotalChange() {
         double totalValue = 0;
+        double totalCostBasis = 0;
 
         for (Investment inv : investments) {
-            totalCost += inv.getValue() / (1 + inv.getPercentChange() / 100);
-            totalValue += inv.getValue();
+            if (inv.getInvestmentType() == 0) {
+                totalValue += inv.getValue();
+                totalCostBasis += inv.getShares() * inv.getPurchasePrice();
+            }
         }
 
-        if (totalCost == 0) return 0;
+        if (totalCostBasis == 0) {
+            return 0;
+        }
 
-        return ((totalValue - totalCost) / totalCost) * 100;
+        return ((totalValue - totalCostBasis) / totalCostBasis) * 100;
+    }
+
+    public double getWhatIfTotalValue() {
+        double total = 0;
+
+        for (Investment inv : investments) {
+            if (inv.getInvestmentType() == 1) {
+                total += inv.getValue();
+            }
+        }
+
+        return total;
+    }
+
+    public double getWhatIfTotalChange() {
+        double totalValue = 0;
+        double totalCostBasis = 0;
+
+        for (Investment inv : investments) {
+            if (inv.getInvestmentType() == 1) {
+                totalValue += inv.getValue();
+                totalCostBasis += inv.getShares() * inv.getPurchasePrice();
+            }
+        }
+
+        if (totalCostBasis == 0) {
+            return 0;
+        }
+
+        return ((totalValue - totalCostBasis) / totalCostBasis) * 100;
     }
 }

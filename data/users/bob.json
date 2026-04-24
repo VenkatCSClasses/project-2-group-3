@@ -1,0 +1,154 @@
+{
+  "username": "bob",
+  "password": "password2",
+  "cashBalance": 1492898.8159168249,
+  "portfolio": {
+    "investments": [
+      {
+        "investmentId": 3,
+        "ticker": "T",
+        "companyName": "AT\u0026T Inc.",
+        "purchaseDate": "2026-04-23",
+        "shares": 228.13616701147262,
+        "purchasePrice": 26.585,
+        "amountInvested": 6065.0,
+        "currentPrice": 26.65,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 4,
+        "ticker": "F",
+        "companyName": "Ford Motor Company",
+        "purchaseDate": "2017-01-04",
+        "shares": 639.0,
+        "purchasePrice": 12.59,
+        "amountInvested": 8045.01,
+        "currentPrice": 12.495,
+        "investmentType": 1
+      },
+      {
+        "investmentId": 6,
+        "ticker": "AAPL",
+        "companyName": "Apple Inc.",
+        "purchaseDate": "2019-03-04",
+        "shares": 60.0,
+        "purchasePrice": 43.7425,
+        "amountInvested": 2624.55,
+        "currentPrice": 273.7,
+        "investmentType": 1
+      },
+      {
+        "investmentId": 7,
+        "ticker": "AAPL",
+        "companyName": "Apple Inc.",
+        "purchaseDate": "2026-04-23",
+        "shares": 0.14247400712737426,
+        "purchasePrice": 272.19,
+        "amountInvested": 38.78,
+        "currentPrice": 273.7,
+        "investmentType": 0
+      }
+    ],
+    "nextInvestmentID": 8
+  },
+  "transactionLog": {
+    "transactionLog": [
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Buy",
+        "ticker": "AMZN",
+        "shares": 39.50695322376738,
+        "transactionPrice": 253.12,
+        "amountInvested": 10000.0
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Sell",
+        "ticker": "AMZN",
+        "shares": 3.916960438699569E-5,
+        "transactionPrice": 255.3,
+        "amountInvested": 0.01
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Sell",
+        "ticker": "AMZN",
+        "shares": 20.0,
+        "transactionPrice": 255.3,
+        "amountInvested": 5106.0
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Sell",
+        "ticker": "AAPL",
+        "shares": 5490.0,
+        "transactionPrice": 273.145,
+        "amountInvested": 1499566.0499999998
+      },
+      {
+        "transactionDate": "2026-04-22",
+        "transactionType": "Removal",
+        "ticker": "AMZN",
+        "shares": 20.0,
+        "transactionPrice": 255.3,
+        "amountInvested": 0.0
+      },
+      {
+        "transactionDate": "2026-04-23",
+        "transactionType": "Sell",
+        "ticker": "AMZN",
+        "shares": 19.506914054162998,
+        "transactionPrice": 254.325,
+        "amountInvested": 4961.095916825004
+      },
+      {
+        "transactionDate": "2026-04-23",
+        "transactionType": "Buy",
+        "ticker": "AMZN",
+        "shares": 42.0,
+        "transactionPrice": 254.33,
+        "amountInvested": 10681.86
+      },
+      {
+        "transactionDate": "2026-04-23",
+        "transactionType": "Buy",
+        "ticker": "T",
+        "shares": 228.13616701147262,
+        "transactionPrice": 26.585,
+        "amountInvested": 6065.0
+      },
+      {
+        "transactionDate": "2026-04-23",
+        "transactionType": "Removal",
+        "ticker": "AMZN",
+        "shares": 42.0,
+        "transactionPrice": 254.07,
+        "amountInvested": 0.0
+      },
+      {
+        "transactionDate": "2026-04-23",
+        "transactionType": "Buy",
+        "ticker": "AAPL",
+        "shares": 30.0,
+        "transactionPrice": 271.99,
+        "amountInvested": 8159.700000000001
+      },
+      {
+        "transactionDate": "2026-04-23",
+        "transactionType": "Buy",
+        "ticker": "AAPL",
+        "shares": 0.14247400712737426,
+        "transactionPrice": 272.19,
+        "amountInvested": 38.78
+      },
+      {
+        "transactionDate": "2026-04-23",
+        "transactionType": "Sell",
+        "ticker": "AAPL",
+        "shares": 30.0,
+        "transactionPrice": 273.7,
+        "amountInvested": 8211.0
+      }
+    ]
+  }
+}

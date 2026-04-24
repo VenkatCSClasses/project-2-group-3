@@ -18,4 +18,10 @@ public class TimeSeries {
     public List<Values> getValues() {
         return values;
     }
+
+    public String toString() {
+        return "Time Series:" +
+                "\nMeta: " + meta +
+                "\nValues: " + values;
+    }
 }

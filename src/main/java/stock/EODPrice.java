@@ -1,4 +1,5 @@
 package stock;
+import misc.NumFormat;
 
 public class EODPrice {
     private String symbol;
@@ -41,6 +42,6 @@ public class EODPrice {
                 "\nExchange: " + exchange +
                 "\nCurrency: " + currency +
                 "\nDate: " + datetime +
-                "\nClosing Price: " + close;
+                "\nClosing Price: " + NumFormat.formatCurrency(close);
     }
 }

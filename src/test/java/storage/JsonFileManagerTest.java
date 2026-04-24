@@ -2,6 +2,7 @@ package storage;
 
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
+
 import trade.Investment;
 
 public class JsonFileManagerTest {
@@ -11,25 +12,29 @@ public class JsonFileManagerTest {
         InvestmentStorage storage = new InvestmentStorage();
 
         Investment investment = new Investment(
+                1,
                 "AAPL",
                 "Apple Inc.",
                 "2026-04-13",
                 5.0,
                 200.0,
-                1000.0
+                1000.0,
+                0
         );
 
         storage.addInvestment(investment);
 
-        JsonFileManager.save(storage, "data/test-investments.json");
+        JsonFileManager.save(storage, "data/test/test-investments.json");
 
         InvestmentStorage loaded =
-                JsonFileManager.load("data/test-investments.json", InvestmentStorage.class);
+                JsonFileManager.load("data/test/test-investments.json", InvestmentStorage.class);
 
         assertNotNull(loaded);
         assertNotNull(loaded.getInvestments());
         assertEquals(1, loaded.getInvestments().size());
         assertEquals("AAPL", loaded.getInvestments().get(0).getTicker());
         assertEquals(5.0, loaded.getInvestments().get(0).getShares());
+        assertEquals(1, loaded.getInvestments().get(0).getInvestmentId());
+        assertEquals(0, loaded.getInvestments().get(0).getInvestmentType());
     }
 }

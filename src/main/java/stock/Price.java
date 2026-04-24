@@ -1,4 +1,5 @@
 package stock;
+import misc.NumFormat;
 
 public class Price {
     private String symbol;
@@ -19,6 +20,7 @@ public class Price {
 
     @Override
     public String toString() {
-        return "Symbol: " + symbol + "\nPrice: " + price;
+        return "Symbol: " + symbol + 
+        "\nPrice: " + NumFormat.formatCurrency(price);
     }
 }
