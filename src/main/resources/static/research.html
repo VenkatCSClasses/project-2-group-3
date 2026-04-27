@@ -460,6 +460,28 @@
     let activePeriod   = '22';  // default 1M
     let lastPrice      = null;
 
+    function money(value, decimals = 2) {
+      return '$' + Number(value || 0).toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function num(value, decimals = 2) {
+      return Number(value || 0).toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function pct(value, decimals = 2) {
+      const n = Number(value || 0);
+      return (n >= 0 ? '+' : '') + n.toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }) + '%';
+    }
+
     // ── Metric info modal content ──────────────────────────────────────────
     const METRIC_INFO = {
       open: {
@@ -569,8 +591,8 @@
       document.getElementById('stockName').textContent   = data.companyName;
 
       // Populate stats
-      document.getElementById('statOpen').textContent   = '$' + data.lastOpeningPrice.toFixed(2);
-      document.getElementById('statClose').textContent  = '$' + data.lastClosingPrice.toFixed(2);
+      document.getElementById('statOpen').textContent = money(data.lastOpeningPrice);
+      document.getElementById('statClose').textContent = money(data.lastClosingPrice);
       document.getElementById('statVolume').textContent = Number(data.volume).toLocaleString();
       setChangeStat('statDayChange', data.oneDayPriceChange, data.oneDayPercentChange);
 
@@ -799,7 +821,7 @@
       if (res.status === 401) { window.location.href = '/index.html'; return; }
       if (res.ok) {
         const data = await res.json();
-        showFeedback('Bought! Cash remaining: $' + data.cashBalance.toFixed(2), true);
+        showFeedback('Bought! Cash remaining: ' + money(data.cashBalance), true);
       } else {
         showFeedback(await res.text(), false);
       }
@@ -920,27 +942,27 @@
         document.getElementById('whatifStats').innerHTML = `
           <div class="stat">
             <div class="label">Historical Price</div>
-            <div class="value">$${data.historicalPrice.toFixed(2)}</div>
+            <div class="value">${money(data.historicalPrice)}</div>
           </div>
           <div class="stat">
             <div class="label">Current Price</div>
-            <div class="value">$${data.currentPrice.toFixed(2)}</div>
+            <div class="value">${money(data.currentPrice)}</div>
           </div>
           <div class="stat">
             <div class="label">Original Value</div>
-            <div class="value">$${data.originalValue.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+            <div class="value">${money(data.originalValue)}</div>
           </div>
           <div class="stat">
             <div class="label">Current Value</div>
-            <div class="value">$${data.currentValue.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+            <div class="value">${money(data.currentValue)}</div>
           </div>
           <div class="stat">
             <div class="label">Gain / Loss</div>
-            <div class="value"><span class="${gainCls}">${sign}$${Math.abs(data.dollarChange).toFixed(2)}</span></div>
+            <div class="value"><span class="${gainCls}">${sign}${money(Math.abs(data.dollarChange))}</span></div>
           </div>
           <div class="stat">
             <div class="label">Price Change</div>
-            <div class="value"><span class="${gainCls}">${sign}${data.percentChange.toFixed(2)}%</span></div>
+            <div class="value"><span class="${gainCls}">${pct(data.percentChange)}</span></div>
           </div>
         `;
 

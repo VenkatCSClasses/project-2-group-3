@@ -278,7 +278,10 @@
       const data = await res.json();
       document.getElementById('username').textContent    = data.username;
       document.getElementById('welcomeName').textContent = data.username;
-      document.getElementById('cash').textContent        = data.cashBalance.toFixed(2);
+      document.getElementById('cash').textContent = Number(data.cashBalance || 0).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
     }
     async function logout() {
       await fetch('/auth/logout', { method: 'POST' });

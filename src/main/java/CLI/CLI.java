@@ -73,7 +73,7 @@ public class CLI {
             } else if (choice == 3) {
                 DefinitionsMenu.definitionsMenu(input);
             } else if (choice == 4) {
-              System.out.println("WIP");
+                AssistanceMenu.assistanceMenu(input);
             } else if (choice == 5) {
                 UserDataManager.saveUser(user);
                 stream.close();

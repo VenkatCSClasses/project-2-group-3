@@ -67,21 +67,30 @@ public class PortfolioController {
             return ResponseEntity.badRequest().body(apiLimitMessage(req.ticker()));
         }
 
-        Investment found = UserTrading.findInvestment(user, req.ticker());
+        Investment found = UserTrading.findInvestmentById(user, req.investmentId());
         if (found == null) return ResponseEntity.badRequest().body("Investment not found.");
-        boolean ok = UserTrading.sellStock(user, found.getInvestmentId(), req.ticker(), price, req.method(), req.amount());
+
+        boolean ok = UserTrading.sellStock(
+                user,
+                found.getInvestmentId(),
+                found.getTicker(),
+                price,
+                req.method(),
+                req.amount()
+        );
+
         if (!ok) return ResponseEntity.badRequest().body("Sale failed — check share count or dollar amount.");
 
         userService.saveUser(user);
         return ResponseEntity.ok(buildPortfolioResponse(user));
     }
 
-    @DeleteMapping("/{ticker}")
-    public ResponseEntity<?> remove(@PathVariable String ticker, HttpSession session) {
+    @DeleteMapping("/{investmentId}")
+    public ResponseEntity<?> remove(@PathVariable int investmentId, HttpSession session) {
         User user = sessionUser(session);
         if (user == null) return ResponseEntity.status(401).body("Please log in first.");
 
-        Investment inv = UserTrading.findInvestment(user, ticker);
+        Investment inv = UserTrading.findInvestmentById(user, investmentId);
         if (inv == null) return ResponseEntity.badRequest().body("Investment not found.");
 
         user.getPortfolio().removeInvestment(inv);
@@ -105,5 +114,5 @@ public class PortfolioController {
     }
 
     record BuyRequest(String ticker, String companyName, String method, double amount) {}
-    record SellRequest(String ticker, String method, double amount) {}
+    record SellRequest(int investmentId, String ticker, String method, double amount) {}
 }

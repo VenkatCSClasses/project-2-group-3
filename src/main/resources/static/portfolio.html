@@ -252,6 +252,29 @@
   <script>
     let portfolioData = null;
     let sellTicker    = null;
+    let sellInvestmentId = null;
+
+    function money(value, decimals = 2) {
+      return '$' + Number(value || 0).toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function num(value, decimals = 4) {
+      return Number(value || 0).toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function pct(value, decimals = 2) {
+      const n = Number(value || 0);
+      return (n >= 0 ? '+' : '') + n.toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }) + '%';
+    }
 
     async function loadPortfolio() {
       const res = await fetch('/portfolio');
@@ -276,11 +299,11 @@
     }
 
     function renderPortfolio(data) {
-      document.getElementById('totalValue').textContent  = '$' + data.totalValue.toFixed(2);
+      document.getElementById('totalValue').textContent = money(data.totalValue);
       const chgEl = document.getElementById('totalChange');
-      chgEl.textContent = (data.totalChange >= 0 ? '+' : '') + data.totalChange.toFixed(2) + '%';
+      chgEl.textContent = pct(data.totalChange);
       chgEl.className   = 'value ' + (data.totalChange >= 0 ? 'positive' : 'negative');
-      document.getElementById('cashBalance').textContent = '$' + data.cashBalance.toFixed(2);
+      document.getElementById('cashBalance').textContent = money(data.cashBalance);
 
       const tbody = document.getElementById('portfolioBody');
       tbody.innerHTML = '';
@@ -295,47 +318,50 @@
       document.getElementById('tableWrap').style.display  = 'block';
 
       for (const inv of data.investments) {
-        const pct  = inv.percentChange ?? ((inv.currentPrice - inv.purchasePrice) / inv.purchasePrice * 100);
-        const cls  = pct >= 0 ? 'positive' : 'negative';
-        const sign = pct >= 0 ? '+' : '';
+        const percentChange = inv.percentChange ?? ((inv.currentPrice - inv.purchasePrice) / inv.purchasePrice * 100);
+        const cls = percentChange >= 0 ? 'positive' : 'negative';
         const row  = document.createElement('tr');
         row.innerHTML = `
           <td>
             <div class="ticker-cell">${inv.ticker}</div>
             <div class="name-cell">${inv.companyName}</div>
           </td>
-          <td>${inv.shares.toFixed(4)}</td>
-          <td>$${inv.purchasePrice.toFixed(4)}</td>
-          <td>$${inv.currentPrice.toFixed(4)}</td>
-          <td>$${(inv.shares * inv.currentPrice).toFixed(2)}</td>
-          <td class="${cls}">${sign}${pct.toFixed(2)}%</td>
+          <td>${num(inv.shares, 4)}</td>
+          <td>${money(inv.purchasePrice, 4)}</td>
+          <td>${money(inv.currentPrice, 4)}</td>
+          <td>${money(inv.shares * inv.currentPrice, 2)}</td>
+          <td class="${cls}">${pct(percentChange, 2)}</td>
           <td>
-            <button class="btn-sell" onclick="openSellModal('${inv.ticker}')">Sell</button>
-            <button class="btn-remove" onclick="removeInvestment('${inv.ticker}')">Remove</button>
+            <button class="btn-sell" onclick="openSellModal(${inv.investmentId}, '${inv.ticker}')">Sell</button>
+            <button class="btn-remove" onclick="removeInvestment(${inv.investmentId}, '${inv.ticker}')">Remove</button>
           </td>`;
         tbody.appendChild(row);
       }
     }
 
-    function openSellModal(ticker) {
+    function openSellModal(investmentId, ticker) {
+      sellInvestmentId = investmentId;
       sellTicker = ticker;
-      document.getElementById('modalTicker').textContent  = ticker;
-      document.getElementById('sellMethod').value         = 'shares';
-      document.getElementById('sellAmount').value         = '';
+      document.getElementById('modalTicker').textContent = ticker;
+      document.getElementById('sellMethod').value = 'shares';
+      document.getElementById('sellAmount').value = '';
       document.getElementById('modalFeedback').style.display = 'none';
       document.getElementById('sellModal').classList.add('open');
     }
+
     function closeSellModal() {
       document.getElementById('sellModal').classList.remove('open');
       sellTicker = null;
+      sellInvestmentId = null;
     }
+
     function setSellAll() { document.getElementById('sellMethod').value = 'all'; }
 
     async function confirmSell() {
       const method = document.getElementById('sellMethod').value;
       let amount;
       if (method === 'all') {
-        const inv = portfolioData.investments.find(i => i.ticker === sellTicker);
+        const inv = portfolioData.investments.find(i => i.investmentId === sellInvestmentId);
         amount = inv ? inv.shares : 0;
       } else {
         amount = parseFloat(document.getElementById('sellAmount').value);
@@ -345,7 +371,12 @@
       const res = await fetch('/portfolio/sell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticker: sellTicker, method: method === 'all' ? 'shares' : method, amount })
+        body: JSON.stringify({
+          investmentId: sellInvestmentId,
+          ticker: sellTicker,
+          method: method === 'all' ? 'shares' : method,
+          amount
+        })
       });
 
       if (res.status === 401) { window.location.href = '/index.html'; return; }
@@ -358,10 +389,16 @@
       }
     }
 
-    async function removeInvestment(ticker) {
+    async function removeInvestment(investmentId, ticker) {
       if (!confirm('Remove ' + ticker + ' from your portfolio? (No cash impact)')) return;
-      const res = await fetch('/portfolio/' + ticker, { method: 'DELETE' });
-      if (res.status === 401) { window.location.href = '/index.html'; return; }
+
+      const res = await fetch('/portfolio/' + investmentId, { method: 'DELETE' });
+
+      if (res.status === 401) {
+        window.location.href = '/index.html';
+        return;
+      }
+
       if (res.ok) {
         portfolioData = await res.json();
         renderPortfolio(portfolioData);

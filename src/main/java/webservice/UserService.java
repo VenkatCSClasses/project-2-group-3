@@ -7,12 +7,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
-import storage.JsonFileManager;
-import storage.UserData;
-import trade.Portfolio;
-import trade.TransactionLog;
-import trade.User;
-import trade.UserAccount;
+import storage.*;
+import trade.*;
 
 @Service
 public class UserService {
