@@ -249,29 +249,24 @@
         <div class="buy-feedback" id="buyFeedback"></div>
       </div>
 
-      </div>
     </div>
 
     <!-- ── What If Card ── -->
-    <h3 class="whatif-card-title">What If I Bought This Stock?</h3>
-    <p class="whatif-subtitle">Enter a number of shares and a past purchase date to compare the historical price against the current price.</p>
-    <div class="whatif-inputs">
-      <input type="number" id="whatifShares" placeholder="Shares (e.g. 10)" min="0.0001" step="any">
-      <input type="date" id="whatifDate">
-      <button class="btn-whatif" onclick="calcWhatIf()">Calculate</button>
-    </div>
+    <div class="whatif-card" id="whatifCard">
+      <h3 class="whatif-card-title">What If I Bought This Stock?</h3>
+      <p class="whatif-subtitle">Enter a number of shares and a past purchase date to compare the historical price against the current price.</p>
+
+      <div class="whatif-inputs">
+        <input type="number" id="whatifShares" placeholder="Shares (e.g. 10)" min="0.0001" step="any">
+        <input type="date" id="whatifDate">
+        <button class="btn-whatif" onclick="calcWhatIf()">Calculate</button>
+      </div>
+
       <div id="whatifStatus" style="display:none; padding:10px 14px; border-radius:8px; font-size:14px; margin-bottom:12px;"></div>
+
       <div id="whatifResult" style="display:none;">
         <p class="whatif-entry-note" id="whatifEntryNote"></p>
         <div class="whatif-stats" id="whatifStats"></div>
-        <!--
-        <div class="chart-section" style="margin-top:4px;">
-          <div class="chart-header">
-            <span>Portfolio Value Over Time</span>
-          </div>
-          <canvas id="whatifChart" height="100"></canvas>
-        </div>
-      -->
       </div>
     </div>
 
@@ -571,18 +566,34 @@
       document.getElementById('whatifDate').value = '';
       document.getElementById('whatifCard').style.display = 'none';
 
-      const res = await fetch('/stocks/' + ticker);
-      document.getElementById('spinner').style.display = 'none';
-      btn.disabled = false; btn.textContent = 'Look Up';
+      let data;
 
-      if (!res.ok) {
-        if (res.status === 401) { window.location.href = '/index.html'; return; }
-        const msg = await res.text();
-        showError(msg || ('Market data is unavailable for "' + ticker + '". The API may be rate-limited or out of daily credits.'));
+      try {
+        const res = await fetch('/stocks/' + ticker);
+
+        if (!res.ok) {
+          if (res.status === 401) {
+            window.location.href = '/index.html';
+            return;
+          }
+
+          const msg = await res.text();
+          showError(msg || ('Market data is unavailable for "' + ticker + '". The API may be rate-limited or out of daily credits.'));
+          return;
+        }
+
+        data = await res.json();
+
+      } catch (e) {
+        showError('Market data could not be loaded. The API may be unavailable or rate-limited.');
         return;
+
+      } finally {
+        document.getElementById('spinner').style.display = 'none';
+        btn.disabled = false;
+        btn.textContent = 'Look Up';
       }
 
-      const data = await res.json();
       currentTicker = data.ticker;
       currentName   = data.companyName;
 
