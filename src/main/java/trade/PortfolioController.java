@@ -51,8 +51,13 @@ public class PortfolioController {
         Investment inv = UserTrading.purchaseStock(user, req.ticker(), req.companyName(), price, req.method(), req.amount());
         if (inv == null) return ResponseEntity.badRequest().body("Purchase failed — insufficient funds or invalid amount.");
 
+        double cashDeducted = inv.getShares() * inv.getPurchasePrice();
         userService.saveUser(user);
-        return ResponseEntity.ok(buildPortfolioResponse(user));
+
+        Map<String, Object> response = buildPortfolioResponse(user);
+        response.put("cashDeducted", cashDeducted);
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/sell")

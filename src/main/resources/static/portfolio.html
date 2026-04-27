@@ -216,6 +216,7 @@
           <tr>
             <th>Stock</th>
             <th>Shares</th>
+            <th>Purchase Date</th>
             <th>Avg Cost</th>
             <th>Current Price</th>
             <th>Value</th>
@@ -327,6 +328,7 @@
             <div class="name-cell">${inv.companyName}</div>
           </td>
           <td>${num(inv.shares, 4)}</td>
+          <td>${inv.purchaseDate || '—'}</td>
           <td>${money(inv.purchasePrice, 4)}</td>
           <td>${money(inv.currentPrice, 4)}</td>
           <td>${money(inv.shares * inv.currentPrice, 2)}</td>

@@ -52,8 +52,15 @@ public class ResearchStockService {
                 */
 
             if ("error".equals(quote.path("status").asText())) {
-                throw new RuntimeException(quote.path("message").asText("API error"));
+                String message = quote.path("message").asText("").toLowerCase();
+
+                if (message.contains("symbol") || message.contains("not found")) {
+                    throw new IllegalArgumentException("Invalid stock symbol. Please enter a valid ticker such as AAPL, MSFT, or NVDA.");
+                }
+
+                throw new RuntimeException("Stock quote data is currently unavailable. The API may be rate-limited or temporarily unavailable.");
             }
+
             if (timeSeries != null && "error".equals(timeSeries.path("status").asText())) {
                 timeSeries = null;
             }
@@ -89,10 +96,13 @@ public class ResearchStockService {
 
             cache.put(cacheKey, new CacheEntry(stock));
             return stock;
+        } catch (IllegalArgumentException e) {
+            throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Market data is currently unavailable for " + ticker 
-            + ". The stock API may be out of daily credits or rate-limited. Try again later.", e);
-        }
+            throw new RuntimeException("Market data is currently unavailable for " + ticker + 
+            ". The stock API may be out of daily credits or rate-limited. Try again later.", e);
+         }
+
     }
 
     private void applyChange(ResearchStock stock, double current, List<Double> closes, int daysBack, String period) {

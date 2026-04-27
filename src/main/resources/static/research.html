@@ -130,8 +130,10 @@
     .whatif-card-title { font-size: 20px; font-weight: 800; color: #e2e8f0; margin-bottom: 8px; letter-spacing: -0.3px; }
     .whatif-subtitle { font-size: 14px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
     .whatif-inputs { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 20px; }
-    .whatif-inputs input[type="number"] { padding: 11px 14px; background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.35); border-radius: 8px; color: #e2e8f0; font-size: 15px; width: 200px; }
-    .whatif-inputs input[type="number"]:focus { outline: none; border-color: #a855f7; box-shadow: 0 0 0 3px rgba(168,85,247,0.15); }
+    .whatif-inputs input[type="number"], .whatif-inputs input[type="date"] {padding: 11px 14px; background: rgba(168,85,247,0.08); 
+      border: 1px solid rgba(168,85,247,0.35); border-radius: 8px; color: #e2e8f0; font-size: 15px; width: 200px;}
+    .whatif-inputs input[type="number"]:focus, .whatif-inputs input[type="date"]:focus {outline: none; border-color: #a855f7; box-shadow: 0 0 0 3px rgba(168,85,247,0.15);}
+    .whatif-inputs input[type="date"]::-webkit-calendar-picker-indicator {filter: invert(1); opacity: 0.75; cursor: pointer;}
     .whatif-inputs select { padding: 11px 14px; background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.35); border-radius: 8px; color: #e2e8f0; font-size: 15px; }
     .whatif-inputs select:focus { outline: none; border-color: #a855f7; }
     .btn-whatif { padding: 11px 24px; background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(168,85,247,0.35); white-space: nowrap; }
@@ -238,15 +240,16 @@
       <!-- Buy -->
       <div class="buy-section">
         <h4>Buy Stock</h4>
-        <div class="buy-row">
+        <div class="buy-row" onchange="updateBuyEstimate()">
           <select id="buyMethod">
             <option value="shares">By Shares</option>
             <option value="dollars">By Dollar Amount</option>
           </select>
-          <input type="number" id="buyAmount" placeholder="Amount" min="0.01" step="any" style="width:160px">
+          <input type="number" id="buyAmount" placeholder="Amount" min="0.01" step="any" style="width:160px" oninput="updateBuyEstimate()">
           <button class="btn-success" onclick="buyStock()">Buy</button>
         </div>
         <div class="buy-feedback" id="buyFeedback"></div>
+        <div class="buy-estimate" id="buyEstimate"></div>
       </div>
 
     </div>
@@ -454,6 +457,7 @@
     let allChartPoints = [];    // full dataset [{label, close}]
     let activePeriod   = '22';  // default 1M
     let lastPrice      = null;
+    let currentReserachPrice = null;
 
     function money(value, decimals = 2) {
       return '$' + Number(value || 0).toLocaleString('en-US', {
@@ -604,6 +608,8 @@
       // Populate stats
       document.getElementById('statOpen').textContent = money(data.lastOpeningPrice);
       document.getElementById('statClose').textContent = money(data.lastClosingPrice);
+      currentResearchPrice = Number(data.lastClosingPrice || 0);
+      updateBuyEstimate();
       document.getElementById('statVolume').textContent = Number(data.volume).toLocaleString();
       setChangeStat('statDayChange', data.oneDayPriceChange, data.oneDayPercentChange);
 
@@ -624,6 +630,7 @@
       document.getElementById('learnPanel').style.display = 'block';
       document.getElementById('learnTitle').textContent = 'Understanding ' + data.ticker;
       document.getElementById('buyFeedback').style.display = 'none';
+      document.getElementById('buyAmount').value = '';
 
       await loadChart(currentTicker);
       // startPriceStream(currentTicker); - temporarily disabled
@@ -665,7 +672,7 @@
 
       // Seed live price display
       if (closes.length > 0 && lastPrice === null) {
-        document.getElementById('livePrice').textContent = '$' + closes[closes.length - 1].toFixed(4);
+        document.getElementById('livePrice').textContent = '$' + closes[closes.length - 1], 2;
       }
 
       if (priceChart) {
@@ -698,7 +705,7 @@
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: ctx => '$' + ctx.parsed.y.toFixed(2)
+                label: ctx => '$' + money(ctx.parsed.y, 2)
               }
             }
           },
@@ -726,7 +733,7 @@
         lastPrice   = price;
 
         const el = document.getElementById('livePrice');
-        el.textContent = '$' + price.toFixed(4);
+        el.textContent = money(price, 2);
         el.classList.remove('up', 'down');
         if (prev !== null) el.classList.add(price >= prev ? 'up' : 'down');
 
@@ -832,10 +839,36 @@
       if (res.status === 401) { window.location.href = '/index.html'; return; }
       if (res.ok) {
         const data = await res.json();
-        showFeedback('Bought! Cash remaining: ' + money(data.cashBalance), true);
+        showFeedback(
+          'Bought! Cash deducted: ' + money(data.cashDeducted) + '. Cash remaining: ' + money(data.cashBalance), true);
       } else {
         showFeedback(await res.text(), false);
       }
+    }
+
+    // Update price when buying
+    function updateBuyEstimate() {
+      const el = document.getElementById('buyEstimate');
+      const method = document.getElementById('buyMethod').value;
+      const amount = parseFloat(document.getElementById('buyAmount').value);
+
+      el.style.display = 'none';
+      el.className = 'buy-feedback';
+
+      if (!currentResearchPrice || !amount || amount <= 0) {
+        return;
+      }
+
+      if (method === 'shares') {
+        const estimatedCost = amount * currentResearchPrice;
+        el.textContent = 'Estimated cash needed: ' + money(estimatedCost, 2);
+      } else {
+        const estimatedShares = amount / currentResearchPrice;
+        el.textContent = 'Estimated shares: ' + num(estimatedShares, 4);
+      }
+
+      el.classList.add('success');
+      el.style.display = 'block';
     }
 
     // ── Info modal ─────────────────────────────────────────────────────────

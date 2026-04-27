@@ -49,11 +49,12 @@ public class ResearchStockController {
         }
         try {
             return ResponseEntity.ok(GetYahooChart.run(ticker.toUpperCase()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(
-                "Historical chart data is currently unavailable for " + ticker
-                + ". The chart API may be out of daily credits or rate-limited. Try again later."
-            );
+                "Market data is currently unavailable for " + ticker.toUpperCase()
+                + ". The stock API may be out of daily credits or rate-limited. Try again later.");
         }
     }
 
