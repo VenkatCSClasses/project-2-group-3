@@ -1,0 +1,166 @@
+{
+  "username": "water",
+  "password": "password",
+  "cashBalance": 5671.290037000002,
+  "portfolio": {
+    "investments": [
+      {
+        "investmentId": 1,
+        "ticker": "AMZN",
+        "companyName": "Amazon.com, Inc.",
+        "purchaseDate": "2026-04-27",
+        "shares": 3.0,
+        "purchasePrice": 261.079987,
+        "amountInvested": 783.239961,
+        "currentPrice": 261.079987,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 2,
+        "ticker": "QQQ",
+        "companyName": "Invesco QQQ Trust",
+        "purchaseDate": "2026-04-27",
+        "shares": 0.7527059553282263,
+        "purchasePrice": 664.27002,
+        "amountInvested": 500.0,
+        "currentPrice": 664.27002,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 3,
+        "ticker": "WM",
+        "companyName": "Waste Management, Inc.",
+        "purchaseDate": "2026-04-27",
+        "shares": 1.0,
+        "purchasePrice": 226.22,
+        "amountInvested": 226.22,
+        "currentPrice": 226.22,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 4,
+        "ticker": "SPY",
+        "companyName": "SPDR S\u0026P 500 ETF Trust",
+        "purchaseDate": "2026-04-27",
+        "shares": 2.7965771070771757,
+        "purchasePrice": 715.15997,
+        "amountInvested": 1999.9999999999998,
+        "currentPrice": 715.15997,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 5,
+        "ticker": "KO",
+        "companyName": "The Coca-Cola Company",
+        "purchaseDate": "2026-04-27",
+        "shares": 5.0,
+        "purchasePrice": 75.45,
+        "amountInvested": 377.25,
+        "currentPrice": 75.45,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 6,
+        "ticker": "IWM",
+        "companyName": "iShares Russell 2000 ETF",
+        "purchaseDate": "2026-04-27",
+        "shares": 0.9022013387873931,
+        "purchasePrice": 277.10001,
+        "amountInvested": 250.0,
+        "currentPrice": 277.10001,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 7,
+        "ticker": "LMT",
+        "companyName": "Lockheed Martin Corporation",
+        "purchaseDate": "2026-04-27",
+        "shares": 0.19474196689386564,
+        "purchasePrice": 513.5,
+        "amountInvested": 100.0,
+        "currentPrice": 513.5,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 8,
+        "ticker": "ALPS",
+        "companyName": "Alps Group Inc.",
+        "purchaseDate": "2026-04-27",
+        "shares": 100.0,
+        "purchasePrice": 0.92000002,
+        "amountInvested": 92.00000200000001,
+        "currentPrice": 0.92000002,
+        "investmentType": 0
+      }
+    ],
+    "nextInvestmentID": 9
+  },
+  "transactionLog": {
+    "transactionLog": [
+      {
+        "transactionDate": "2026-04-27",
+        "transactionType": "Buy",
+        "ticker": "AMZN",
+        "shares": 3.0,
+        "transactionPrice": 261.079987,
+        "amountInvested": 783.239961
+      },
+      {
+        "transactionDate": "2026-04-27",
+        "transactionType": "Buy",
+        "ticker": "QQQ",
+        "shares": 0.7527059553282263,
+        "transactionPrice": 664.27002,
+        "amountInvested": 500.0
+      },
+      {
+        "transactionDate": "2026-04-27",
+        "transactionType": "Buy",
+        "ticker": "WM",
+        "shares": 1.0,
+        "transactionPrice": 226.22,
+        "amountInvested": 226.22
+      },
+      {
+        "transactionDate": "2026-04-27",
+        "transactionType": "Buy",
+        "ticker": "SPY",
+        "shares": 2.7965771070771757,
+        "transactionPrice": 715.15997,
+        "amountInvested": 1999.9999999999998
+      },
+      {
+        "transactionDate": "2026-04-27",
+        "transactionType": "Buy",
+        "ticker": "KO",
+        "shares": 5.0,
+        "transactionPrice": 75.45,
+        "amountInvested": 377.25
+      },
+      {
+        "transactionDate": "2026-04-27",
+        "transactionType": "Buy",
+        "ticker": "IWM",
+        "shares": 0.9022013387873931,
+        "transactionPrice": 277.10001,
+        "amountInvested": 250.0
+      },
+      {
+        "transactionDate": "2026-04-27",
+        "transactionType": "Buy",
+        "ticker": "LMT",
+        "shares": 0.19474196689386564,
+        "transactionPrice": 513.5,
+        "amountInvested": 100.0
+      },
+      {
+        "transactionDate": "2026-04-27",
+        "transactionType": "Buy",
+        "ticker": "ALPS",
+        "shares": 100.0,
+        "transactionPrice": 0.92000002,
+        "amountInvested": 92.00000200000001
+      }
+    ]
+  }
+}

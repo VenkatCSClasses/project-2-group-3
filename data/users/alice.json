@@ -1,7 +1,7 @@
 {
   "username": "alice",
   "password": "password1",
-  "cashBalance": 1112.681441447642,
+  "cashBalance": 1491.3814514476421,
   "portfolio": {
     "investments": [
       {
@@ -9,10 +9,10 @@
         "ticker": "AAPL",
         "companyName": "Apple Inc.",
         "purchaseDate": "2026-04-20",
-        "shares": 6.0,
+        "shares": 5.0,
         "purchasePrice": 273.97,
-        "amountInvested": 1643.8200000000002,
-        "currentPrice": 271.059998,
+        "amountInvested": 1369.8500000000001,
+        "currentPrice": 267.67999,
         "investmentType": 0
       },
       {
@@ -23,7 +23,7 @@
         "shares": 0.011907029910459135,
         "purchasePrice": 419.92,
         "amountInvested": 5.0,
-        "currentPrice": 424.57999,
+        "currentPrice": 425.059998,
         "investmentType": 0
       },
       {
@@ -34,7 +34,7 @@
         "shares": 5.0,
         "purchasePrice": 339.55,
         "amountInvested": 1697.75,
-        "currentPrice": 344.29001,
+        "currentPrice": 350.34,
         "investmentType": 0
       },
       {
@@ -45,7 +45,7 @@
         "shares": 5.0,
         "purchasePrice": 390.89,
         "amountInvested": 1954.4499999999998,
-        "currentPrice": 376.16,
+        "currentPrice": 378.70001,
         "investmentType": 0
       },
       {
@@ -56,7 +56,7 @@
         "shares": 3.0,
         "purchasePrice": 225.17,
         "amountInvested": 675.51,
-        "currentPrice": 232.44,
+        "currentPrice": 231.32001,
         "investmentType": 0
       },
       {
@@ -67,7 +67,7 @@
         "shares": 2.0,
         "purchasePrice": 199.855,
         "amountInvested": 399.71,
-        "currentPrice": 208.19,
+        "currentPrice": 216.63,
         "investmentType": 0
       },
       {
@@ -78,7 +78,7 @@
         "shares": 2.0,
         "purchasePrice": 12.775,
         "amountInvested": 25.55,
-        "currentPrice": 12.38,
+        "currentPrice": 12.4962,
         "investmentType": 0
       },
       {
@@ -89,7 +89,7 @@
         "shares": 5.0,
         "purchasePrice": 496.0,
         "amountInvested": 2480.0,
-        "currentPrice": 496.0,
+        "currentPrice": 524.70001,
         "investmentType": 0
       },
       {
@@ -109,12 +109,12 @@
   "transactionLog": {
     "transactionLog": [
       {
-        "transactionDate": "2026-04-26",
-        "transactionType": "Buy",
-        "ticker": "MU",
-        "shares": 2.0161290322580645,
-        "transactionPrice": 496.0,
-        "amountInvested": 1000.0
+        "transactionDate": "2026-04-27",
+        "transactionType": "Sell",
+        "ticker": "AAPL",
+        "shares": 1.0,
+        "transactionPrice": 378.70001,
+        "amountInvested": 378.70001
       }
     ]
   }
