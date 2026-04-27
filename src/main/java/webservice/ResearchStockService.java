@@ -41,6 +41,7 @@ public class ResearchStockService {
             JsonNode quote = objectMapper.readTree(quoteJson);
 
             JsonNode timeSeries = null;
+            /* Temp disabled
             try {
                 String tsUrl = BASE_URL + "/time_series?symbol=" + ticker + "&interval=1day&outputsize=260&apikey=" + apiKey;
                 String tsJson = restTemplate.getForObject(tsUrl, String.class);
@@ -48,6 +49,7 @@ public class ResearchStockService {
             } catch (Exception ignored) {
                 timeSeries = null;
             }
+                */
 
             if ("error".equals(quote.path("status").asText())) {
                 throw new RuntimeException(quote.path("message").asText("API error"));
