@@ -253,31 +253,25 @@
     </div>
 
     <!-- ── What If Card ── -->
-    <div class="whatif-card" id="whatifCard">
-      <h3 class="whatif-card-title">💸 What If I Had Invested?</h3>
-      <p class="whatif-subtitle">Enter an amount and pick how far back to go — see exactly what your money would be worth today.</p>
-      <div class="whatif-inputs">
-        <input type="number" id="whatifAmount" placeholder="$ Amount (e.g. 1000)" min="1" step="any">
-        <select id="whatifPeriod">
-          <option value="5">1 Week Ago</option>
-          <option value="22" selected>1 Month Ago</option>
-          <option value="66">3 Months Ago</option>
-          <option value="130">6 Months Ago</option>
-          <option value="260">1 Year Ago</option>
-          <option value="all">All Available Data</option>
-        </select>
-        <button class="btn-whatif" onclick="calcWhatIf()">Calculate</button>
-      </div>
+    <h3 class="whatif-card-title">What If I Bought This Stock?</h3>
+    <p class="whatif-subtitle">Enter a number of shares and a past purchase date to compare the historical price against the current price.</p>
+    <div class="whatif-inputs">
+      <input type="number" id="whatifShares" placeholder="Shares (e.g. 10)" min="0.0001" step="any">
+      <input type="date" id="whatifDate">
+      <button class="btn-whatif" onclick="calcWhatIf()">Calculate</button>
+    </div>
       <div id="whatifStatus" style="display:none; padding:10px 14px; border-radius:8px; font-size:14px; margin-bottom:12px;"></div>
       <div id="whatifResult" style="display:none;">
         <p class="whatif-entry-note" id="whatifEntryNote"></p>
         <div class="whatif-stats" id="whatifStats"></div>
+        <!--
         <div class="chart-section" style="margin-top:4px;">
           <div class="chart-header">
             <span>Portfolio Value Over Time</span>
           </div>
           <canvas id="whatifChart" height="100"></canvas>
         </div>
+      -->
       </div>
     </div>
 
@@ -547,11 +541,12 @@
       document.getElementById('whatifCard').style.display = 'none';
       document.getElementById('spinner').style.display = 'block';
 
-      if (priceEventSource) { priceEventSource.close(); priceEventSource = null; }
+      // if (priceEventSource) { priceEventSource.close(); priceEventSource = null; } - temporarily disabled
       if (priceChart)        { priceChart.destroy(); priceChart = null; }
       if (whatifChart)       { whatifChart.destroy(); whatifChart = null; }
       document.getElementById('whatifResult').style.display = 'none';
-      document.getElementById('whatifAmount').value = '';
+      document.getElementById('whatifShares').value = '';
+      document.getElementById('whatifDate').value = '';
       document.getElementById('whatifCard').style.display = 'none';
 
       const res = await fetch('/stocks/' + ticker);
@@ -560,7 +555,8 @@
 
       if (!res.ok) {
         if (res.status === 401) { window.location.href = '/index.html'; return; }
-        showError('Could not find "' + ticker + '". Check the symbol and try again.');
+        const msg = await res.text();
+        showError(msg || ('Market data is unavailable for "' + ticker + '". The API may be rate-limited or out of daily credits.'));
         return;
       }
 
@@ -597,7 +593,7 @@
       document.getElementById('buyFeedback').style.display = 'none';
 
       await loadChart(currentTicker);
-      startPriceStream(currentTicker);
+      // startPriceStream(currentTicker); - temporarily disabled
     }
 
     // ── Chart ──────────────────────────────────────────────────────────────
@@ -874,130 +870,81 @@
       el.style.color = type === 'error' ? '#fca5a5' : '#6ee7b7';
     }
 
-    function calcWhatIf() {
+    async function calcWhatIf() {
       try {
         document.getElementById('whatifStatus').style.display = 'none';
 
-        const amount = parseFloat(document.getElementById('whatifAmount').value);
-        if (!amount || amount <= 0) {
-          setWhatifStatus('Please enter a dollar amount greater than 0.', 'error');
+        const shares = parseFloat(document.getElementById('whatifShares').value);
+        const date = document.getElementById('whatifDate').value;
+
+        if (!currentTicker) {
+          setWhatifStatus('Search for a stock first.', 'error');
           return;
         }
 
-        if (!allChartPoints || allChartPoints.length === 0) {
-          setWhatifStatus('Historical price data is not loaded yet. This usually means the chart API hit a rate limit. Wait 30 seconds and search the stock again.', 'error');
+        if (!shares || shares <= 0) {
+          setWhatifStatus('Please enter a valid number of shares greater than 0.', 'error');
           return;
         }
 
-        const period = document.getElementById('whatifPeriod').value;
-        let slice = allChartPoints;
-        if (period !== 'all') {
-          const n = parseInt(period);
-          slice = allChartPoints.slice(Math.max(0, allChartPoints.length - n));
-        }
-
-        if (slice.length < 2) {
-          setWhatifStatus('Not enough data for this time period (' + slice.length + ' data points). Try a shorter range or "All Available Data".', 'error');
+        if (!date) {
+          setWhatifStatus('Please choose a purchase date.', 'error');
           return;
         }
 
-        const entryPrice   = parseFloat(slice[0].close);
-        const exitPrice    = parseFloat(slice[slice.length - 1].close);
-        const shares       = amount / entryPrice;
-        const currentValue = shares * exitPrice;
-        const gain         = currentValue - amount;
-        const pct          = (gain / amount) * 100;
+        const res = await fetch('/stocks/' + currentTicker + '/what-if?shares=' 
+          + encodeURIComponent(shares) 
+          + '&date=' 
+          + encodeURIComponent(date));
+
+        if (res.status === 401) {
+          window.location.href = '/index.html';
+          return;
+        }
+
+        if (!res.ok) {
+          const msg = await res.text();
+          setWhatifStatus(msg || 'Could not calculate what-if result.', 'error');
+          return;
+        }
+
+        const data = await res.json();
+
+        const gainCls = data.dollarChange >= 0 ? 'positive' : 'negative';
+        const sign = data.dollarChange >= 0 ? '+' : '';
 
         document.getElementById('whatifEntryNote').textContent =
-          'If you bought on ' + slice[0].label + ' at $' + entryPrice.toFixed(2) + '/share, you would have gotten ' + shares.toFixed(4) + ' shares.';
+          'If you bought ' + data.shares + ' shares of ' + data.ticker +
+          ' on ' + data.purchaseDate + ', this is how the position would compare today.';
 
-        const gainCls = gain >= 0 ? 'positive' : 'negative';
-        const sign    = gain >= 0 ? '+' : '';
         document.getElementById('whatifStats').innerHTML = `
           <div class="stat">
-            <div class="label">Invested</div>
-            <div class="value">$${amount.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+            <div class="label">Historical Price</div>
+            <div class="value">$${data.historicalPrice.toFixed(2)}</div>
+          </div>
+          <div class="stat">
+            <div class="label">Current Price</div>
+            <div class="value">$${data.currentPrice.toFixed(2)}</div>
+          </div>
+          <div class="stat">
+            <div class="label">Original Value</div>
+            <div class="value">$${data.originalValue.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
           </div>
           <div class="stat">
             <div class="label">Current Value</div>
-            <div class="value">$${currentValue.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
+            <div class="value">$${data.currentValue.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}</div>
           </div>
           <div class="stat">
             <div class="label">Gain / Loss</div>
-            <div class="value"><span class="${gainCls}">${sign}$${Math.abs(gain).toFixed(2)}</span></div>
+            <div class="value"><span class="${gainCls}">${sign}$${Math.abs(data.dollarChange).toFixed(2)}</span></div>
           </div>
           <div class="stat">
-            <div class="label">Total Return</div>
-            <div class="value"><span class="${gainCls}">${sign}${pct.toFixed(2)}%</span></div>
-          </div>`;
+            <div class="label">Price Change</div>
+            <div class="value"><span class="${gainCls}">${sign}${data.percentChange.toFixed(2)}%</span></div>
+          </div>
+        `;
 
-        const labels    = slice.map(p => p.label);
-        const values    = slice.map(p => parseFloat((shares * parseFloat(p.close)).toFixed(2)));
-        const baseline  = labels.map(() => amount);
-        const lineColor = gain >= 0 ? '#00ff88' : '#ff4f4f';
-        const fillColor = gain >= 0 ? 'rgba(0,255,136,0.08)' : 'rgba(255,79,79,0.08)';
-
-        // Must show container before Chart.js init so canvas has real pixel size
         document.getElementById('whatifResult').style.display = 'block';
-
-        if (whatifChart) {
-          whatifChart.data.labels = labels;
-          whatifChart.data.datasets[0].data = values;
-          whatifChart.data.datasets[0].borderColor = lineColor;
-          whatifChart.data.datasets[0].backgroundColor = fillColor;
-          whatifChart.data.datasets[1].data = baseline;
-          whatifChart.update('none');
-        } else {
-          const canvasCtx = document.getElementById('whatifChart').getContext('2d');
-          whatifChart = new Chart(canvasCtx, {
-            type: 'line',
-            data: {
-              labels,
-              datasets: [
-                {
-                  label: 'Portfolio Value',
-                  data: values,
-                  borderColor: lineColor,
-                  backgroundColor: fillColor,
-                  borderWidth: 2,
-                  pointRadius: 0,
-                  fill: true,
-                  tension: 0.3
-                },
-                {
-                  label: 'Amount Invested',
-                  data: baseline,
-                  borderColor: 'rgba(255,255,255,0.25)',
-                  borderDash: [5, 4],
-                  borderWidth: 1.5,
-                  pointRadius: 0,
-                  fill: false,
-                  tension: 0
-                }
-              ]
-            },
-            options: {
-              responsive: true,
-              animation: false,
-              plugins: {
-                legend: {
-                  display: true,
-                  labels: { color: '#94a3b8', font: { size: 11 }, boxWidth: 14 }
-                },
-                tooltip: {
-                  callbacks: {
-                    label: item => '$' + item.parsed.y.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})
-                  }
-                }
-              },
-              scales: {
-                x: { ticks: { color: '#475569', maxTicksLimit: 6, font: { size: 11 } }, grid: { color: '#1e293b' } },
-                y: { ticks: { color: '#475569', callback: val => '$' + val.toLocaleString(), font: { size: 11 } }, grid: { color: '#1e293b' } }
-              }
-            }
-          });
-        }
-
         document.getElementById('whatifResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
       } catch (e) {

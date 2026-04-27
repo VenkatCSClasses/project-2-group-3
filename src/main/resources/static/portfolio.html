@@ -187,7 +187,7 @@
   <div class="container">
     <div class="page-header">
       <h2>My Portfolio</h2>
-      <span class="refresh-note"><span class="refresh-dot"></span>Prices refresh every 10s</span>
+      <span class="refresh-note"><span class="refresh-dot"></span>Prices shown are the latest available</span>
     </div>
 
     <div class="summary-bar" id="summaryBar">
@@ -255,9 +255,24 @@
 
     async function loadPortfolio() {
       const res = await fetch('/portfolio');
-      if (res.status === 401) { window.location.href = '/index.html'; return; }
+
+      if (res.status === 401) {
+        window.location.href = '/index.html';
+        return;
+      }
+
+      if (!res.ok) {
+        const msg = await res.text();
+        showModalError(msg || 'Portfolio data could not be loaded. The stock API may be out of daily credits or rate-limited.');
+        return;
+      }
+
       portfolioData = await res.json();
       renderPortfolio(portfolioData);
+
+      if (portfolioData.priceRefreshLimited) {
+        showModalError('Some current prices could not be refreshed. The stock API may be out of daily credits or rate-limited.');
+      }
     }
 
     function renderPortfolio(data) {
@@ -347,7 +362,12 @@
       if (!confirm('Remove ' + ticker + ' from your portfolio? (No cash impact)')) return;
       const res = await fetch('/portfolio/' + ticker, { method: 'DELETE' });
       if (res.status === 401) { window.location.href = '/index.html'; return; }
-      if (res.ok) { portfolioData = await res.json(); renderPortfolio(portfolioData); }
+      if (res.ok) {
+        portfolioData = await res.json();
+        renderPortfolio(portfolioData);
+      } else {
+        showModalError(await res.text());
+      }
     }
 
     function showModalError(msg) {
@@ -365,7 +385,7 @@
     });
 
     loadPortfolio();
-    setInterval(loadPortfolio, 10000);
+    // setInterval(loadPortfolio, 10000); - temporarily disabled
   </script>
 </body>
 </html>

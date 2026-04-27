@@ -16,12 +16,14 @@ import java.util.function.Consumer;
 @RequestMapping("/prices")
 public class PriceController {
 
+    /* temp disable
     private final PriceStream priceStream;
 
     @Autowired
     public PriceController(PriceStream priceStream) {
         this.priceStream = priceStream;
     }
+        */
 
     @GetMapping("/{ticker}")
     public ResponseEntity<?> getPrice(@PathVariable String ticker, HttpSession session) {
@@ -36,6 +38,7 @@ public class PriceController {
         }
     }
 
+    /* temp disabled
     @GetMapping(value = "/{ticker}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamPrice(@PathVariable String ticker, HttpSession session) {
         SseEmitter emitter = new SseEmitter(0L);
@@ -56,6 +59,7 @@ public class PriceController {
             }
         };
 
+
         priceStream.addListener(symbol, listener);
         emitter.onCompletion(() -> priceStream.removeListener(symbol, listener));
         emitter.onTimeout(() -> priceStream.removeListener(symbol, listener));
@@ -63,4 +67,5 @@ public class PriceController {
 
         return emitter;
     }
+        */
 }

@@ -14,6 +14,11 @@ import java.util.Map;
 @RequestMapping("/portfolio")
 public class PortfolioController {
 
+    private String apiLimitMessage(String ticker) {
+        return "Price data is currently unavailable for " + ticker.toUpperCase()
+        + ". The stock API may be out of daily credits, rate-limited, or unable to return this ticker right now.";
+    }
+
     @Autowired
     private UserService userService;
 
@@ -40,7 +45,7 @@ public class PortfolioController {
         try {
             price = GetPrice.run(req.ticker()).getPrice();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Could not fetch price for " + req.ticker());
+            return ResponseEntity.badRequest().body(apiLimitMessage(req.ticker()));
         }
 
         Investment inv = UserTrading.purchaseStock(user, req.ticker(), req.companyName(), price, req.method(), req.amount());
@@ -59,7 +64,7 @@ public class PortfolioController {
         try {
             price = GetPrice.run(req.ticker()).getPrice();
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Could not fetch price for " + req.ticker());
+            return ResponseEntity.badRequest().body(apiLimitMessage(req.ticker()));
         }
 
         Investment found = UserTrading.findInvestment(user, req.ticker());

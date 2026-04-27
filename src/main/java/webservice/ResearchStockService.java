@@ -40,15 +40,20 @@ public class ResearchStockService {
             String quoteJson = restTemplate.getForObject(quoteUrl, String.class);
             JsonNode quote = objectMapper.readTree(quoteJson);
 
-            String tsUrl = BASE_URL + "/time_series?symbol=" + ticker + "&interval=1day&outputsize=260&apikey=" + apiKey;
-            String tsJson = restTemplate.getForObject(tsUrl, String.class);
-            JsonNode timeSeries = objectMapper.readTree(tsJson);
+            JsonNode timeSeries = null;
+            try {
+                String tsUrl = BASE_URL + "/time_series?symbol=" + ticker + "&interval=1day&outputsize=260&apikey=" + apiKey;
+                String tsJson = restTemplate.getForObject(tsUrl, String.class);
+                timeSeries = objectMapper.readTree(tsJson);
+            } catch (Exception ignored) {
+                timeSeries = null;
+            }
 
             if ("error".equals(quote.path("status").asText())) {
                 throw new RuntimeException(quote.path("message").asText("API error"));
             }
-            if ("error".equals(timeSeries.path("status").asText())) {
-                throw new RuntimeException(timeSeries.path("message").asText("API error"));
+            if (timeSeries != null && "error".equals(timeSeries.path("status").asText())) {
+                timeSeries = null;
             }
 
             ResearchStock stock = new ResearchStock();
@@ -63,7 +68,7 @@ public class ResearchStockService {
             stock.setOneDayPriceChange(Double.parseDouble(quote.get("change").asText()));
             stock.setOneDayPercentChange(Double.parseDouble(quote.get("percent_change").asText()));
 
-            JsonNode values = timeSeries.get("values");
+            JsonNode values = timeSeries == null ? null : timeSeries.get("values");
             if (values != null && values.isArray()) {
                 List<Double> closes = new ArrayList<>();
                 List<String> dates = new ArrayList<>();
@@ -83,7 +88,8 @@ public class ResearchStockService {
             cache.put(cacheKey, new CacheEntry(stock));
             return stock;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch stock data for " + ticker, e);
+            throw new RuntimeException("Market data is currently unavailable for " + ticker 
+            + ". The stock API may be out of daily credits or rate-limited. Try again later.", e);
         }
     }
 
