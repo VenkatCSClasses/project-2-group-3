@@ -10,23 +10,37 @@ import org.springframework.web.client.RestTemplate;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ResearchStockService {
 
     private static final String BASE_URL = "https://api.twelvedata.com";
+    private static final long CACHE_TTL_MS = 5 * 60 * 1000;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Map<String, CacheEntry> cache = new ConcurrentHashMap<>();
+
+    private static class CacheEntry {
+        final ResearchStock stock;
+        final long timestamp;
+        CacheEntry(ResearchStock stock) { this.stock = stock; this.timestamp = System.currentTimeMillis(); }
+        boolean isExpired() { return System.currentTimeMillis() - timestamp > CACHE_TTL_MS; }
+    }
 
     public ResearchStock getStockResearch(String ticker) {
+        String cacheKey = ticker.toUpperCase();
+        CacheEntry cached = cache.get(cacheKey);
+        if (cached != null && !cached.isExpired()) return cached.stock;
         try {
-            String key = ApiKey.getApiKey();
+            String apiKey = ApiKey.getApiKey();
 
-            String quoteUrl = BASE_URL + "/quote?symbol=" + ticker + "&apikey=" + key;
+            String quoteUrl = BASE_URL + "/quote?symbol=" + ticker + "&apikey=" + apiKey;
             String quoteJson = restTemplate.getForObject(quoteUrl, String.class);
             JsonNode quote = objectMapper.readTree(quoteJson);
 
-            String tsUrl = BASE_URL + "/time_series?symbol=" + ticker + "&interval=1day&outputsize=260&apikey=" + key;
+            String tsUrl = BASE_URL + "/time_series?symbol=" + ticker + "&interval=1day&outputsize=260&apikey=" + apiKey;
             String tsJson = restTemplate.getForObject(tsUrl, String.class);
             JsonNode timeSeries = objectMapper.readTree(tsJson);
 
@@ -59,7 +73,6 @@ public class ResearchStockService {
                     dates.add(v.get("datetime").asText());
                 }
 
-                // values[0] is most recent; values[N] is N trading days back
                 applyChange(stock, currentClose, closes, 5, "week");
                 applyChange(stock, currentClose, closes, 22, "month");
                 applyChange(stock, currentClose, closes, 66, "threeMonth");
@@ -67,6 +80,7 @@ public class ResearchStockService {
                 applyYTD(stock, currentClose, closes, dates);
             }
 
+            cache.put(cacheKey, new CacheEntry(stock));
             return stock;
         } catch (Exception e) {
             throw new RuntimeException("Failed to fetch stock data for " + ticker, e);
