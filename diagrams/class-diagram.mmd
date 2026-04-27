@@ -1,68 +1,70 @@
 ```text
 classDiagram
+    direction LR
 
     class User {
-        - userID: int
-        - password: String
-        - cashBalance: double
-        - portfolio: Portfolio
-        + getBalance() double
-        + purchaseStock(ticker, method, amount)
-        + sellStock(ticker, method, amount)
-        + viewPortfolio()
-        + researchStock(ticker)
-    }
-
-    class Admin {
-        - adminID: int
-        - password: String
-        + createAccount(userID, userPW)
-        + closeAccount(userID)
-        + viewAccountBalance(userID)
-    }
-
-    class Authentication {
-        + login(userID, password)
-        + logout()
+        -String username
+        -double cashBalance
+        -Portfolio portfolio
+        -TransactionLog transactionLog
     }
 
     class Portfolio {
-        - portfolioID: int
-        - investments: List~Investment~
-        + getTotalValue() double
-        + getTotalChange() double
+        -ArrayList~Investment~ investments
+        +addInvestment()
+        +removeInvestment()
+        +getRealTotalValue()
     }
 
     class Investment {
-        - investmentID: int
-        - stock: Stock
-        - shares: double
-        - cost: double
-        - date: Date
-        + getValue() double
-        + getPercentChange() double
+        -String ticker
+        -String companyName
+        -double shares
+        -double purchasePrice
+        -double currentPrice
+        +getValue()
+        +getPercentChange()
     }
 
-    class Stock {
-        - ticker: String
-        - companyName: String
-        - lastClosingPrice: double
-        - lastOpeningPrice: double
-        - volume: int
-        + calcPriceChange(period) double
+    class TransactionLog {
+        -ArrayList~Transaction~ transactions
+        +addTransaction()
     }
 
-    class API {
-        + getData(ticker)
+    class Transaction {
+        -String transactionType
+        -String ticker
+        -double shares
+        -double transactionPrice
+        -double amountInvested
     }
 
-    Authentication ..> User : Authenticates
-    Authentication ..> Admin : Authenticates
-    Admin ..> User : Manages
-    User *-- Portfolio : Composition
-    Portfolio *-- "*" Investment : Composition
-    Investment --> "1" Stock
-    User ..> Stock : Buy, Sell
-    User ..> API : Research
-    API ..> Stock : Data
+    class UserTrading {
+        +purchaseStock()
+        +sellStock()
+    }
+
+    class UserDataManager {
+        +loadUser()
+        +saveUser()
+        +createUser()
+    }
+
+    class PriceStream {
+        +connect()
+        +subscribe()
+        +getPrice()
+    }
+
+    User *-- Portfolio
+    User *-- TransactionLog
+    Portfolio *-- Investment
+    TransactionLog *-- Transaction
+
+    UserTrading ..> User
+    UserTrading ..> Investment
+    UserTrading ..> Transaction
+
+    UserDataManager ..> User
+    PriceStream ..> Investment
 ```

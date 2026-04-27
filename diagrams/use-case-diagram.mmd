@@ -1,40 +1,19 @@
 ```text
-graph TB
-actor1["👤 User Account"]
-actor2["👤 Administrator"]
+graph TD
+    A[User] --> U1(Login)
+    A --> U2(Create Account)
 
-subgraph BothSystems
-direction LR
+    U2 --> U1
 
-subgraph UserSystem
-UC1((Login))
-UC2((View Portfolio))
-UC3((Manage Portfolio))
-UC4((Buy / Sell Stocks))
-UC5((Research Stocks))
-UC6((Exit))
-end
+    U1 --> U3(Research Stock)
+    U1 --> U8(Manage Portfolio)
 
-subgraph AdminSystem
-UC7((Login))
-UC8((View Account Balances))
-UC9((Create Account))
-UC10((Close Account))
-UC11((Exit))
-end
+    U3 --> U4(Get EOD Price)
+    U3 --> U5(Get Quote)
+    U3 --> U6(Buy Stock)
+    U3 --> U7(What-If Position)
 
-end
-
-actor1 --> UC1
-actor1 --> UC2
-actor1 --> UC3
-actor1 --> UC4
-actor1 --> UC5
-actor1 --> UC6
-
-actor2 --> UC7
-actor2 --> UC8
-actor2 --> UC9
-actor2 --> UC10
-actor2 --> UC11
+    U8 --> U9(Sell Stock)
+    U8 --> U10(Remove Stock)
+    U8 --> U11(Review Transaction Log)
 ```
