@@ -1,73 +1,121 @@
 {
   "username": "alice",
   "password": "password1",
-  "cashBalance": 4592.681441447642,
+  "cashBalance": 1112.681441447642,
   "portfolio": {
     "investments": [
       {
+        "investmentId": 0,
         "ticker": "AAPL",
         "companyName": "Apple Inc.",
         "purchaseDate": "2026-04-20",
         "shares": 6.0,
         "purchasePrice": 273.97,
         "amountInvested": 1643.8200000000002,
-        "currentPrice": 270.44
+        "currentPrice": 271.059998,
+        "investmentType": 0
       },
       {
+        "investmentId": 0,
         "ticker": "MSFT",
         "companyName": "Microsoft Corp.",
         "purchaseDate": "2026-04-20",
         "shares": 0.011907029910459135,
         "purchasePrice": 419.92,
         "amountInvested": 5.0,
-        "currentPrice": 430.43
+        "currentPrice": 424.57999,
+        "investmentType": 0
       },
       {
+        "investmentId": 0,
         "ticker": "GOOGL",
         "companyName": "Alphabet Inc.",
         "purchaseDate": "2026-04-20",
         "shares": 5.0,
         "purchasePrice": 339.55,
         "amountInvested": 1697.75,
-        "currentPrice": 337.76
+        "currentPrice": 344.29001,
+        "investmentType": 0
       },
       {
+        "investmentId": 0,
         "ticker": "TSLA",
         "companyName": "Tesla, Inc.",
         "purchaseDate": "2026-04-20",
         "shares": 5.0,
         "purchasePrice": 390.89,
         "amountInvested": 1954.4499999999998,
-        "currentPrice": 391.57
+        "currentPrice": 376.16,
+        "investmentType": 0
       },
       {
+        "investmentId": 0,
         "ticker": "BA",
         "companyName": "Boeing Company",
         "purchaseDate": "2026-04-22",
         "shares": 3.0,
         "purchasePrice": 225.17,
         "amountInvested": 675.51,
-        "currentPrice": 225.36
+        "currentPrice": 232.44,
+        "investmentType": 0
       },
       {
+        "investmentId": 0,
         "ticker": "NVDA",
         "companyName": "NVIDIA Corporation",
         "purchaseDate": "2026-04-22",
         "shares": 2.0,
         "purchasePrice": 199.855,
         "amountInvested": 399.71,
-        "currentPrice": 199.855
+        "currentPrice": 208.19,
+        "investmentType": 0
       },
       {
+        "investmentId": 0,
         "ticker": "F",
         "companyName": "Ford Motor Company",
         "purchaseDate": "2026-04-22",
         "shares": 2.0,
         "purchasePrice": 12.775,
         "amountInvested": 25.55,
-        "currentPrice": 12.775
+        "currentPrice": 12.38,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 1,
+        "ticker": "MU",
+        "companyName": "Micron Technology, Inc.",
+        "purchaseDate": "2026-04-26",
+        "shares": 5.0,
+        "purchasePrice": 496.0,
+        "amountInvested": 2480.0,
+        "currentPrice": 496.0,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 2,
+        "ticker": "MU",
+        "companyName": "Micron Technology, Inc.",
+        "purchaseDate": "2026-04-26",
+        "shares": 2.0161290322580645,
+        "purchasePrice": 496.0,
+        "amountInvested": 1000.0,
+        "currentPrice": 496.0,
+        "investmentType": 0
       }
     ],
-    "nextInvestmentID": 1
+    "nextInvestmentID": 3
+  },
+  "transactionLog": {
+    "transactionLog": [
+      {
+        "transactionDate": "2026-04-26",
+        "transactionType": "Buy",
+        "ticker": "MU",
+        "shares": 2.0161290322580645,
+        "transactionPrice": 496.0,
+        "amountInvested": 1000.0
+      }
+    ]
   }
 }

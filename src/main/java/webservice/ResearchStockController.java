@@ -1,6 +1,6 @@
 package webservice;
 
-import api.GetTimeSeries;
+import api.GetYahooChart;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,7 +35,7 @@ public class ResearchStockController {
             return ResponseEntity.status(401).body("Please log in first.");
         }
         try {
-            return ResponseEntity.ok(GetTimeSeries.run(ticker.toUpperCase(), "1day"));
+            return ResponseEntity.ok(GetYahooChart.run(ticker.toUpperCase()));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Could not fetch chart data for " + ticker);
         }

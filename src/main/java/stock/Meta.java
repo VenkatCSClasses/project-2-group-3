@@ -12,6 +12,13 @@ public class Meta {
         this.type = type;
     }
 
+    public String getSymbol()            { return symbol; }
+    public String getInterval()          { return interval; }
+    public String getCurrency()          { return currency; }
+    public String getExchange_timezone() { return exchange_timezone; }
+    public String getExchange()          { return exchange; }
+    public String getType()              { return type; }
+
     @Override
     public String toString() {
         return "Symbol: " + symbol + 
