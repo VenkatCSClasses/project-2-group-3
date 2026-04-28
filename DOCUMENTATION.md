@@ -16,8 +16,9 @@ For demonstrative purposes, all further screenshots will be taken from a pre-exi
 ![Homepage](documentation-images/homepage.png)
 
 The homepage will display the user's total available cash, as well as menu options for the application's primary functions:
-    - Research Stocks
-    - Manage Portfolio
+
+- Research Stocks
+- Manage Portfolio
 
 Additionally, the panels below the menu options list general features of TradeApp.
 
@@ -28,11 +29,12 @@ When researching stocks, the user must enter **the stock symbol,** or stock tick
 ![Invalid Ticker Symbol](documentation-images/invalid-ticker.png)
 
 However, once the user does enter a valid ticker symbol, they will see:
-    - A graph displaying the stock's price trend across the past week, month, and year
-    - The stock's current latest available price
-    - The opening price, latest price, volume, and 1-day change
-    - The stock's price change across 1 week, 1 month, 3 months, 6 months, and year-to-date
-    - A brief analysis of the stock's performance, and what it means
+
+- A graph displaying the stock's price trend across the past week, month, and year
+- The stock's current latest available price
+- The opening price, latest price, volume, and 1-day change
+- The stock's price change across 1 week, 1 month, 3 months, 6 months, and year-to-date
+- A brief analysis of the stock's performance, and what it means
 
 ![Research Info](documentation-images/research-info.png)
 
@@ -57,9 +59,10 @@ This analysis does not contribute anything to the actual portfolio's value, nor 
 ![What-If Analysis](documentation-images/what-if-analysis.png)
 
 Below all the analysis are three menus containing valuable information for beginners:
-    - Metrics, which explains the significance of the metrics displayed throughout the TradeApp analysis - opening price, closing price, volume, 1-day change, performance periods
-    - How to read price charts, and what information can be taken away from them
-    - A glossary, which contains common definitions used throughout stock analysis and in the trading world
+
+- Metrics, which explains the significance of the metrics displayed throughout the TradeApp analysis - opening price, closing price, volume, 1-day change, performance periods
+- How to read price charts, and what information can be taken away from them
+- A glossary, which contains common definitions used throughout stock analysis and in the trading world
 
 ![Glossary Example](documentation-images/glossary-example.png)
 
@@ -74,9 +77,10 @@ The portfolio contains all of the investments a user has made throughout their t
 Users can then either sell their investments at a profit (or loss), or completely remove them from the portfolio without receiving the profits (or losses) from their investment.
 
 When selling investments, users have three options:
-    - Sell by number of shares
-    - Sell by dollar amount
-    - Sell everything
+
+- Sell by number of shares
+- Sell by dollar amount
+- Sell everything
 
 As each investment made is distinct, the sale will only impact the investment selected for that line.
 
