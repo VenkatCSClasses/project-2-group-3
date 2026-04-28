@@ -142,15 +142,9 @@
       padding: 6px 14px; background: rgba(255,79,79,0.15);
       border: 1px solid rgba(255,79,79,0.3); border-radius: 6px;
       color: #ff4f4f; font-size: 12px; font-weight: 600; cursor: pointer;
-      transition: all 0.2s; margin-right: 6px;
+      transition: all 0.2s;
     }
     .btn-sell:hover { background: rgba(255,79,79,0.25); border-color: rgba(255,79,79,0.5); }
-    .btn-remove {
-      padding: 6px 12px; background: transparent;
-      border: 1px solid rgba(255,255,255,0.08); border-radius: 6px;
-      color: #475569; font-size: 12px; cursor: pointer; transition: all 0.2s;
-    }
-    .btn-remove:hover { border-color: rgba(255,255,255,0.2); color: #94a3b8; }
 
     /* Sell Modal */
     .modal-backdrop {
@@ -196,7 +190,7 @@
     .modal-feedback.error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
     .sell-all-btn {
       background: none; border: none; color: #00d4ff; font-size: 13px;
-      cursor: pointer; padding: 0; margin-bottom: 16px; text-decoration: underline;
+      cursor: pointer; padding: 0; margin-bottom: 16px; text-decoration: underline; display: block;
     }
   </style>
 </head>
@@ -263,12 +257,11 @@
       <h3>Sell <span id="modalTicker"></span></h3>
       <div class="modal-feedback error" id="modalFeedback"></div>
       <label>Sell by</label>
-      <select id="sellMethod">
+      <select id="sellMethod" onchange="onMethodChange()">
         <option value="shares">Number of shares</option>
         <option value="dollars">Dollar amount</option>
-        <option value="all">Sell all</option>
       </select>
-      <label id="amountLabel">Amount</label>
+      <label id="amountLabel">Shares</label>
       <input type="number" id="sellAmount" placeholder="Enter amount" min="0.01" step="any">
       <button class="sell-all-btn" onclick="setSellAll()">Sell everything</button>
       <div class="modal-actions">

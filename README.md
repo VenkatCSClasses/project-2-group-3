@@ -118,8 +118,16 @@ https://docs.google.com/document/d/1gkXGanp0KlpdXKhPZEXx28eHQ4JMBSvqu-arnf0j74M
 ![Use Case Diagram](diagrams/use-case-diagram.png)
 
 ### Class Diagram
-
 ![Class Diagram](diagrams/class-diagram.png)
+
+### Sell Stock Sequence Diagram
+![Sell Sequence Diagram](diagrams/SellSequeneceDiagram.png)
+
+### Research Stock Sequence Diagram
+![Research Stock Sequence Diagram](diagrams/ResearchStockSequenceDiagram.png)
+
+### Buying Stock Sequence Diagram
+![Buying Stock Sequence Diagram](diagrams/BuyingStockSequenceDiagram.png)
 
 ## Coding Agent Usage
 

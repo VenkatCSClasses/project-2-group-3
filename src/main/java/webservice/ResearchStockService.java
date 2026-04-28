@@ -249,7 +249,7 @@ public class ResearchStockService {
         double base = findCloseBefore(closes, dates, yearStart);
         double change = round(current - base);
         double pct = base == 0 ? 0 : round((change / base) * 100);
-
+      
         stock.setYearToDatePriceChange(change);
         stock.setYearToDatePercentChange(pct);
     }

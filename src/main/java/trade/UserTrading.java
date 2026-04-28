@@ -31,6 +31,15 @@ public class UserTrading {
 
         user.setCashBalance(user.getCashBalance() - totalCost);
 
+        // Merge into existing position for this ticker if one exists
+        Investment existing = findInvestment(user, ticker);
+        if (existing != null && existing.getInvestmentType() == 0) {
+            existing.addShares(sharesToBuy, livePrice);
+            existing.setCurrentPrice(livePrice);
+            user.getTransactionLog().addTransaction(new Transaction("Buy", ticker, sharesToBuy, livePrice, totalCost));
+            return existing;
+        }
+
         String today = java.time.LocalDate.now().toString();
         int investmentId = user.getPortfolio().generateInvestmentID();
 
@@ -75,7 +84,7 @@ public class UserTrading {
         Transaction newTransaction = new Transaction("Sell", ticker, sharesToSell, livePrice, proceeds);
         user.getTransactionLog().addTransaction(newTransaction);
 
-        if (investment.getShares() <= 0) {
+        if (investment.getShares() < 0.0001) {
             user.getPortfolio().removeInvestment(investment);
         }
         return true;
