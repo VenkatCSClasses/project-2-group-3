@@ -116,15 +116,9 @@
       padding: 6px 14px; background: rgba(255,79,79,0.15);
       border: 1px solid rgba(255,79,79,0.3); border-radius: 6px;
       color: #ff4f4f; font-size: 12px; font-weight: 600; cursor: pointer;
-      transition: all 0.2s; margin-right: 6px;
+      transition: all 0.2s;
     }
     .btn-sell:hover { background: rgba(255,79,79,0.25); border-color: rgba(255,79,79,0.5); }
-    .btn-remove {
-      padding: 6px 12px; background: transparent;
-      border: 1px solid rgba(255,255,255,0.08); border-radius: 6px;
-      color: #475569; font-size: 12px; cursor: pointer; transition: all 0.2s;
-    }
-    .btn-remove:hover { border-color: rgba(255,255,255,0.2); color: #94a3b8; }
 
     /* Sell Modal */
     .modal-backdrop {
@@ -170,7 +164,7 @@
     .modal-feedback.error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #fca5a5; }
     .sell-all-btn {
       background: none; border: none; color: #00d4ff; font-size: 13px;
-      cursor: pointer; padding: 0; margin-bottom: 16px; text-decoration: underline;
+      cursor: pointer; padding: 0; margin-bottom: 16px; text-decoration: underline; display: block;
     }
   </style>
 </head>
@@ -234,12 +228,11 @@
       <h3>Sell <span id="modalTicker"></span></h3>
       <div class="modal-feedback error" id="modalFeedback"></div>
       <label>Sell by</label>
-      <select id="sellMethod">
+      <select id="sellMethod" onchange="onMethodChange()">
         <option value="shares">Number of shares</option>
         <option value="dollars">Dollar amount</option>
-        <option value="all">Sell all</option>
       </select>
-      <label id="amountLabel">Amount</label>
+      <label id="amountLabel">Shares</label>
       <input type="number" id="sellAmount" placeholder="Enter amount" min="0.01" step="any">
       <button class="sell-all-btn" onclick="setSellAll()">Sell everything</button>
       <div class="modal-actions">
@@ -296,7 +289,6 @@
           <td class="${cls}">${sign}${pct.toFixed(2)}%</td>
           <td>
             <button class="btn-sell" onclick="openSellModal('${inv.ticker}')">Sell</button>
-            <button class="btn-remove" onclick="removeInvestment('${inv.ticker}')">Remove</button>
           </td>`;
         tbody.appendChild(row);
       }
@@ -304,33 +296,43 @@
 
     function openSellModal(ticker) {
       sellTicker = ticker;
-      document.getElementById('modalTicker').textContent  = ticker;
-      document.getElementById('sellMethod').value         = 'shares';
-      document.getElementById('sellAmount').value         = '';
+      document.getElementById('modalTicker').textContent = ticker;
+      document.getElementById('sellMethod').value = 'shares';
+      document.getElementById('amountLabel').textContent = 'Shares';
+      document.getElementById('sellAmount').value = '';
       document.getElementById('modalFeedback').style.display = 'none';
       document.getElementById('sellModal').classList.add('open');
     }
+
     function closeSellModal() {
       document.getElementById('sellModal').classList.remove('open');
       sellTicker = null;
     }
-    function setSellAll() { document.getElementById('sellMethod').value = 'all'; }
+
+    function onMethodChange() {
+      const method = document.getElementById('sellMethod').value;
+      document.getElementById('amountLabel').textContent = method === 'shares' ? 'Shares' : 'Dollar Amount';
+    }
+
+    function setSellAll() {
+      // Sum shares across all positions for this ticker
+      const total = portfolioData.investments
+        .filter(i => i.ticker === sellTicker)
+        .reduce((sum, i) => sum + i.shares, 0);
+      document.getElementById('sellMethod').value = 'shares';
+      document.getElementById('amountLabel').textContent = 'Shares';
+      document.getElementById('sellAmount').value = total.toFixed(6);
+    }
 
     async function confirmSell() {
       const method = document.getElementById('sellMethod').value;
-      let amount;
-      if (method === 'all') {
-        const inv = portfolioData.investments.find(i => i.ticker === sellTicker);
-        amount = inv ? inv.shares : 0;
-      } else {
-        amount = parseFloat(document.getElementById('sellAmount').value);
-        if (!amount || amount <= 0) { showModalError('Enter a valid amount.'); return; }
-      }
+      const amount = parseFloat(document.getElementById('sellAmount').value);
+      if (!amount || amount <= 0) { showModalError('Enter a valid amount.'); return; }
 
       const res = await fetch('/portfolio/sell', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ticker: sellTicker, method: method === 'all' ? 'shares' : method, amount })
+        body: JSON.stringify({ ticker: sellTicker, method, amount })
       });
 
       if (res.status === 401) { window.location.href = '/index.html'; return; }
@@ -341,13 +343,6 @@
       } else {
         showModalError(await res.text());
       }
-    }
-
-    async function removeInvestment(ticker) {
-      if (!confirm('Remove ' + ticker + ' from your portfolio? (No cash impact)')) return;
-      const res = await fetch('/portfolio/' + ticker, { method: 'DELETE' });
-      if (res.status === 401) { window.location.href = '/index.html'; return; }
-      if (res.ok) { portfolioData = await res.json(); renderPortfolio(portfolioData); }
     }
 
     function showModalError(msg) {

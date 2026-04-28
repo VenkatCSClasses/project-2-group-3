@@ -1,13 +1,15 @@
 package trade;
 
-import api.GetPrice;
+import api.GetYahooPrice;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import webservice.UserService;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -24,7 +26,7 @@ public class PortfolioController {
 
         for (Investment inv : user.getPortfolio().getInvestments()) {
             try {
-                inv.setCurrentPrice(GetPrice.run(inv.getTicker()).getPrice());
+                inv.setCurrentPrice(GetYahooPrice.run(inv.getTicker()));
             } catch (Exception ignored) {}
         }
 
@@ -38,7 +40,7 @@ public class PortfolioController {
 
         double price;
         try {
-            price = GetPrice.run(req.ticker()).getPrice();
+            price = GetYahooPrice.run(req.ticker());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Could not fetch price for " + req.ticker());
         }
@@ -57,15 +59,46 @@ public class PortfolioController {
 
         double price;
         try {
-            price = GetPrice.run(req.ticker()).getPrice();
+            price = GetYahooPrice.run(req.ticker());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Could not fetch price for " + req.ticker());
         }
 
-        Investment found = UserTrading.findInvestment(user, req.ticker());
-        if (found == null) return ResponseEntity.badRequest().body("Investment not found.");
-        boolean ok = UserTrading.sellStock(user, found.getInvestmentId(), req.ticker(), price, req.method(), req.amount());
-        if (!ok) return ResponseEntity.badRequest().body("Sale failed — check share count or dollar amount.");
+        // Collect ALL positions for this ticker (handles duplicate entries from past buys)
+        List<Investment> positions = new ArrayList<>();
+        for (Investment inv : user.getPortfolio().getInvestments()) {
+            if (inv.getTicker().equalsIgnoreCase(req.ticker()) && inv.getInvestmentType() == 0)
+                positions.add(inv);
+        }
+        if (positions.isEmpty()) return ResponseEntity.badRequest().body("Investment not found.");
+
+        double totalShares = positions.stream().mapToDouble(Investment::getShares).sum();
+
+        double sharesToSell;
+        if (req.method().equalsIgnoreCase("shares")) {
+            sharesToSell = req.amount();
+        } else if (req.method().equalsIgnoreCase("dollars")) {
+            sharesToSell = req.amount() / price;
+        } else {
+            return ResponseEntity.badRequest().body("Invalid sell method.");
+        }
+
+        if (sharesToSell <= 0 || sharesToSell > totalShares + 0.0001)
+            return ResponseEntity.badRequest().body("Sale failed — not enough shares.");
+
+        // Deduct shares across positions in order, removing any that hit zero
+        double remaining = sharesToSell;
+        for (Investment pos : positions) {
+            if (remaining <= 0.0001) break;
+            double take = Math.min(pos.getShares(), remaining);
+            pos.removeShares(take);
+            remaining -= take;
+            if (pos.getShares() < 0.0001) user.getPortfolio().removeInvestment(pos);
+        }
+
+        double proceeds = sharesToSell * price;
+        user.setCashBalance(user.getCashBalance() + proceeds);
+        user.getTransactionLog().addTransaction(new Transaction("Sell", req.ticker(), sharesToSell, price, proceeds));
 
         userService.saveUser(user);
         return ResponseEntity.ok(buildPortfolioResponse(user));
