@@ -128,7 +128,7 @@ https://docs.google.com/document/d/1gkXGanp0KlpdXKhPZEXx28eHQ4JMBSvqu-arnf0j74M
 
 ## Research Stock Sequence Diagram
 
-![Research Stock Sequence Diagram](diagrams/ResearchStockSequeneceDiagram.png)
+![Research Stock Sequence Diagram](diagrams/ResearchStockSequenceDiagram.png)
 
 ## Buying Stock Sequence Diagram
 
