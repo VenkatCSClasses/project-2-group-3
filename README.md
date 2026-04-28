@@ -123,9 +123,9 @@ https://docs.google.com/document/d/1gkXGanp0KlpdXKhPZEXx28eHQ4JMBSvqu-arnf0j74M
 
 ## Coding Agent Usage
 
-We used coding agents (Claude and ChatGPT) to:
+- We used coding agents (Claude and ChatGPT) to:
     - Create boilerplate code for the web application
     - Develop the HTML framework for the web application
     - Debug program
     - Write tests
-    - Combine different branch functionalities 
+    - Combine different branch functionalities
