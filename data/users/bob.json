@@ -1,20 +1,9 @@
 {
   "username": "bob",
   "password": "password2",
-  "cashBalance": 1479777.8627249575,
+  "cashBalance": 1480506.0627249575,
   "portfolio": {
     "investments": [
-      {
-        "investmentId": 4,
-        "ticker": "F",
-        "companyName": "Ford Motor Company",
-        "purchaseDate": "2017-01-04",
-        "shares": 639.0,
-        "purchasePrice": 12.59,
-        "amountInvested": 8045.01,
-        "currentPrice": 12.49,
-        "investmentType": 1
-      },
       {
         "investmentId": 7,
         "ticker": "AAPL",
@@ -53,9 +42,9 @@
         "ticker": "DXCM",
         "companyName": "Dexcom Inc.",
         "purchaseDate": "2026-04-27",
-        "shares": 36.0,
+        "shares": 16.0,
         "purchasePrice": 61.4,
-        "amountInvested": 2210.4,
+        "amountInvested": 982.4,
         "currentPrice": 61.41,
         "investmentType": 0
       },
@@ -82,28 +71,36 @@
         "investmentType": 0
       },
       {
-        "investmentId": 14,
+        "investmentId": 15,
         "ticker": "AAPL",
         "companyName": "Apple Inc.",
-        "purchaseDate": "2026-04-27",
-        "shares": 1.0,
-        "purchasePrice": 267.67999,
-        "amountInvested": 267.67999,
+        "purchaseDate": "2026-04-28",
+        "shares": 1.8683905683644109,
+        "purchasePrice": 267.61,
+        "amountInvested": 500.0,
         "currentPrice": 267.61,
         "investmentType": 0
       }
     ],
-    "nextInvestmentID": 15
+    "nextInvestmentID": 16
   },
   "transactionLog": {
     "transactionLog": [
       {
-        "transactionDate": "2026-04-27",
+        "transactionDate": "2026-04-28",
+        "transactionType": "Buy",
+        "ticker": "AAPL",
+        "shares": 1.8683905683644109,
+        "transactionPrice": 267.61,
+        "amountInvested": 500.0
+      },
+      {
+        "transactionDate": "2026-04-28",
         "transactionType": "Sell",
         "ticker": "DXCM",
-        "shares": 1.0,
+        "shares": 20.0,
         "transactionPrice": 61.41,
-        "amountInvested": 61.41
+        "amountInvested": 1228.1999999999998
       }
     ]
   }

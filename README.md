@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a **paper trading stock exchange platform** that allows users to practice trading stocks and ETFs using simulated money. The system uses the Twelve Data API to pull real-time stock data so users can research investments and manage a simulated portfolio.
+This project is a **paper trading stock exchange platform** that allows users to practice trading stocks and ETFs using simulated money. The system uses both the Yahoo Finance API and the Twelve Data API to pull real-time stock data so users can research investments and manage a simulated portfolio.
 
 For simplicity, the term **stock** is used throughout this document to refer to any investment.
 
@@ -13,76 +13,73 @@ We have a **CLI implementation** as well as a **web application.** The **web app
 ## Core Features
 
 ### Stock Research
+#### Researching Stocks
 - Enter in a stock (including publicly-traded mutual funds or exchange-traded funds) symbol
 - Will display:
-    - The stock ticker and company name
-    - The current date & time of the quote pulled
-    - The opening price
-    - The high of the day
-    - The low of the day
-    - The previous day's closing price
-    - The volume (how many stocks of that type have been traded)
-    - The change (in dollars and by percent)
-    - A 52-week summary (low, high, change, range, all across the past 52 weeks)
-- The user can then refresh the live price, find similar stocks, or get a time series
-- A time series shows a series of opening, high, and low prices across a distinct range of time 
+    - Price history graph (Over 1 week, 1 month, 1 year)
+    - Stock ticker and company name
+    - Opening price
+    - Latest price
+    - Volume (how many stocks have been traded throughout the day)
+    - Change (in dollars and by percent)
+    - Performance (percentage change over 1 week, 1 month, 3 months, 6 months, year-to-date)
+    - Stock analysis advice
+- The user can then refresh the live price by refreshing the webpage
 
-### Purchasing Stocks
-- Upon doing research, stocks can be purchased through shares or dollars
+#### Purchasing Stocks
+- On the same page displaying the above information, a stock can be purchased through **dollars and by number of shares**
+- An estimated cost will be calculated when determining how much to buy
 - The live price will be updated before the transaction is completed
 - The transaction **must not exceed the current cash balance**
 
-### Historical / What-If Purchases
-- When purchasing a stock, the user may choose to buy a historical/what-if position
-- The user selects the date they want the stock to be priced at, then can purchase shares at that price
-- These purchases will **not** impact total portfolio value
-- These purchases **cannot** be sold for actual cash
-    - They must be removed from the portfolio rather than sold
+#### What-If Analysis
+- Below the option to purchase a stock, the user can see what would have happened if they purchased the stock on a certain date
+- The user selects how many shares they want to purchase, and the date to price the stock at
+- This calculation then displays the original price at that date, versus the current price, alongside the change in value
+- The stock will **not** be purchased for the user
+
+#### Understanding Information
+- Below all the technical analysis and ability to purchase stocks is a menu explaining
+    - Frequently used metrics
+    - How to read price charts
+    - A glossary of definitions commonly used in investing and trading
 
 ### Portfolio Management
-- The portfolio displays all the investments (real and what-if) a user has made, and contains:
-    - The date the investment was made
-    - How much the investment has changed in value, by $ and %
-    - A live price stream of **each distinct stock** held
+#### The Portfolio
+- The portfolio displays all the investments a user has made, and shows line-by-line for each investment:
+    - Stock symbol & name
+    - Number of shares
+    - Purchase date
+    - Average cost
+    - Current price
+    - Value
+    - Price change (percent)
+- The portfolio also shows the user's current portfolio value, cash balance, and overall change in value
 
-## Selling Stocks
-- Investments (**not historical / what-if purchases**) can either be sold or removed
-- Historical / what-if investments can only be **removed**
+#### Selling Stocks
+- Investments can either be sold or removed
     - Selling an investment will increase the cash balance by the investment's value
     - Removing an investment will not increase the cash balance
 
-### Transaction Log (CLI Only)
-- Each investment, even if made on the same day, is denoted separately
-    - This ensures that the proper investment is sold or removed when selling or removing investments
-- Every investment purchase, **excluding historical / what-if transactions**, are included in a transaction log
-    - This is because historical / what-if investments do not impact the portfolio's actual value
-
-### Definitions and Assistance Menu
-- Definitions menu outlines basic investment and data terms (i.e. quote, time series)
-- Assistance menu guides users on how to utilize the platform
-
-### Account Specifications
-- Each user account has:
-    - a distinct username
-    - a password
-    - a portfolio and corresponding transaction log
+#### Account Specifications
+- Each user account has a distinct username, password, and portfolio
 - Each user starts with **$10,000**
 - Users may only gain or lose money beyond the initial $10,000 through **realized gains or losses** from selling stocks
 - Since the money is simulated, there is no limit to how much a user can gain or lose
 
-### Account Management
+#### Account Management
 - Individual users can create multiple accounts if they choose to start over
-- All transaction and investment data is sorted in a user's distinct json file
+- All transaction and investment data is stored in a user's distinct json file
 
 ---
 
 ## Limitations
 
 ### API Limitations
-- Only **800 API calls** can be made per day
-    - Only **8 API calls** can be made per minute
-- All searches must be performed **using the stock symbol**
-    - **Cannot** search **based on company or fund name**
+- Stock data may be delayed or unavailable due to **API limitations**
+    - The **Yahoo Finance API** is used for stock research and latest price data
+    - The **Twelve Data API** is used for historical prices in the What-If Analysis feature
+- All searches must be performed using the stock symbol
 
 ### Platform Limitations
 - Users **cannot take on debt** to purchase stocks
@@ -122,4 +119,13 @@ https://docs.google.com/document/d/1gkXGanp0KlpdXKhPZEXx28eHQ4JMBSvqu-arnf0j74M
 
 ### Class Diagram
 
-![Use Case Diagram](diagrams/class-diagram.png)
+![Class Diagram](diagrams/class-diagram.png)
+
+## Coding Agent Usage
+
+We used coding agents (Claude and ChatGPT) to:
+    - Create boilerplate code for the web application
+    - Develop the HTML framework for the web application
+    - Debug program
+    - Write tests
+    - Combine different branch functionalities 
