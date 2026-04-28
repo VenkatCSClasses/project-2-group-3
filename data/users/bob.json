@@ -1,7 +1,7 @@
 {
   "username": "bob",
   "password": "password2",
-  "cashBalance": 1488889.4502989578,
+  "cashBalance": 1480598.1327149577,
   "portfolio": {
     "investments": [
       {
@@ -42,9 +42,9 @@
         "ticker": "DXCM",
         "companyName": "Dexcom Inc.",
         "purchaseDate": "2026-04-27",
-        "shares": 31.0,
+        "shares": 29.97,
         "purchasePrice": 61.4,
-        "amountInvested": 1903.3999999999999,
+        "amountInvested": 1840.158,
         "currentPrice": 61.4,
         "investmentType": 0
       },
@@ -58,75 +58,46 @@
         "amountInvested": 2210.4,
         "currentPrice": 61.4,
         "investmentType": 0
+      },
+      {
+        "investmentId": 12,
+        "ticker": "AMZN",
+        "companyName": "Amazon.com, Inc.",
+        "purchaseDate": "2026-04-27",
+        "shares": 32.0,
+        "purchasePrice": 261.079987,
+        "amountInvested": 8354.559584,
+        "currentPrice": 261.079987,
+        "investmentType": 0
       }
     ],
-    "nextInvestmentID": 12
+    "nextInvestmentID": 13
   },
   "transactionLog": {
     "transactionLog": [
       {
         "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
-        "ticker": "DXCM",
-        "shares": 325.7328990228013,
-        "transactionPrice": 61.4,
-        "amountInvested": 20000.0
-      },
-      {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
-        "ticker": "DXCM",
-        "shares": 36.0,
-        "transactionPrice": 61.4,
-        "amountInvested": 2210.4
-      },
-      {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
-        "ticker": "DXCM",
-        "shares": 36.0,
-        "transactionPrice": 61.4,
-        "amountInvested": 2210.4
-      },
-      {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
-        "ticker": "DXCM",
-        "shares": 36.0,
-        "transactionPrice": 61.4,
-        "amountInvested": 2210.4
-      },
-      {
-        "transactionDate": "2026-04-27",
         "transactionType": "Sell",
-        "ticker": "AAPL",
-        "shares": 60.0,
-        "transactionPrice": 267.67999,
-        "amountInvested": 16060.799399999998
-      },
-      {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Sell",
-        "ticker": "T",
-        "shares": 228.13616701147262,
-        "transactionPrice": 25.52,
-        "amountInvested": 5822.034982132781
+        "ticker": "DXCM",
+        "shares": 0.03,
+        "transactionPrice": 61.4,
+        "amountInvested": 1.8419999999999999
       },
       {
         "transactionDate": "2026-04-27",
         "transactionType": "Sell",
         "ticker": "DXCM",
-        "shares": 5.0,
+        "shares": 1.0,
         "transactionPrice": 61.4,
-        "amountInvested": 307.0
+        "amountInvested": 61.4
       },
       {
         "transactionDate": "2026-04-27",
-        "transactionType": "Sell",
-        "ticker": "DXCM",
-        "shares": 7.035830618892509,
-        "transactionPrice": 61.4,
-        "amountInvested": 432.0
+        "transactionType": "Buy",
+        "ticker": "AMZN",
+        "shares": 32.0,
+        "transactionPrice": 261.079987,
+        "amountInvested": 8354.559584
       }
     ]
   }

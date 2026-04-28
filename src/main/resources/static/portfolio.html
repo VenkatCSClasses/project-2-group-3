@@ -90,6 +90,32 @@
     .empty-state h3 { font-size: 20px; margin-bottom: 8px; color: #475569; }
     .empty-state a { color: #00d4ff; text-decoration: none; }
 
+    .portfolio-feedback {
+      display: none;
+      margin-bottom: 20px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 14px;
+    }
+
+    .portfolio-feedback.success {
+      background: rgba(0,255,136,0.08);
+      border: 1px solid rgba(0,255,136,0.25);
+      color: #6ee7b7;
+    }
+
+    .portfolio-feedback.info {
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.25);
+      color: #7dd3fc;
+    }
+
+    .portfolio-feedback.error {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #fca5a5;
+    }
+
     /* Table wrapper */
     .table-wrap {
       background: rgba(13,20,45,0.7);
@@ -187,7 +213,7 @@
   <div class="container">
     <div class="page-header">
       <h2>My Portfolio</h2>
-      <span class="refresh-note"><span class="refresh-dot"></span>Prices shown are the latest available</span>
+      <span class="refresh-note"><span class="refresh-dot"></span>Prices update when this page is loaded or refreshed</span>
     </div>
 
     <div class="summary-bar" id="summaryBar">
@@ -204,6 +230,8 @@
         <div class="value neutral" id="cashBalance">—</div>
       </div>
     </div>
+
+    <div class="portfolio-feedback" id="portfolioFeedback"></div>
 
     <div class="empty-state" id="emptyState">
       <h3>Your portfolio is empty</h3>
@@ -327,10 +355,10 @@
             <div class="ticker-cell">${inv.ticker}</div>
             <div class="name-cell">${inv.companyName}</div>
           </td>
-          <td>${num(inv.shares, 4)}</td>
+          <td>${num(inv.shares, 2)}</td>
           <td>${inv.purchaseDate || '—'}</td>
-          <td>${money(inv.purchasePrice, 4)}</td>
-          <td>${money(inv.currentPrice, 4)}</td>
+          <td>${money(inv.purchasePrice, 2)}</td>
+          <td>${money(inv.currentPrice, 2)}</td>
           <td>${money(inv.shares * inv.currentPrice, 2)}</td>
           <td class="${cls}">${pct(percentChange, 2)}</td>
           <td>
@@ -383,9 +411,20 @@
 
       if (res.status === 401) { window.location.href = '/index.html'; return; }
       if (res.ok) {
+        const oldCash = portfolioData.cashBalance;
+
         portfolioData = await res.json();
         renderPortfolio(portfolioData);
         closeSellModal();
+
+        const cashAdded = portfolioData.cashBalance - oldCash;
+
+        showPortfolioNotice(
+          'Sale complete. Cash added: ' + money(cashAdded, 2) +
+          '. New cash balance: ' + money(portfolioData.cashBalance, 2) +
+          '. Portfolio value: ' + money(portfolioData.totalValue, 2) + '.',
+          'success'
+        );
       } else {
         showModalError(await res.text());
       }
@@ -404,6 +443,13 @@
       if (res.ok) {
         portfolioData = await res.json();
         renderPortfolio(portfolioData);
+
+        showPortfolioNotice(
+          'Removed ' + ticker + ' from your portfolio. Cash balance unchanged: ' +
+          money(portfolioData.cashBalance, 2) +
+          '. Portfolio value: ' + money(portfolioData.totalValue, 2) + '.',
+          'info'
+        );
       } else {
         showModalError(await res.text());
       }
@@ -412,6 +458,13 @@
     function showModalError(msg) {
       const el = document.getElementById('modalFeedback');
       el.textContent = msg; el.style.display = 'block';
+    }
+
+    function showPortfolioNotice(msg, type = 'success') {
+      const el = document.getElementById('portfolioFeedback');
+      el.textContent = msg;
+      el.className = 'portfolio-feedback ' + type;
+      el.style.display = 'block';
     }
 
     async function logout() {

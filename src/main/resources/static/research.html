@@ -190,7 +190,7 @@
           <div class="live-price" id="livePrice">—</div>
           <div class="live-label">
             <span class="stream-dot"></span>
-            Live Price
+            Latest Available Price
           </div>
         </div>
       </div>
@@ -248,8 +248,8 @@
           <input type="number" id="buyAmount" placeholder="Amount" min="0.01" step="any" style="width:160px" oninput="updateBuyEstimate()">
           <button class="btn-success" onclick="buyStock()">Buy</button>
         </div>
-        <div class="buy-feedback" id="buyFeedback"></div>
         <div class="buy-estimate" id="buyEstimate"></div>
+        <div class="buy-feedback" id="buyFeedback"></div>
       </div>
 
     </div>
@@ -360,8 +360,8 @@
           <p>The same stock can look like a great buy on a 1-week chart and a poor one on a 1-year chart — or vice versa. Always look at multiple time frames. Short-term traders focus on days/weeks; long-term investors focus on months/years. Understanding your own time horizon is critical.</p>
         </div>
         <div class="learn-section">
-          <h4>The Live Price Feed</h4>
-          <p>The live price in this app streams from a WebSocket connection — it updates in real time as trades happen on the exchange. During market hours (9:30 AM – 4:00 PM ET), you'll see the price tick with every transaction. Outside market hours, you'll see the last closing price.</p>
+          <h4>Price Data</h4>
+          <p>The app shows the latest available price returned by the stock data API. Automatic live streaming is currently disabled to avoid rate-limit issues during testing and demo use.</p>
         </div>
       </div>
 
@@ -457,7 +457,8 @@
     let allChartPoints = [];    // full dataset [{label, close}]
     let activePeriod   = '22';  // default 1M
     let lastPrice      = null;
-    let currentReserachPrice = null;
+    let currentResearchPrice = null;
+    const USE_PRICE_STREAM = false;
 
     function money(value, decimals = 2) {
       return '$' + Number(value || 0).toLocaleString('en-US', {
@@ -549,8 +550,14 @@
 
     async function searchStock() {
       const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
-      if (!ticker || !/^[A-Z]{1,5}$/.test(ticker)) {
-        showError('Enter a valid ticker symbol (1–5 letters).');
+
+      if (!ticker) {
+        showError('Enter a stock symbol.');
+        return;
+      }
+
+      if (!/^[A-Z]{1,5}$/.test(ticker)) {
+        showError('Enter a valid ticker symbol using 1–5 letters.');
         return;
       }
 
@@ -562,7 +569,11 @@
       document.getElementById('whatifCard').style.display = 'none';
       document.getElementById('spinner').style.display = 'block';
 
-      // if (priceEventSource) { priceEventSource.close(); priceEventSource = null; } - temporarily disabled
+      if (USE_PRICE_STREAM && priceEventSource) {
+        priceEventSource.close();
+        priceEventSource = null;
+      }
+
       if (priceChart)        { priceChart.destroy(); priceChart = null; }
       if (whatifChart)       { whatifChart.destroy(); whatifChart = null; }
       document.getElementById('whatifResult').style.display = 'none';
@@ -633,7 +644,9 @@
       document.getElementById('buyAmount').value = '';
 
       await loadChart(currentTicker);
-      // startPriceStream(currentTicker); - temporarily disabled
+      if (USE_PRICE_STREAM) {
+        startPriceStream(currentTicker);
+      }
     }
 
     // ── Chart ──────────────────────────────────────────────────────────────
@@ -672,7 +685,7 @@
 
       // Seed live price display
       if (closes.length > 0 && lastPrice === null) {
-        document.getElementById('livePrice').textContent = '$' + closes[closes.length - 1], 2;
+        document.getElementById('livePrice').textContent = money(closes[closes.length - 1], 2);
       }
 
       if (priceChart) {
@@ -705,13 +718,13 @@
             legend: { display: false },
             tooltip: {
               callbacks: {
-                label: ctx => '$' + money(ctx.parsed.y, 2)
+                label: ctx => money(ctx.parsed.y, 2)
               }
             }
           },
           scales: {
             x: { ticks: { color: '#475569', maxTicksLimit: 6, font: { size: 11 } }, grid: { color: '#1e293b' } },
-            y: { ticks: { color: '#475569', callback: v => '$' + v.toFixed(0), font: { size: 11 } }, grid: { color: '#1e293b' } }
+            y: { ticks: { color: '#475569', callback: v => money(v, 2), font: { size: 11 } }, grid: { color: '#1e293b' } }
           }
         }
       });
@@ -841,6 +854,9 @@
         const data = await res.json();
         showFeedback(
           'Bought! Cash deducted: ' + money(data.cashDeducted) + '. Cash remaining: ' + money(data.cashBalance), true);
+        document.getElementById('buyAmount').value = '';
+        document.getElementById('buyEstimate').style.display = 'none';
+        document.getElementById('buyEstimate').textContent = '';
       } else {
         showFeedback(await res.text(), false);
       }
@@ -899,11 +915,12 @@
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────
-    function setChangeStat(id, price, pct) {
-      const el  = document.getElementById(id);
-      const cls = pct >= 0 ? 'positive' : 'negative';
-      const sign = pct >= 0 ? '+' : '';
-      el.innerHTML = `<span class="${cls}">${sign}$${Math.abs(price).toFixed(2)} (${sign}${pct.toFixed(2)}%)</span>`;
+    function setChangeStat(id, priceChange, percentChange) {
+      const el = document.getElementById(id);
+      const cls = percentChange >= 0 ? 'positive' : 'negative';
+      const sign = percentChange >= 0 ? '+' : '';
+
+      el.innerHTML = `<span class="${cls}">${sign}${money(Math.abs(priceChange), 2)} (${pct(percentChange, 2)})</span>`;
     }
 
     function showFeedback(msg, success) {
