@@ -1,7 +1,7 @@
 {
   "username": "bob",
   "password": "password2",
-  "cashBalance": 1480598.1327149577,
+  "cashBalance": 1479716.4527249576,
   "portfolio": {
     "investments": [
       {
@@ -69,35 +69,41 @@
         "amountInvested": 8354.559584,
         "currentPrice": 261.079987,
         "investmentType": 0
+      },
+      {
+        "investmentId": 13,
+        "ticker": "DXCM",
+        "companyName": "Dexcom Inc.",
+        "purchaseDate": "2026-04-27",
+        "shares": 10.0,
+        "purchasePrice": 61.4,
+        "amountInvested": 614.0,
+        "currentPrice": 61.4,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 14,
+        "ticker": "AAPL",
+        "companyName": "Apple Inc.",
+        "purchaseDate": "2026-04-27",
+        "shares": 1.0,
+        "purchasePrice": 267.67999,
+        "amountInvested": 267.67999,
+        "currentPrice": 267.67999,
+        "investmentType": 0
       }
     ],
-    "nextInvestmentID": 13
+    "nextInvestmentID": 15
   },
   "transactionLog": {
     "transactionLog": [
       {
         "transactionDate": "2026-04-27",
-        "transactionType": "Sell",
-        "ticker": "DXCM",
-        "shares": 0.03,
-        "transactionPrice": 61.4,
-        "amountInvested": 1.8419999999999999
-      },
-      {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Sell",
-        "ticker": "DXCM",
-        "shares": 1.0,
-        "transactionPrice": 61.4,
-        "amountInvested": 61.4
-      },
-      {
-        "transactionDate": "2026-04-27",
         "transactionType": "Buy",
-        "ticker": "AMZN",
-        "shares": 32.0,
-        "transactionPrice": 261.079987,
-        "amountInvested": 8354.559584
+        "ticker": "AAPL",
+        "shares": 1.0,
+        "transactionPrice": 267.67999,
+        "amountInvested": 267.67999
       }
     ]
   }

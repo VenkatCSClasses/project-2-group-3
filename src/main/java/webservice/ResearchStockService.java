@@ -41,6 +41,23 @@ public class ResearchStockService {
             String quoteJson = restTemplate.getForObject(quoteUrl, String.class);
             JsonNode quote = objectMapper.readTree(quoteJson);
 
+            if ("error".equals(quote.path("status").asText())) {
+                String message = quote.path("message").asText("").toLowerCase();
+
+                if (message.contains("symbol") ||
+                    message.contains("not found") ||
+                    message.contains("invalid") ||
+                    message.contains("does not exist")) {
+                    throw new IllegalArgumentException(
+                        "Invalid stock symbol. Please enter a valid ticker such as AAPL, MSFT, or NVDA."
+                    );
+                }
+
+                throw new RuntimeException(
+                    "Stock data is currently unavailable. The API may be rate-limited or temporarily unavailable."
+                );
+            }
+
             JsonNode timeSeries = null;
             
             if (USE_TIME_SERIES) {
@@ -69,6 +86,16 @@ public class ResearchStockService {
 
             ResearchStock stock = new ResearchStock();
             stock.setTicker(ticker.toUpperCase());
+
+            if (quote.path("name").isMissingNode() ||
+                quote.path("close").isMissingNode() ||
+                quote.path("open").isMissingNode() ||
+                quote.path("volume").isMissingNode()) {
+                throw new IllegalArgumentException(
+                    "Invalid stock symbol. Please enter a valid ticker such as AAPL, MSFT, or NVDA."
+                );
+            }
+
             stock.setCompanyName(quote.get("name").asText());
 
             double currentClose = Double.parseDouble(quote.get("close").asText());
