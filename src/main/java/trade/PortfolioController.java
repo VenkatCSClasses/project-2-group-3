@@ -1,6 +1,6 @@
 package trade;
 
-import api.GetPrice;
+import api.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ public class PortfolioController {
 
         for (Investment inv : user.getPortfolio().getInvestments()) {
             try {
-                inv.setCurrentPrice(GetPrice.run(inv.getTicker()).getPrice());
+                inv.setCurrentPrice(GetYahooPrice.run(inv.getTicker()));
             } catch (Exception ignored) {}
         }
 
@@ -43,7 +43,7 @@ public class PortfolioController {
 
         double price;
         try {
-            price = GetPrice.run(req.ticker()).getPrice();
+            price = GetYahooPrice.run(req.ticker());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(apiLimitMessage(req.ticker()));
         }
@@ -67,7 +67,7 @@ public class PortfolioController {
 
         double price;
         try {
-            price = GetPrice.run(req.ticker()).getPrice();
+            price = GetYahooPrice.run(req.ticker());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(apiLimitMessage(req.ticker()));
         }
