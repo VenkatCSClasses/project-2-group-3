@@ -83,14 +83,10 @@ public class ResearchStockService {
 
             double currentPrice = meta.get("regularMarketPrice").getAsDouble();
 
-            double previousClose = meta.has("chartPreviousClose")
-                ? meta.get("chartPreviousClose").getAsDouble()
-                : currentPrice;
-
             double openPrice = meta.has("regularMarketOpen")
                 ? meta.get("regularMarketOpen").getAsDouble()
-                : previousClose;
-
+                : currentPrice;
+            
             long volume = meta.has("regularMarketVolume")
                 ? meta.get("regularMarketVolume").getAsLong()
                 : 0L;
@@ -101,17 +97,24 @@ public class ResearchStockService {
                     ? meta.get("shortName").getAsString()
                     : symbol;
 
-            double dayChange = round(currentPrice - previousClose);
-            double dayChangePct = previousClose == 0
-                ? 0
-                : round((dayChange / previousClose) * 100);
-
             JsonArray timestamps = result.getAsJsonArray("timestamp");
-            JsonArray closes = result.getAsJsonObject("indicators")
+            
+            JsonObject quote = result.getAsJsonObject("indicators")
                 .getAsJsonArray("quote")
                 .get(0)
-                .getAsJsonObject()
-                .getAsJsonArray("close");
+                .getAsJsonObject();
+
+            JsonArray closes = quote.getAsJsonArray("close");
+            JsonArray opens = quote.getAsJsonArray("open");
+
+            if (opens != null) {
+                for (int i = opens.size() - 1; i >= 0; i--) {
+                    if (!opens.get(i).isJsonNull()) {
+                        openPrice = opens.get(i).getAsDouble();
+                        break;
+                    }
+                }
+            }
 
             List<Double> closeList = new ArrayList<>();
             List<String> dateList = new ArrayList<>();
@@ -130,30 +133,34 @@ public class ResearchStockService {
                 );
             }
 
-            List<Double> closesDesc = new ArrayList<>();
-            List<String> datesDesc = new ArrayList<>();
+            double previousClose = closeList.size() >= 2
+                ? closeList.get(closeList.size() - 2)
+                : currentPrice;
 
-            for (int i = closeList.size() - 1; i >= 0; i--) {
-                closesDesc.add(closeList.get(i));
-                datesDesc.add(dateList.get(i));
-            }
+            double dayChange = round(currentPrice - previousClose);
+            double dayChangePct = previousClose == 0
+                ? 0
+                : round((dayChange / previousClose) * 100);
 
             ResearchStock stock = new ResearchStock();
             stock.setTicker(symbol);
             stock.setCompanyName(companyName);
-            stock.setLastClosingPrice(currentPrice);
+            stock.setLastClosingPrice(previousClose);
+            stock.setCurrentPrice(currentPrice);
             stock.setLastOpeningPrice(openPrice);
             stock.setVolume(volume);
             stock.setOneDayPriceChange(dayChange);
             stock.setOneDayPercentChange(dayChangePct);
 
-            applyChange(stock, currentPrice, closesDesc, 5, "week");
-            applyChange(stock, currentPrice, closesDesc, 22, "month");
-            applyChange(stock, currentPrice, closesDesc, 66, "threeMonth");
-            applyChange(stock, currentPrice, closesDesc, 132, "sixMonth");
+            LocalDate today = LocalDate.now(NY);
 
-            if (!closesDesc.isEmpty() && !datesDesc.isEmpty()) {
-                applyYTD(stock, currentPrice, closesDesc, datesDesc);
+            applyChangeByDate(stock, currentPrice, closeList, dateList, today.minusWeeks(1), "week");
+            applyChangeByDate(stock, currentPrice, closeList, dateList, today.minusMonths(1), "month");
+            applyChangeByDate(stock, currentPrice, closeList, dateList, today.minusMonths(3), "threeMonth");
+            applyChangeByDate(stock, currentPrice, closeList, dateList, today.minusMonths(6), "sixMonth");
+
+            if (!closeList.isEmpty() && !dateList.isEmpty()) {
+                applyYTD(stock, currentPrice, closeList, dateList);
             }
 
             cache.put(cacheKey, new CacheEntry(stock));
@@ -192,12 +199,12 @@ public class ResearchStockService {
         return JsonParser.parseString(sb.toString()).getAsJsonObject();
     }
 
-    private void applyChange(ResearchStock stock, double current, List<Double> closes, int daysBack, String period) {
-        if (closes.size() <= daysBack) {
+    private void applyChangeByDate(ResearchStock stock, double current, List<Double> closes, List<String> dates, LocalDate targetDate, String period) {
+        if (closes.isEmpty() || dates.isEmpty()) {
             return;
         }
 
-        double past = closes.get(daysBack);
+        double past = findCloseOnOrBefore(closes, dates, targetDate);
         double change = round(current - past);
         double pct = past == 0 ? 0 : round((change / past) * 100);
 
@@ -220,23 +227,43 @@ public class ResearchStockService {
             }
         }
     }
-
-    private void applyYTD(ResearchStock stock, double current, List<Double> closes, List<String> dates) {
-        String yearStart = LocalDate.now().getYear() + "-01-01";
-        double base = closes.get(closes.size() - 1); // fallback: oldest available
-
+    private double findCloseOnOrBefore(List<Double> closes, List<String> dates, LocalDate targetDate) {
         for (int i = dates.size() - 1; i >= 0; i--) {
-            if (dates.get(i).compareTo(yearStart) < 0) {
-                base = closes.get(i);
-                break;
+            LocalDate d = LocalDate.parse(dates.get(i));
+
+            if (!d.isAfter(targetDate)) {
+                return closes.get(i);
             }
         }
 
+        return closes.get(0);
+    }
+
+    private void applyYTD(ResearchStock stock, double current, List<Double> closes, List<String> dates) {
+        if (closes.isEmpty() || dates.isEmpty()) {
+            return;
+        }
+
+        LocalDate yearStart = LocalDate.now(NY).withDayOfYear(1);
+
+        double base = findCloseBefore(closes, dates, yearStart);
         double change = round(current - base);
         double pct = base == 0 ? 0 : round((change / base) * 100);
 
         stock.setYearToDatePriceChange(change);
         stock.setYearToDatePercentChange(pct);
+    }
+
+    private double findCloseBefore(List<Double> closes, List<String> dates, LocalDate targetDate) {
+        for (int i = dates.size() - 1; i >= 0; i--) {
+            LocalDate d = LocalDate.parse(dates.get(i));
+
+            if (d.isBefore(targetDate)) {
+                return closes.get(i);
+            }
+        }
+
+        return closes.get(0);
     }
 
     private double round(double value) {

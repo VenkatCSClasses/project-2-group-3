@@ -1,7 +1,7 @@
 {
   "username": "water",
   "password": "password",
-  "cashBalance": 5671.290037000002,
+  "cashBalance": 4680.661237000002,
   "portfolio": {
     "investments": [
       {
@@ -9,10 +9,10 @@
         "ticker": "AMZN",
         "companyName": "Amazon.com, Inc.",
         "purchaseDate": "2026-04-27",
-        "shares": 3.0,
+        "shares": 2.986170343137255,
         "purchasePrice": 261.079987,
-        "amountInvested": 783.239961,
-        "currentPrice": 261.079987,
+        "amountInvested": 779.6293143660602,
+        "currentPrice": 261.12,
         "investmentType": 0
       },
       {
@@ -23,7 +23,7 @@
         "shares": 0.7527059553282263,
         "purchasePrice": 664.27002,
         "amountInvested": 500.0,
-        "currentPrice": 664.27002,
+        "currentPrice": 664.23,
         "investmentType": 0
       },
       {
@@ -34,7 +34,7 @@
         "shares": 1.0,
         "purchasePrice": 226.22,
         "amountInvested": 226.22,
-        "currentPrice": 226.22,
+        "currentPrice": 226.2,
         "investmentType": 0
       },
       {
@@ -45,7 +45,7 @@
         "shares": 2.7965771070771757,
         "purchasePrice": 715.15997,
         "amountInvested": 1999.9999999999998,
-        "currentPrice": 715.15997,
+        "currentPrice": 715.17,
         "investmentType": 0
       },
       {
@@ -56,7 +56,7 @@
         "shares": 5.0,
         "purchasePrice": 75.45,
         "amountInvested": 377.25,
-        "currentPrice": 75.45,
+        "currentPrice": 75.44,
         "investmentType": 0
       },
       {
@@ -67,7 +67,7 @@
         "shares": 0.9022013387873931,
         "purchasePrice": 277.10001,
         "amountInvested": 250.0,
-        "currentPrice": 277.10001,
+        "currentPrice": 277.14,
         "investmentType": 0
       },
       {
@@ -78,7 +78,7 @@
         "shares": 0.19474196689386564,
         "purchasePrice": 513.5,
         "amountInvested": 100.0,
-        "currentPrice": 513.5,
+        "currentPrice": 513.35,
         "investmentType": 0
       },
       {
@@ -89,77 +89,67 @@
         "shares": 100.0,
         "purchasePrice": 0.92000002,
         "amountInvested": 92.00000200000001,
-        "currentPrice": 0.92000002,
+        "currentPrice": 0.92,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 9,
+        "ticker": "PI",
+        "companyName": "Impinj, Inc.",
+        "purchaseDate": "2026-04-27",
+        "shares": 2.0,
+        "purchasePrice": 122.12,
+        "amountInvested": 244.24,
+        "currentPrice": 122.12,
+        "investmentType": 0
+      },
+      {
+        "investmentId": 10,
+        "ticker": "AMD",
+        "companyName": "Advanced Micro Devices, Inc.",
+        "purchaseDate": "2026-04-27",
+        "shares": 2.2412814152945044,
+        "purchasePrice": 334.63,
+        "amountInvested": 750.0,
+        "currentPrice": 334.63,
         "investmentType": 0
       }
     ],
-    "nextInvestmentID": 9
+    "nextInvestmentID": 11
   },
   "transactionLog": {
     "transactionLog": [
       {
         "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
+        "transactionType": "Sell",
         "ticker": "AMZN",
-        "shares": 3.0,
-        "transactionPrice": 261.079987,
-        "amountInvested": 783.239961
+        "shares": 0.01,
+        "transactionPrice": 261.12,
+        "amountInvested": 2.6112
+      },
+      {
+        "transactionDate": "2026-04-27",
+        "transactionType": "Sell",
+        "ticker": "AMZN",
+        "shares": 0.003829656862745098,
+        "transactionPrice": 261.12,
+        "amountInvested": 1.0
       },
       {
         "transactionDate": "2026-04-27",
         "transactionType": "Buy",
-        "ticker": "QQQ",
-        "shares": 0.7527059553282263,
-        "transactionPrice": 664.27002,
-        "amountInvested": 500.0
+        "ticker": "PI",
+        "shares": 2.0,
+        "transactionPrice": 122.12,
+        "amountInvested": 244.24
       },
       {
         "transactionDate": "2026-04-27",
         "transactionType": "Buy",
-        "ticker": "WM",
-        "shares": 1.0,
-        "transactionPrice": 226.22,
-        "amountInvested": 226.22
-      },
-      {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
-        "ticker": "SPY",
-        "shares": 2.7965771070771757,
-        "transactionPrice": 715.15997,
-        "amountInvested": 1999.9999999999998
-      },
-      {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
-        "ticker": "KO",
-        "shares": 5.0,
-        "transactionPrice": 75.45,
-        "amountInvested": 377.25
-      },
-      {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
-        "ticker": "IWM",
-        "shares": 0.9022013387873931,
-        "transactionPrice": 277.10001,
-        "amountInvested": 250.0
-      },
-      {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
-        "ticker": "LMT",
-        "shares": 0.19474196689386564,
-        "transactionPrice": 513.5,
-        "amountInvested": 100.0
-      },
-      {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
-        "ticker": "ALPS",
-        "shares": 100.0,
-        "transactionPrice": 0.92000002,
-        "amountInvested": 92.00000200000001
+        "ticker": "AMD",
+        "shares": 2.2412814152945044,
+        "transactionPrice": 334.63,
+        "amountInvested": 750.0
       }
     ]
   }

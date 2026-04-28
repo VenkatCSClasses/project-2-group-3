@@ -3,6 +3,7 @@ package webservice;
 public class ResearchStock {
     private String ticker;
     private String companyName;
+    private double currentPrice;
     private double lastClosingPrice;
     private double lastOpeningPrice;
     private long volume;
@@ -54,6 +55,14 @@ public class ResearchStock {
 
     public double getLastOpeningPrice() {
         return lastOpeningPrice;
+    }
+
+    public double getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public void setCurrentPrice(double currentPrice) {
+        this.currentPrice = currentPrice;
     }
 
     public void setLastOpeningPrice(double lastOpeningPrice) {

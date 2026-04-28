@@ -215,7 +215,7 @@
           <div class="value" id="statOpen">—</div>
         </div>
         <div class="stat">
-          <div class="label">Prev Close <button class="info-btn" onclick="showInfo('close')">?</button></div>
+          <div class="label">Latest Price <button class="info-btn" onclick="showInfo('close')">?</button></div>
           <div class="value" id="statClose">—</div>
         </div>
         <div class="stat">
@@ -461,10 +461,13 @@
     const USE_PRICE_STREAM = false;
 
     function money(value, decimals = 2) {
-      return '$' + Number(value || 0).toLocaleString('en-US', {
+      const n = Number(value || 0);
+      const abs = Math.abs(n).toLocaleString('en-US', {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals
       });
+
+      return (n < 0 ? '-$' : '$') + abs;
     }
 
     function num(value, decimals = 2) {
@@ -618,8 +621,8 @@
 
       // Populate stats
       document.getElementById('statOpen').textContent = money(data.lastOpeningPrice);
-      document.getElementById('statClose').textContent = money(data.lastClosingPrice);
-      currentResearchPrice = Number(data.lastClosingPrice || 0);
+      document.getElementById('statClose').textContent = money(data.currentPrice);
+      currentResearchPrice = Number(data.currentPrice || 0);
       updateBuyEstimate();
       document.getElementById('statVolume').textContent = Number(data.volume).toLocaleString();
       setChangeStat('statDayChange', data.oneDayPriceChange, data.oneDayPercentChange);
@@ -918,9 +921,9 @@
     function setChangeStat(id, priceChange, percentChange) {
       const el = document.getElementById(id);
       const cls = percentChange >= 0 ? 'positive' : 'negative';
-      const sign = percentChange >= 0 ? '+' : '';
+      const sign = priceChange >= 0 ? '+' : '';
 
-      el.innerHTML = `<span class="${cls}">${sign}${money(Math.abs(priceChange), 2)} (${pct(percentChange, 2)})</span>`;
+      el.innerHTML = `<span class="${cls}">${sign}${money(priceChange, 2)} (${pct(percentChange, 2)})</span>`;
     }
 
     function showFeedback(msg, success) {
@@ -1002,14 +1005,6 @@
 
         document.getElementById('whatifStats').innerHTML = `
           <div class="stat">
-            <div class="label">Historical Price</div>
-            <div class="value">${money(data.historicalPrice)}</div>
-          </div>
-          <div class="stat">
-            <div class="label">Current Price</div>
-            <div class="value">${money(data.currentPrice)}</div>
-          </div>
-          <div class="stat">
             <div class="label">Original Value</div>
             <div class="value">${money(data.originalValue)}</div>
           </div>
@@ -1019,7 +1014,7 @@
           </div>
           <div class="stat">
             <div class="label">Gain / Loss</div>
-            <div class="value"><span class="${gainCls}">${sign}${money(Math.abs(data.dollarChange))}</span></div>
+            <div class="value"><span class="${gainCls}">${sign}${money(data.dollarChange)}</span></div>
           </div>
           <div class="stat">
             <div class="label">Price Change</div>

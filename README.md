@@ -6,6 +6,8 @@ This project is a **paper trading stock exchange platform** that allows users to
 
 For simplicity, the term **stock** is used throughout this document to refer to any investment.
 
+We have a **CLI implementation** as well as a **web application.** The **web application** will be what we are demonstrating and focusing on.
+
 ---
 
 ## Core Features
@@ -49,7 +51,7 @@ For simplicity, the term **stock** is used throughout this document to refer to 
     - Selling an investment will increase the cash balance by the investment's value
     - Removing an investment will not increase the cash balance
 
-### Transaction Log
+### Transaction Log (CLI Only)
 - Each investment, even if made on the same day, is denoted separately
     - This ensures that the proper investment is sold or removed when selling or removing investments
 - Every investment purchase, **excluding historical / what-if transactions**, are included in a transaction log
