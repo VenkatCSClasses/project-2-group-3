@@ -18,6 +18,7 @@ public class ResearchStockService {
 
     private static final String BASE_URL = "https://api.twelvedata.com";
     private static final long CACHE_TTL_MS = 5 * 60 * 1000;
+    private static boolean USE_TIME_SERIES = true;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final Map<String, CacheEntry> cache = new ConcurrentHashMap<>();
@@ -41,15 +42,16 @@ public class ResearchStockService {
             JsonNode quote = objectMapper.readTree(quoteJson);
 
             JsonNode timeSeries = null;
-            /* Temp disabled
-            try {
-                String tsUrl = BASE_URL + "/time_series?symbol=" + ticker + "&interval=1day&outputsize=260&apikey=" + apiKey;
-                String tsJson = restTemplate.getForObject(tsUrl, String.class);
-                timeSeries = objectMapper.readTree(tsJson);
-            } catch (Exception ignored) {
-                timeSeries = null;
+            
+            if (USE_TIME_SERIES) {
+                try {
+                    String tsUrl = BASE_URL + "/time_series?symbol=" + ticker + "&interval=1day&outputsize=260&apikey=" + apiKey;
+                    String tsJson = restTemplate.getForObject(tsUrl, String.class);
+                    timeSeries = objectMapper.readTree(tsJson);
+                } catch (Exception ignored) {
+                    timeSeries = null;
+                }
             }
-                */
 
             if ("error".equals(quote.path("status").asText())) {
                 String message = quote.path("message").asText("").toLowerCase();
