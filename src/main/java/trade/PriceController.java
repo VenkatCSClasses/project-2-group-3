@@ -1,6 +1,6 @@
 package trade;
 
-import api.GetPrice;
+import api.GetYahooPrice;
 import apistream.PriceStream;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ public class PriceController {
             return ResponseEntity.status(401).body("Please log in first.");
         }
         try {
-            double price = GetPrice.run(ticker.toUpperCase()).getPrice();
+            double price = GetYahooPrice.run(ticker.toUpperCase());
             return ResponseEntity.ok(Map.of("ticker", ticker.toUpperCase(), "price", price));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Could not fetch price for " + ticker);

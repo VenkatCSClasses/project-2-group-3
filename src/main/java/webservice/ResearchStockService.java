@@ -1,13 +1,17 @@
 package webservice;
 
-import api.ApiKey;
+import com.google.gson.*;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,16 +20,15 @@ import java.util.concurrent.ConcurrentHashMap;
 @Service
 public class ResearchStockService {
 
-    private static final String BASE_URL = "https://api.twelvedata.com";
     private static final long CACHE_TTL_MS = 5 * 60 * 1000;
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final ZoneId NY = ZoneId.of("America/New_York");
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final Map<String, CacheEntry> cache = new ConcurrentHashMap<>();
 
     private static class CacheEntry {
         final ResearchStock stock;
         final long timestamp;
-        CacheEntry(ResearchStock stock) { this.stock = stock; this.timestamp = System.currentTimeMillis(); }
+        CacheEntry(ResearchStock s) { this.stock = s; this.timestamp = System.currentTimeMillis(); }
         boolean isExpired() { return System.currentTimeMillis() - timestamp > CACHE_TTL_MS; }
     }
 
@@ -33,89 +36,125 @@ public class ResearchStockService {
         String cacheKey = ticker.toUpperCase();
         CacheEntry cached = cache.get(cacheKey);
         if (cached != null && !cached.isExpired()) return cached.stock;
+
         try {
-            String apiKey = ApiKey.getApiKey();
+            String symbol = ticker.toUpperCase();
 
-            String quoteUrl = BASE_URL + "/quote?symbol=" + ticker + "&apikey=" + apiKey;
-            String quoteJson = restTemplate.getForObject(quoteUrl, String.class);
-            JsonNode quote = objectMapper.readTree(quoteJson);
+            // Single chart call gives us everything: meta (price, name, volume) + historical closes
+            JsonObject root = fetchYahoo(
+                "https://query1.finance.yahoo.com/v8/finance/chart/"
+                + symbol + "?interval=1d&range=1y");
 
-            String tsUrl = BASE_URL + "/time_series?symbol=" + ticker + "&interval=1day&outputsize=260&apikey=" + apiKey;
-            String tsJson = restTemplate.getForObject(tsUrl, String.class);
-            JsonNode timeSeries = objectMapper.readTree(tsJson);
+            JsonObject result = root.getAsJsonObject("chart")
+                                    .getAsJsonArray("result")
+                                    .get(0).getAsJsonObject();
 
-            if ("error".equals(quote.path("status").asText())) {
-                throw new RuntimeException(quote.path("message").asText("API error"));
+            JsonObject meta = result.getAsJsonObject("meta");
+
+            double currentPrice  = meta.get("regularMarketPrice").getAsDouble();
+            double previousClose = meta.has("chartPreviousClose")
+                                   ? meta.get("chartPreviousClose").getAsDouble() : currentPrice;
+            double openPrice     = meta.has("regularMarketOpen")
+                                   ? meta.get("regularMarketOpen").getAsDouble() : previousClose;
+            long   volume        = meta.has("regularMarketVolume")
+                                   ? meta.get("regularMarketVolume").getAsLong() : 0L;
+            String companyName   = meta.has("longName")  ? meta.get("longName").getAsString()
+                                 : meta.has("shortName") ? meta.get("shortName").getAsString()
+                                 : symbol;
+
+            double dayChange    = round(currentPrice - previousClose);
+            double dayChangePct = round((dayChange / previousClose) * 100);
+
+            // Historical closes for period performance
+            JsonArray timestamps = result.getAsJsonArray("timestamp");
+            JsonArray closes     = result.getAsJsonObject("indicators")
+                                         .getAsJsonArray("quote")
+                                         .get(0).getAsJsonObject()
+                                         .getAsJsonArray("close");
+
+            // Yahoo returns oldest-first; build chronological lists then reverse
+            List<Double> closeList = new ArrayList<>();
+            List<String> dateList  = new ArrayList<>();
+            for (int i = 0; i < timestamps.size(); i++) {
+                if (closes.get(i).isJsonNull()) continue;
+                closeList.add(closes.get(i).getAsDouble());
+                dateList.add(Instant.ofEpochSecond(timestamps.get(i).getAsLong())
+                                    .atZone(NY).toLocalDate().format(FMT));
             }
-            if ("error".equals(timeSeries.path("status").asText())) {
-                throw new RuntimeException(timeSeries.path("message").asText("API error"));
+
+            // Reverse: index 0 = most recent
+            List<Double> closesDesc = new ArrayList<>();
+            List<String> datesDesc  = new ArrayList<>();
+            for (int i = closeList.size() - 1; i >= 0; i--) {
+                closesDesc.add(closeList.get(i));
+                datesDesc.add(dateList.get(i));
             }
 
             ResearchStock stock = new ResearchStock();
-            stock.setTicker(ticker.toUpperCase());
-            stock.setCompanyName(quote.get("name").asText());
+            stock.setTicker(symbol);
+            stock.setCompanyName(companyName);
+            stock.setLastClosingPrice(currentPrice);
+            stock.setLastOpeningPrice(openPrice);
+            stock.setVolume(volume);
+            stock.setOneDayPriceChange(dayChange);
+            stock.setOneDayPercentChange(dayChangePct);
 
-            double currentClose = Double.parseDouble(quote.get("close").asText());
-            stock.setLastClosingPrice(currentClose);
-            stock.setLastOpeningPrice(Double.parseDouble(quote.get("open").asText()));
-            stock.setVolume(Long.parseLong(quote.get("volume").asText()));
-
-            stock.setOneDayPriceChange(Double.parseDouble(quote.get("change").asText()));
-            stock.setOneDayPercentChange(Double.parseDouble(quote.get("percent_change").asText()));
-
-            JsonNode values = timeSeries.get("values");
-            if (values != null && values.isArray()) {
-                List<Double> closes = new ArrayList<>();
-                List<String> dates = new ArrayList<>();
-
-                for (JsonNode v : values) {
-                    closes.add(Double.parseDouble(v.get("close").asText()));
-                    dates.add(v.get("datetime").asText());
-                }
-
-                applyChange(stock, currentClose, closes, 5, "week");
-                applyChange(stock, currentClose, closes, 22, "month");
-                applyChange(stock, currentClose, closes, 66, "threeMonth");
-                applyChange(stock, currentClose, closes, 132, "sixMonth");
-                applyYTD(stock, currentClose, closes, dates);
-            }
+            applyChange(stock, currentPrice, closesDesc, 5,   "week");
+            applyChange(stock, currentPrice, closesDesc, 22,  "month");
+            applyChange(stock, currentPrice, closesDesc, 66,  "threeMonth");
+            applyChange(stock, currentPrice, closesDesc, 132, "sixMonth");
+            applyYTD(stock, currentPrice, closesDesc, datesDesc);
 
             cache.put(cacheKey, new CacheEntry(stock));
             return stock;
+
         } catch (Exception e) {
-            throw new RuntimeException("Failed to fetch stock data for " + ticker, e);
+            throw new RuntimeException("Failed to fetch stock data for " + ticker + ": " + e.getMessage(), e);
         }
+    }
+
+    private JsonObject fetchYahoo(String urlStr) throws Exception {
+        HttpURLConnection conn = (HttpURLConnection) new URI(urlStr).toURL().openConnection();
+        conn.setRequestMethod("GET");
+        conn.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)");
+        conn.setRequestProperty("Accept", "application/json");
+        conn.setConnectTimeout(10000);
+        conn.setReadTimeout(10000);
+
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader r = new BufferedReader(new InputStreamReader(conn.getInputStream()))) {
+            String line;
+            while ((line = r.readLine()) != null) sb.append(line);
+        } finally {
+            conn.disconnect();
+        }
+        return JsonParser.parseString(sb.toString()).getAsJsonObject();
     }
 
     private void applyChange(ResearchStock stock, double current, List<Double> closes, int daysBack, String period) {
         if (closes.size() <= daysBack) return;
-        double past = closes.get(daysBack);
+        double past   = closes.get(daysBack);
         double change = round(current - past);
-        double pct = round((change / past) * 100);
+        double pct    = round((change / past) * 100);
         switch (period) {
-            case "week"       -> { stock.setOneWeekPriceChange(change);   stock.setOneWeekPercentChange(pct); }
-            case "month"      -> { stock.setOneMonthPriceChange(change);  stock.setOneMonthPercentChange(pct); }
+            case "week"       -> { stock.setOneWeekPriceChange(change);    stock.setOneWeekPercentChange(pct); }
+            case "month"      -> { stock.setOneMonthPriceChange(change);   stock.setOneMonthPercentChange(pct); }
             case "threeMonth" -> { stock.setThreeMonthPriceChange(change); stock.setThreeMonthPercentChange(pct); }
-            case "sixMonth"   -> { stock.setSixMonthPriceChange(change);  stock.setSixMonthPercentChange(pct); }
+            case "sixMonth"   -> { stock.setSixMonthPriceChange(change);   stock.setSixMonthPercentChange(pct); }
         }
     }
 
     private void applyYTD(ResearchStock stock, double current, List<Double> closes, List<String> dates) {
         String yearStart = LocalDate.now().getYear() + "-01-01";
-        double base = closes.get(closes.size() - 1); // fallback: oldest available
+        double base = closes.get(closes.size() - 1);
         for (int i = dates.size() - 1; i >= 0; i--) {
-            if (dates.get(i).compareTo(yearStart) < 0) {
-                base = closes.get(i);
-                break;
-            }
+            if (dates.get(i).compareTo(yearStart) < 0) { base = closes.get(i); break; }
         }
         double change = round(current - base);
-        double pct = round((change / base) * 100);
+        double pct    = round((change / base) * 100);
         stock.setYearToDatePriceChange(change);
         stock.setYearToDatePercentChange(pct);
     }
 
-    private double round(double value) {
-        return Math.round(value * 100.0) / 100.0;
-    }
+    private double round(double v) { return Math.round(v * 100.0) / 100.0; }
 }
