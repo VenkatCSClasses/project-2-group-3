@@ -65,36 +65,45 @@ public class ResearchStockService {
             double dayChange    = round(currentPrice - previousClose);
             double dayChangePct = round((dayChange / previousClose) * 100);
 
-            // Historical closes for period performance
+            // Historical OHLCV for period performance and accurate open/prev-close
             JsonArray timestamps = result.getAsJsonArray("timestamp");
-            JsonArray closes     = result.getAsJsonObject("indicators")
+            JsonObject quote     = result.getAsJsonObject("indicators")
                                          .getAsJsonArray("quote")
-                                         .get(0).getAsJsonObject()
-                                         .getAsJsonArray("close");
+                                         .get(0).getAsJsonObject();
+            JsonArray closes = quote.getAsJsonArray("close");
+            JsonArray opens  = quote.getAsJsonArray("open");
 
             // Yahoo returns oldest-first; build chronological lists then reverse
             List<Double> closeList = new ArrayList<>();
+            List<Double> openList  = new ArrayList<>();
             List<String> dateList  = new ArrayList<>();
             for (int i = 0; i < timestamps.size(); i++) {
                 if (closes.get(i).isJsonNull()) continue;
                 closeList.add(closes.get(i).getAsDouble());
+                openList.add(opens.get(i).isJsonNull() ? closes.get(i).getAsDouble() : opens.get(i).getAsDouble());
                 dateList.add(Instant.ofEpochSecond(timestamps.get(i).getAsLong())
                                     .atZone(NY).toLocalDate().format(FMT));
             }
 
-            // Reverse: index 0 = most recent
+            // Reverse: index 0 = most recent trading day
             List<Double> closesDesc = new ArrayList<>();
+            List<Double> opensDesc  = new ArrayList<>();
             List<String> datesDesc  = new ArrayList<>();
             for (int i = closeList.size() - 1; i >= 0; i--) {
                 closesDesc.add(closeList.get(i));
+                opensDesc.add(openList.get(i));
                 datesDesc.add(dateList.get(i));
             }
+
+            // Use actual OHLCV data: most recent open, most recent completed close
+            double actualOpen      = opensDesc.isEmpty()  ? openPrice    : opensDesc.get(0);
+            double actualPrevClose = closesDesc.isEmpty() ? previousClose : closesDesc.get(0);
 
             ResearchStock stock = new ResearchStock();
             stock.setTicker(symbol);
             stock.setCompanyName(companyName);
-            stock.setLastClosingPrice(currentPrice);
-            stock.setLastOpeningPrice(openPrice);
+            stock.setLastClosingPrice(actualPrevClose);
+            stock.setLastOpeningPrice(actualOpen);
             stock.setVolume(volume);
             stock.setOneDayPriceChange(dayChange);
             stock.setOneDayPercentChange(dayChangePct);

@@ -1,29 +1,18 @@
 {
   "username": "alice",
   "password": "password1",
-  "cashBalance": 208.37652876013203,
+  "cashBalance": 4710.086531850132,
   "portfolio": {
     "investments": [
-      {
-        "investmentId": 0,
-        "ticker": "AAPL",
-        "companyName": "Apple Inc.",
-        "purchaseDate": "2026-04-20",
-        "shares": 5.904743760716329,
-        "purchasePrice": 273.97,
-        "amountInvested": 1617.7226481234527,
-        "currentPrice": 267.61,
-        "investmentType": 0
-      },
       {
         "investmentId": 0,
         "ticker": "GOOGL",
         "companyName": "Alphabet Inc.",
         "purchaseDate": "2026-04-20",
-        "shares": 5.0,
-        "purchasePrice": 339.55,
-        "amountInvested": 1697.75,
-        "currentPrice": 350.34,
+        "shares": 7.0,
+        "purchasePrice": 342.47285714285715,
+        "amountInvested": 2397.31,
+        "currentPrice": 349.78,
         "investmentType": 0
       },
       {
@@ -34,7 +23,7 @@
         "shares": 5.0,
         "purchasePrice": 390.89,
         "amountInvested": 1954.4499999999998,
-        "currentPrice": 378.67,
+        "currentPrice": 376.02,
         "investmentType": 0
       },
       {
@@ -45,7 +34,7 @@
         "shares": 3.0,
         "purchasePrice": 225.17,
         "amountInvested": 675.51,
-        "currentPrice": 231.33,
+        "currentPrice": 230.72,
         "investmentType": 0
       },
       {
@@ -56,40 +45,7 @@
         "shares": 2.0,
         "purchasePrice": 199.855,
         "amountInvested": 399.71,
-        "currentPrice": 216.61,
-        "investmentType": 0
-      },
-      {
-        "investmentId": 0,
-        "ticker": "F",
-        "companyName": "Ford Motor Company",
-        "purchaseDate": "2026-04-22",
-        "shares": 2.0,
-        "purchasePrice": 12.775,
-        "amountInvested": 25.55,
-        "currentPrice": 12.49,
-        "investmentType": 0
-      },
-      {
-        "investmentId": 1,
-        "ticker": "MU",
-        "companyName": "Micron Technology, Inc.",
-        "purchaseDate": "2026-04-26",
-        "shares": 5.19063596156779,
-        "purchasePrice": 497.04892022917585,
-        "amountInvested": 2580.0,
-        "currentPrice": 524.56,
-        "investmentType": 0
-      },
-      {
-        "investmentId": 2,
-        "ticker": "MU",
-        "companyName": "Micron Technology, Inc.",
-        "purchaseDate": "2026-04-26",
-        "shares": 2.0161290322580645,
-        "purchasePrice": 496.0,
-        "amountInvested": 1000.0,
-        "currentPrice": 524.56,
+        "currentPrice": 213.17,
         "investmentType": 0
       },
       {
@@ -100,7 +56,7 @@
         "shares": 3.0,
         "purchasePrice": 216.61,
         "amountInvested": 649.83,
-        "currentPrice": 216.61,
+        "currentPrice": 213.17,
         "investmentType": 0
       },
       {
@@ -111,7 +67,7 @@
         "shares": 0.3041825095057034,
         "purchasePrice": 657.5,
         "amountInvested": 200.0,
-        "currentPrice": 657.5,
+        "currentPrice": 654.26,
         "investmentType": 0
       }
     ],
@@ -120,28 +76,36 @@
   "transactionLog": {
     "transactionLog": [
       {
-        "transactionDate": "2026-04-27",
+        "transactionDate": "2026-04-28",
         "transactionType": "Sell",
-        "ticker": "MSFT",
-        "shares": 0.011907,
-        "transactionPrice": 424.82,
-        "amountInvested": 5.05833174
+        "ticker": "F",
+        "shares": 2.0,
+        "transactionPrice": 12.355,
+        "amountInvested": 24.71
       },
       {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
-        "ticker": "VOO",
-        "shares": 0.3041825095057034,
-        "transactionPrice": 657.5,
-        "amountInvested": 200.0
-      },
-      {
-        "transactionDate": "2026-04-27",
-        "transactionType": "Buy",
+        "transactionDate": "2026-04-28",
+        "transactionType": "Sell",
         "ticker": "MU",
-        "shares": 0.19063596156779017,
-        "transactionPrice": 524.56,
-        "amountInvested": 100.0
+        "shares": 7.206765,
+        "transactionPrice": 496.49,
+        "amountInvested": 3578.08675485
+      },
+      {
+        "transactionDate": "2026-04-28",
+        "transactionType": "Buy",
+        "ticker": "GOOGL",
+        "shares": 2.0,
+        "transactionPrice": 349.78,
+        "amountInvested": 699.56
+      },
+      {
+        "transactionDate": "2026-04-28",
+        "transactionType": "Sell",
+        "ticker": "AAPL",
+        "shares": 5.904744,
+        "transactionPrice": 270.71,
+        "amountInvested": 1598.47324824
       }
     ]
   }
