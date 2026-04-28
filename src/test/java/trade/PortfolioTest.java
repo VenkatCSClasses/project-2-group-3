@@ -111,4 +111,5 @@ public class PortfolioTest {
 
         assertEquals(0.0, portfolio.getRealTotalChange(), 0.0001);
     }
+    
 }
