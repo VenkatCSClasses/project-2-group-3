@@ -57,9 +57,7 @@ We have a **CLI implementation** as well as a **web application.** The **web app
 - The portfolio also shows the user's current portfolio value, cash balance, and overall change in value
 
 #### Selling Stocks
-- Investments can either be sold or removed
-    - Selling an investment will increase the cash balance by the investment's value
-    - Removing an investment will not increase the cash balance
+- Investments can be sold to increase the cash balance by the investment's value
 
 #### Account Specifications
 - Each user account has a distinct username, password, and portfolio

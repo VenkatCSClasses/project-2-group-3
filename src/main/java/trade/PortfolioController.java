@@ -92,19 +92,6 @@ public class PortfolioController {
         return ResponseEntity.ok(buildPortfolioResponse(user));
     }
 
-    @DeleteMapping("/{investmentId}")
-    public ResponseEntity<?> remove(@PathVariable int investmentId, HttpSession session) {
-        User user = sessionUser(session);
-        if (user == null) return ResponseEntity.status(401).body("Please log in first.");
-
-        Investment inv = UserTrading.findInvestmentById(user, investmentId);
-        if (inv == null) return ResponseEntity.badRequest().body("Investment not found.");
-
-        user.getPortfolio().removeInvestment(inv);
-        userService.saveUser(user);
-        return ResponseEntity.ok(buildPortfolioResponse(user));
-    }
-
     private User sessionUser(HttpSession session) {
         String username = (String) session.getAttribute("username");
         return username == null ? null : userService.getUser(username);

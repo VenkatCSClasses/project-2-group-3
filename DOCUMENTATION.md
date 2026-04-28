@@ -74,7 +74,7 @@ The portfolio contains all of the investments a user has made throughout their t
 
 ![Portfolio Show](documentation-images/portfolio-show.png)
 
-Users can then either sell their investments at a profit (or loss), or completely remove them from the portfolio without receiving the profits (or losses) from their investment.
+Users can then either sell their investments at a profit (or loss).
 
 When selling investments, users have three options:
 
@@ -97,25 +97,5 @@ The portfolio value, overall change, and cash balance will be updated accordingl
 As will the change for that specific investment. The only investment impacted was the one made for 36 shares, which is now 16 shares.
 
 ![After Selling Dexcom](documentation-images/after-selling-dxcm.png)
-
-However, when removing an investment, the entire investment will be removed for that individual line. Meaning, if there have been two transactions made for a stock, but the user removes one, the other one will still remain.
-
-This should only be used in rare cases based on user need.
-
-Again: **profits or losses will not be received when removing an investment.**
-
-![Before Removing Apple](documentation-images/before-removing-aapl.png)
-
-Say the user wants to remove their 1-share investment that was made accidentally:
-
-![Remove Apple Prompt](documentation-images/remove-aapl-prompt.png)
-
-The portfolio value will change, but the cash balance will not:
-
-![Updated Portfolio Values Remove](documentation-images/updated-portfolio-values-remove.png)
-
-And the investment will no longer exist in the portfolio:
-
-![After Removing Apple](documentation-images/after-removing-aapl.png)
 
 Once complete, the user may sign out. Their data will be saved.

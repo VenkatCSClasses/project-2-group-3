@@ -97,7 +97,24 @@
     .buy-section { border-top: 1px solid rgba(255,255,255,0.07); padding-top: 24px; }
     .buy-section h4 { font-size: 15px; font-weight: 600; margin-bottom: 16px; }
     .buy-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
-    .buy-row select, .buy-row input[type="number"] { padding: 10px 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #e2e8f0; font-size: 14px; }
+    .buy-row select,
+    .buy-row input[type="number"] {
+      padding: 10px 12px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 14px;
+    }
+
+    .buy-row select {
+      cursor: pointer;
+    }
+
+    .buy-row select option {
+      background: #0d142d;
+      color: #e2e8f0;
+    }
     .buy-row select:focus, .buy-row input[type="number"]:focus { outline: none; border-color: #00d4ff; }
     .btn-success { padding: 10px 20px; background: linear-gradient(135deg, #00ff88, #00c46a); color: #06091a; border: none; border-radius: 8px; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(0,255,136,0.25); }
     .btn-success:hover { box-shadow: 0 4px 24px rgba(0,255,136,0.4); transform: translateY(-1px); }
@@ -129,13 +146,43 @@
     .whatif-card { background: rgba(13,20,45,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(168,85,247,0.3); border-radius: 16px; padding: 32px; display: none; margin-bottom: 24px; }
     .whatif-card-title { font-size: 20px; font-weight: 800; color: #e2e8f0; margin-bottom: 8px; letter-spacing: -0.3px; }
     .whatif-subtitle { font-size: 14px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
-    .whatif-inputs { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 20px; }
-    .whatif-inputs input[type="number"], .whatif-inputs input[type="date"] {padding: 11px 14px; background: rgba(168,85,247,0.08); 
-      border: 1px solid rgba(168,85,247,0.35); border-radius: 8px; color: #e2e8f0; font-size: 15px; width: 200px;}
-    .whatif-inputs input[type="number"]:focus, .whatif-inputs input[type="date"]:focus {outline: none; border-color: #a855f7; box-shadow: 0 0 0 3px rgba(168,85,247,0.15);}
-    .whatif-inputs input[type="date"]::-webkit-calendar-picker-indicator {filter: invert(1); opacity: 0.75; cursor: pointer;}
-    .whatif-inputs select { padding: 11px 14px; background: rgba(168,85,247,0.08); border: 1px solid rgba(168,85,247,0.35); border-radius: 8px; color: #e2e8f0; font-size: 15px; }
-    .whatif-inputs select:focus { outline: none; border-color: #a855f7; }
+    .whatif-inputs input[type="number"] {
+      padding: 11px 14px;
+      background: rgba(168,85,247,0.08);
+      border: 1px solid rgba(168,85,247,0.35);
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 15px;
+      width: 200px;
+    }
+
+    .whatif-inputs input[type="number"]:focus {
+      outline: none;
+      border-color: #a855f7;
+      box-shadow: 0 0 0 3px rgba(168,85,247,0.15);
+    }
+
+    .whatif-inputs select {
+      padding: 11px 14px;
+      background: rgba(168,85,247,0.08);
+      border: 1px solid rgba(168,85,247,0.35);
+      border-radius: 8px;
+      color: #e2e8f0;
+      font-size: 15px;
+      min-width: 180px;
+      cursor: pointer;
+    }
+
+    .whatif-inputs select:focus {
+      outline: none;
+      border-color: #a855f7;
+      box-shadow: 0 0 0 3px rgba(168,85,247,0.15);
+    }
+
+    .whatif-inputs select option {
+      background: #0d142d;
+      color: #e2e8f0;
+    }
     .btn-whatif { padding: 11px 24px; background: linear-gradient(135deg, #a855f7, #7c3aed); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(168,85,247,0.35); white-space: nowrap; }
     .btn-whatif:hover { box-shadow: 0 4px 28px rgba(168,85,247,0.55); transform: translateY(-1px); }
     .whatif-stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
@@ -256,21 +303,35 @@
 
     <!-- ── What If Card ── -->
     <div class="whatif-card" id="whatifCard">
-      <h3 class="whatif-card-title">What If I Bought This Stock?</h3>
-      <p class="whatif-subtitle">Enter a number of shares and a past purchase date to compare the historical price against the current price.</p>
+    <h3 class="whatif-card-title">What If I Had Invested?</h3>
+    <p class="whatif-subtitle">Enter an amount and pick how far back to go — see what your money would be worth today.</p>
 
-      <div class="whatif-inputs">
-        <input type="number" id="whatifShares" placeholder="Shares (e.g. 10)" min="0.0001" step="any">
-        <input type="date" id="whatifDate">
-        <button class="btn-whatif" onclick="calcWhatIf()">Calculate</button>
+    <div class="whatif-inputs">
+      <input type="number" id="whatifAmount" placeholder="$ Amount (e.g. 1000)" min="1" step="any">
+      <select id="whatifPeriod">
+        <option value="5">1 Week Ago</option>
+        <option value="22" selected>1 Month Ago</option>
+        <option value="66">3 Months Ago</option>
+        <option value="130">6 Months Ago</option>
+        <option value="260">1 Year Ago</option>
+        <option value="all">All Available Data</option>
+      </select>
+      <button class="btn-whatif" onclick="calcWhatIf()">Calculate</button>
+    </div>
+
+    <div id="whatifStatus" style="display:none; padding:10px 14px; border-radius:8px; font-size:14px; margin-bottom:12px;"></div>
+
+    <div id="whatifResult" style="display:none;">
+      <p class="whatif-entry-note" id="whatifEntryNote"></p>
+      <div class="whatif-stats" id="whatifStats"></div>
+
+      <div class="chart-section" style="margin-top:4px;">
+        <div class="chart-header">
+          <span>Portfolio Value Over Time</span>
+        </div>
+        <canvas id="whatifChart" height="100"></canvas>
       </div>
-
-      <div id="whatifStatus" style="display:none; padding:10px 14px; border-radius:8px; font-size:14px; margin-bottom:12px;"></div>
-
-      <div id="whatifResult" style="display:none;">
-        <p class="whatif-entry-note" id="whatifEntryNote"></p>
-        <div class="whatif-stats" id="whatifStats"></div>
-      </div>
+    </div>
     </div>
 
     <!-- ── Learn Panel ── -->
@@ -580,8 +641,7 @@
       if (priceChart)        { priceChart.destroy(); priceChart = null; }
       if (whatifChart)       { whatifChart.destroy(); whatifChart = null; }
       document.getElementById('whatifResult').style.display = 'none';
-      document.getElementById('whatifShares').value = '';
-      document.getElementById('whatifDate').value = '';
+      document.getElementById('whatifAmount').value = '';
       document.getElementById('whatifCard').style.display = 'none';
 
       let data;
@@ -956,74 +1016,164 @@
       el.style.color = type === 'error' ? '#fca5a5' : '#6ee7b7';
     }
 
-    async function calcWhatIf() {
+   function calcWhatIf() {
       try {
         document.getElementById('whatifStatus').style.display = 'none';
 
-        const shares = parseFloat(document.getElementById('whatifShares').value);
-        const date = document.getElementById('whatifDate').value;
+        const amount = parseFloat(document.getElementById('whatifAmount').value);
 
         if (!currentTicker) {
           setWhatifStatus('Search for a stock first.', 'error');
           return;
         }
 
-        if (!shares || shares <= 0) {
-          setWhatifStatus('Please enter a valid number of shares greater than 0.', 'error');
+        if (!amount || amount <= 0) {
+          setWhatifStatus('Please enter a dollar amount greater than 0.', 'error');
           return;
         }
 
-        if (!date) {
-          setWhatifStatus('Please choose a purchase date.', 'error');
+        if (!allChartPoints || allChartPoints.length === 0) {
+          setWhatifStatus('Historical price data is not loaded yet. Try searching the stock again.', 'error');
           return;
         }
 
-        const res = await fetch('/stocks/' + currentTicker + '/what-if?shares=' 
-          + encodeURIComponent(shares) 
-          + '&date=' 
-          + encodeURIComponent(date));
+        const period = document.getElementById('whatifPeriod').value;
 
-        if (res.status === 401) {
-          window.location.href = '/index.html';
+        let slice = allChartPoints;
+        if (period !== 'all') {
+          const n = parseInt(period);
+          slice = allChartPoints.slice(Math.max(0, allChartPoints.length - n));
+        }
+
+        if (slice.length < 2) {
+          setWhatifStatus('Not enough data for this time period. Try a different range.', 'error');
           return;
         }
 
-        if (!res.ok) {
-          const msg = await res.text();
-          setWhatifStatus(msg || 'Could not calculate what-if result.', 'error');
-          return;
-        }
+        const entryPrice = Number(slice[0].close);
+        const exitPrice = Number(slice[slice.length - 1].close);
 
-        const data = await res.json();
+        const shares = amount / entryPrice;
+        const currentValue = shares * exitPrice;
+        const gain = currentValue - amount;
+        const percentReturn = (gain / amount) * 100;
 
-        const gainCls = data.dollarChange >= 0 ? 'positive' : 'negative';
-        const sign = data.dollarChange >= 0 ? '+' : '';
+        const gainCls = gain >= 0 ? 'positive' : 'negative';
+        const sign = gain >= 0 ? '+' : '';
 
         document.getElementById('whatifEntryNote').textContent =
-          'If you bought ' + data.shares + ' shares of ' + data.ticker +
-          ' on ' + data.purchaseDate + ', this is how the position would compare today.';
+          'If you bought on ' + slice[0].label + ' at ' + money(entryPrice) +
+          '/share, you would have gotten ' + num(shares, 4) + ' shares.';
 
         document.getElementById('whatifStats').innerHTML = `
           <div class="stat">
-            <div class="label">Original Value</div>
-            <div class="value">${money(data.originalValue)}</div>
+            <div class="label">Invested</div>
+            <div class="value">${money(amount)}</div>
           </div>
           <div class="stat">
             <div class="label">Current Value</div>
-            <div class="value">${money(data.currentValue)}</div>
+            <div class="value">${money(currentValue)}</div>
           </div>
           <div class="stat">
             <div class="label">Gain / Loss</div>
-            <div class="value"><span class="${gainCls}">${sign}${money(data.dollarChange)}</span></div>
+            <div class="value"><span class="${gainCls}">${sign}${money(Math.abs(gain))}</span></div>
           </div>
           <div class="stat">
-            <div class="label">Price Change</div>
-            <div class="value"><span class="${gainCls}">${pct(data.percentChange)}</span></div>
+            <div class="label">Total Return</div>
+            <div class="value"><span class="${gainCls}">${sign}${num(Math.abs(percentReturn), 2)}%</span></div>
           </div>
         `;
 
+        const labels = slice.map(p => p.label);
+        const values = slice.map(p => Number((shares * Number(p.close)).toFixed(2)));
+        const baseline = labels.map(() => amount);
+
+        const lineColor = gain >= 0 ? '#00ff88' : '#ff4f4f';
+        const fillColor = gain >= 0 ? 'rgba(0,255,136,0.08)' : 'rgba(255,79,79,0.08)';
+
         document.getElementById('whatifResult').style.display = 'block';
-        document.getElementById('whatifResult').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        if (whatifChart) {
+          whatifChart.data.labels = labels;
+          whatifChart.data.datasets[0].data = values;
+          whatifChart.data.datasets[0].borderColor = lineColor;
+          whatifChart.data.datasets[0].backgroundColor = fillColor;
+          whatifChart.data.datasets[1].data = baseline;
+          whatifChart.update('none');
+        } else {
+          const ctx = document.getElementById('whatifChart').getContext('2d');
+
+          whatifChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [
+                {
+                  label: 'Portfolio Value',
+                  data: values,
+                  borderColor: lineColor,
+                  backgroundColor: fillColor,
+                  borderWidth: 2,
+                  pointRadius: 0,
+                  fill: true,
+                  tension: 0.3
+                },
+                {
+                  label: 'Amount Invested',
+                  data: baseline,
+                  borderColor: 'rgba(255,255,255,0.25)',
+                  borderDash: [5, 4],
+                  borderWidth: 1.5,
+                  pointRadius: 0,
+                  fill: false,
+                  tension: 0
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              animation: false,
+              plugins: {
+                legend: {
+                  display: true,
+                  labels: {
+                    color: '#94a3b8',
+                    font: { size: 11 },
+                    boxWidth: 14
+                  }
+                },
+                tooltip: {
+                  callbacks: {
+                    label: item => money(item.parsed.y)
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    color: '#475569',
+                    maxTicksLimit: 6,
+                    font: { size: 11 }
+                  },
+                  grid: { color: '#1e293b' }
+                },
+                y: {
+                  ticks: {
+                    color: '#475569',
+                    callback: val => money(val, 0),
+                    font: { size: 11 }
+                  },
+                  grid: { color: '#1e293b' }
+                }
+              }
+            }
+          });
+        }
+
+        document.getElementById('whatifResult').scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
 
       } catch (e) {
         setWhatifStatus('Error: ' + e.message, 'error');

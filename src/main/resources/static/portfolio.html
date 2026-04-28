@@ -356,7 +356,6 @@
           <td class="${cls}">${pct(percentChange, 2)}</td>
           <td>
             <button class="btn-sell" onclick="openSellModal(${inv.investmentId}, '${inv.ticker}')">Sell</button>
-            <button class="btn-remove" onclick="removeInvestment(${inv.investmentId}, '${inv.ticker}')">Remove</button>
           </td>`;
         tbody.appendChild(row);
       }
@@ -417,31 +416,6 @@
           '. New cash balance: ' + money(portfolioData.cashBalance, 2) +
           '. Portfolio value: ' + money(portfolioData.totalValue, 2) + '.',
           'success'
-        );
-      } else {
-        showModalError(await res.text());
-      }
-    }
-
-    async function removeInvestment(investmentId, ticker) {
-      if (!confirm('Remove ' + ticker + ' from your portfolio? (No cash impact)')) return;
-
-      const res = await fetch('/portfolio/' + investmentId, { method: 'DELETE' });
-
-      if (res.status === 401) {
-        window.location.href = '/index.html';
-        return;
-      }
-
-      if (res.ok) {
-        portfolioData = await res.json();
-        renderPortfolio(portfolioData);
-
-        showPortfolioNotice(
-          'Removed ' + ticker + ' from your portfolio. Cash balance unchanged: ' +
-          money(portfolioData.cashBalance, 2) +
-          '. Portfolio value: ' + money(portfolioData.totalValue, 2) + '.',
-          'info'
         );
       } else {
         showModalError(await res.text());
