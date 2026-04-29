@@ -1,20 +1,9 @@
 {
   "username": "bob",
   "password": "password2",
-  "cashBalance": 1501227.5623611468,
+  "cashBalance": 1500936.682361147,
   "portfolio": {
     "investments": [
-      {
-        "investmentId": 10,
-        "ticker": "DXCM",
-        "companyName": "Dexcom Inc.",
-        "purchaseDate": "2026-04-27",
-        "shares": 16.0,
-        "purchasePrice": 61.4,
-        "amountInvested": 982.4,
-        "currentPrice": 59.32,
-        "investmentType": 0
-      },
       {
         "investmentId": 12,
         "ticker": "AMZN",
@@ -47,35 +36,38 @@
         "amountInvested": 500.0,
         "currentPrice": 270.71,
         "investmentType": 0
+      },
+      {
+        "investmentId": 16,
+        "ticker": "F",
+        "companyName": "Ford Motor Company",
+        "purchaseDate": "2026-04-28",
+        "shares": 100.0,
+        "purchasePrice": 12.4,
+        "amountInvested": 1240.0,
+        "currentPrice": 12.4,
+        "investmentType": 0
       }
     ],
-    "nextInvestmentID": 16
+    "nextInvestmentID": 17
   },
   "transactionLog": {
     "transactionLog": [
       {
         "transactionDate": "2026-04-28",
-        "transactionType": "Sell",
-        "ticker": "AAPL",
-        "shares": 7.1273742741073676E-9,
-        "transactionPrice": 270.71,
-        "amountInvested": 1.929451489743605E-6
+        "transactionType": "Buy",
+        "ticker": "F",
+        "shares": 100.0,
+        "transactionPrice": 12.4,
+        "amountInvested": 1240.0
       },
       {
         "transactionDate": "2026-04-28",
         "transactionType": "Sell",
         "ticker": "DXCM",
-        "shares": 29.97,
+        "shares": 16.0,
         "transactionPrice": 59.32,
-        "amountInvested": 1777.8203999999998
-      },
-      {
-        "transactionDate": "2026-04-28",
-        "transactionType": "Sell",
-        "ticker": "DXCM",
-        "shares": 318.69706840390876,
-        "transactionPrice": 59.32,
-        "amountInvested": 18905.11009771987
+        "amountInvested": 949.12
       }
     ]
   }
