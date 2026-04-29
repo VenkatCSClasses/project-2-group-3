@@ -64,20 +64,32 @@ public class UserTrading {
             return false;
         }
 
-        if (sharesToSell <= 0 || sharesToSell > investment.getShares()) {
+        final double EPSILON = 0.000001;
+
+        double ownedShares = investment.getShares();
+
+        if (sharesToSell <= 0 || sharesToSell > ownedShares + EPSILON) {
             return false;
+        }
+
+        // If the requested sale is basically the whole position, force it to exact full shares.
+        // This prevents tiny leftovers like 0.00000000003 from staying in the portfolio.
+        if (Math.abs(sharesToSell - ownedShares) <= EPSILON) {
+            sharesToSell = ownedShares;
         }
 
         double proceeds = sharesToSell * livePrice;
         user.setCashBalance(user.getCashBalance() + proceeds);
 
         investment.removeShares(sharesToSell);
+
         Transaction newTransaction = new Transaction("Sell", ticker, sharesToSell, livePrice, proceeds);
         user.getTransactionLog().addTransaction(newTransaction);
 
-        if (investment.getShares() <= 0) {
+        if (investment.getShares() <= EPSILON) {
             user.getPortfolio().removeInvestment(investment);
         }
+
         return true;
     }
 

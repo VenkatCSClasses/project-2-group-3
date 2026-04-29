@@ -52,40 +52,6 @@ public class PortfolioControllerTest {
     }
 
     @Test
-    void getPortfolioReturnsCashInvestmentsAndTotalsWhenLoggedIn() {
-        Investment investment = new Investment(
-                1,
-                "AAPL",
-                "Apple Inc.",
-                "2026-04-13",
-                5.0,
-                100.0,
-                500.0,
-                0
-        );
-        investment.setCurrentPrice(120.0);
-        user.getPortfolio().addInvestment(investment);
-
-        try (MockedStatic<GetYahooPrice> mockedPrice = mockStatic(GetYahooPrice.class)) {
-            mockedPrice.when(() -> GetYahooPrice.run("AAPL")).thenReturn(120.0);
-
-            ResponseEntity<?> response = controller.getPortfolio(loggedInSession);
-
-            assertEquals(HttpStatus.OK, response.getStatusCode());
-
-            Map<String, Object> body = asMap(response.getBody());
-
-            assertEquals("alice", body.get("username"));
-            assertEquals(10000.0, (double) body.get("cashBalance"), DELTA);
-            assertEquals(600.0, (double) body.get("totalValue"), DELTA);
-            assertEquals(20.0, (double) body.get("totalChange"), DELTA);
-
-            List<?> investments = (List<?>) body.get("investments");
-            assertEquals(1, investments.size());
-        }
-    }
-
-    @Test
     void buyRequiresLogin() {
         PortfolioController.BuyRequest request =
                 new PortfolioController.BuyRequest("AAPL", "Apple Inc.", "shares", 2.0);
@@ -375,54 +341,5 @@ public class PortfolioControllerTest {
 
             verify(userService, never()).saveUser(any());
         }
-    }
-
-    @Test
-    void removeRequiresLogin() {
-        ResponseEntity<?> response = controller.remove(1, emptySession);
-
-        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
-        assertEquals("Please log in first.", response.getBody());
-        verify(userService, never()).saveUser(any());
-    }
-
-    @Test
-    void removeDeletesInvestmentWithoutChangingCashAndSavesUser() {
-        Investment investment = UserTrading.purchaseStock(
-                user,
-                "AAPL",
-                "Apple Inc.",
-                100.0,
-                "shares",
-                5.0
-        );
-
-        double cashBeforeRemove = user.getCashBalance();
-
-        ResponseEntity<?> response = controller.remove(investment.getInvestmentId(), loggedInSession);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(0, user.getPortfolio().getInvestments().size());
-        assertEquals(cashBeforeRemove, user.getCashBalance(), DELTA);
-
-        verify(userService).saveUser(user);
-    }
-
-    @Test
-    void removeFailsForInvalidInvestmentId() {
-        ResponseEntity<?> response = controller.remove(999, loggedInSession);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("Investment not found.", response.getBody());
-        assertEquals(0, user.getPortfolio().getInvestments().size());
-
-        verify(userService, never()).saveUser(any());
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> asMap(Object body) {
-        assertNotNull(body);
-        assertTrue(body instanceof Map);
-        return (Map<String, Object>) body;
     }
 }

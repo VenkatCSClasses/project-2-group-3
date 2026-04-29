@@ -366,6 +366,7 @@
       sellTicker = ticker;
       document.getElementById('modalTicker').textContent = ticker;
       document.getElementById('sellMethod').value = 'shares';
+      document.getElementById('amountLabel').textContent = 'Shares';
       document.getElementById('sellAmount').value = '';
       document.getElementById('modalFeedback').style.display = 'none';
       document.getElementById('sellModal').classList.add('open');
@@ -377,17 +378,27 @@
       sellInvestmentId = null;
     }
 
-    function setSellAll() { document.getElementById('sellMethod').value = 'all'; }
+    function setSellAll() {
+      const inv = portfolioData?.investments?.find(i => i.investmentId === sellInvestmentId);
+
+      if (!inv) {
+        showModalError('Investment not found.');
+        return;
+      }
+
+      document.getElementById('sellMethod').value = 'shares';
+      document.getElementById('amountLabel').textContent = 'Shares';
+      document.getElementById('sellAmount').value = inv.shares;
+      document.getElementById('modalFeedback').style.display = 'none';
+    }
 
     async function confirmSell() {
       const method = document.getElementById('sellMethod').value;
-      let amount;
-      if (method === 'all') {
-        const inv = portfolioData.investments.find(i => i.investmentId === sellInvestmentId);
-        amount = inv ? inv.shares : 0;
-      } else {
-        amount = parseFloat(document.getElementById('sellAmount').value);
-        if (!amount || amount <= 0) { showModalError('Enter a valid amount.'); return; }
+      const amount = parseFloat(document.getElementById('sellAmount').value);
+
+      if (!amount || amount <= 0) {
+        showModalError('Enter a valid amount.');
+        return;
       }
 
       const res = await fetch('/portfolio/sell', {
@@ -396,11 +407,10 @@
         body: JSON.stringify({
           investmentId: sellInvestmentId,
           ticker: sellTicker,
-          method: method === 'all' ? 'shares' : method,
+          method,
           amount
         })
       });
-
       if (res.status === 401) { window.location.href = '/index.html'; return; }
       if (res.ok) {
         const oldCash = portfolioData.cashBalance;
